@@ -22,5 +22,6 @@ urlpatterns = [
     path('query', views.query, name='query'),
     path('data_base', views.data_base, name='data_base'),
     path('data_set', views.data_set, name='data_set'),
-    path('download_csv', views.download_csv, name='download_csv'),
+    path('visualize', views.visualize, name='visualize'),
+    path('download_json', views.download_json, name='download_json'),
 ]

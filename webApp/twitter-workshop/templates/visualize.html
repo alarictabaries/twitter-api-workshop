@@ -1,0 +1,54 @@
+{% include "header.html" with subtitle="Visualize" %}
+
+<div class="content">
+
+  <div class="title">
+
+    <div class="toggle-nav">
+      <i class="material-icons">chevron_right</i>
+    </div>
+
+    <i class="material-icons">bubble_chart</i> Visualize : {{ header.2 }}
+
+  </div>
+
+  <div class="sub-content full">
+
+    <!--<p>
+      You can explore the selected data set and visualize information about it by clicking on the links below.<br />
+      <i>Data set header : {{header.1}} (filename), {{header.2}} (subject), {{header.3}} (count), {{header.4}} (language), {{header.5}} (RT included), {{header.6}} (creation date).</i>
+    </p>
+
+      <div class="actions">
+        <a href="#"><i class="material-icons">bubble_chart</i>Visualize</a>
+        <a href="#"><i class="material-icons">graphic_eq</i>View processed data</a>
+        <a href="{{url}}"><i class="material-icons">open_in_new</i>Export to CSV</a>
+        <input id="tw-search" class="field" placeholder="search"/>
+      </div>
+
+     -->
+
+      <canvas class="graph full"></canvas>
+
+      {% for entity in entities %}
+
+        {{ entity.0 }} - {{ entity.1 }} ->
+            {% for mention in entity.2 %}
+
+                {{ mention.0 }} - {{ mention.1 }} /
+
+            {% endfor %}
+
+        <br />
+
+      {% endfor %}
+
+
+  </>
+
+</div>
+
+</div>
+
+</body>
+</html>

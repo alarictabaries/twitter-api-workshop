@@ -149,6 +149,15 @@ select {
   border: 0;
 }
 
+.graph {
+  display: block;
+}
+
+.graph.full {
+  width: 100%;
+  height: calc(100vh - 45px);
+}
+
 @media only screen and (max-width: 580px) {
   input:after {
     content: '\A';

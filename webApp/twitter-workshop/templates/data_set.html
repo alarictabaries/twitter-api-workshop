@@ -16,13 +16,13 @@
 
     <p>
       You can explore the selected data set and visualize information about it by clicking on the links below.<br />
-      <i>Data set header : {{header.1}} (filename), {{header.2}} (subject), {{header.3}} (count), {{header.4}} (language), {{header.5}} (creation date)</i>
+      <i>Data set header : {{header.1}} (filename), {{header.2}} (subject), {{header.3}} (count), {{header.4}} (language), {{header.5}} (RT included), {{header.6}} (creation date).</i>
     </p>
 
       <div class="actions">
-        <a href="#"><i class="material-icons">bubble_chart</i>Visualize</a>
+        <a href="visualize?seed={{header.0}}"><i class="material-icons">bubble_chart</i>Visualize</a>
         <a href="#"><i class="material-icons">graphic_eq</i>View processed data</a>
-        <a href="{{url}}"><i class="material-icons">open_in_new</i>Export to CSV</a>
+        <a href="download_json?seed={{header.0}}"><i class="material-icons">open_in_new</i>Export to JSON</a>
         <input id="tw-search" class="field" placeholder="search"/>
       </div>
 
