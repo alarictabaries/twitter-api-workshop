@@ -1,0 +1,51 @@
+{% include "header.html" with subtitle="Data set" %}
+
+<div class="content">
+
+  <div class="title">
+
+    <div class="toggle-nav">
+      <i class="material-icons">chevron_right</i>
+    </div>
+
+    <i class="material-icons">list</i> Data set : {{ header.2 }}
+
+  </div>
+
+  <div class="sub-content">
+
+    <p>
+      You can explore the selected data set and visualize information about it by clicking on the links below.<br />
+      <i>Data set header : {{header.1}} (filename), {{header.2}} (subject), {{header.3}} (count), {{header.4}} (language), {{header.5}} (creation date)</i>
+    </p>
+
+      <div class="actions">
+        <a href="#"><i class="material-icons">bubble_chart</i>Visualize</a>
+        <a href="#"><i class="material-icons">graphic_eq</i>View processed data</a>
+        <a href="{{url}}"><i class="material-icons">open_in_new</i>Export to CSV</a>
+        <input id="tw-search" class="field" placeholder="search"/>
+      </div>
+
+      <table class="list">
+        <tr class="top">
+          <th>Text</th>
+          <th>Author</th>
+          <th>Date</th>
+        </tr>
+          {% for tweet in data %}
+        <tr>
+          <td class="text"><a target="_BLANK" href="https://twitter.com/{{ tweet.4 }}/status/{{ tweet.2 }}">{{ tweet.1 }}</a></td>
+          <td class="alias"><a target="_BLANK" href="https://twitter.com/intent/user?user_id={{ tweet.4 }}">@{{ tweet.3 }}</a></td>
+          <td class="date">{{ tweet.5 }}</td>
+        </tr>
+          {% endfor %}
+      </table>
+
+  </div>
+
+</div>
+
+</div>
+
+</body>
+</html>

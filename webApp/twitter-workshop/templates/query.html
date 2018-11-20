@@ -1,0 +1,32 @@
+{% include "header.html" with subtitle="Create a query" %}
+
+<div class="content">
+
+    <div class="title">
+
+        <div class="toggle-nav">
+            <i class="material-icons">chevron_right</i>
+        </div>
+
+        <i class="material-icons">search</i> Create a query
+
+    </div>
+
+    <div class="sub-content">
+
+        <p>Fill the form bellow to generate a data set meeting your search criteria. <br />Due to the API limit rate, this application can scrape up to 2,665 tweets per 15 minutes.</p>
+
+        <form action="" method="post">
+            {% csrf_token %}
+            {{ form|linebreaksbr }}
+            <input type="submit" value="Query">
+        </form>
+
+    </div>
+
+</div>
+
+</div>
+
+</body>
+</html>
