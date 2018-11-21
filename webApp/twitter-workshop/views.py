@@ -103,4 +103,22 @@ def visualize(request):
             entities.append([tweet["user"]["screen_name"], tweet["user"]["id_str"], mentions])
         json_data.close()
 
-    return render(request, 'visualize.html', {'header': header, 'entities': entities})
+    engaged_entities = []
+    tmp_entities = []
+
+    for tweet in entities:
+        for engaged in tweet[2]:
+            if engaged[0] in tmp_entities:
+                index = tmp_entities.index(engaged[0])
+                engaged_entities[index][2] = engaged_entities[index][2] + 1
+            else:
+                tmp_entities.append(engaged[0])
+                engaged_entities.append([engaged[0], engaged[1], 1])
+
+        engaged_entities = sorted(engaged_entities, key=lambda x: x[2], reverse=True)
+
+        # top can be reworked
+        # it actually return the 15 first without paying attention to the count column
+        top_engaged_entities = engaged_entities[:15]
+
+    return render(request, 'visualize.html', {'header': header, 'entities': top_engaged_entities})

@@ -149,6 +149,8 @@ select {
   border: 0;
 }
 
+/* Graphs */
+
 .graph {
   display: block;
 }

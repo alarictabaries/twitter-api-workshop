@@ -1,4 +1,5 @@
-{% include "header.html" with subtitle="Visualize" %}
+{% include "header.html" with subtitle="Visualize" d3js="bubbles.js"%}
+
 
 <div class="content">
 
@@ -28,27 +29,30 @@
 
      -->
 
-      <canvas class="graph full"></canvas>
-
-      {% for entity in entities %}
-
-        {{ entity.0 }} - {{ entity.1 }} ->
-            {% for mention in entity.2 %}
-
-                {{ mention.0 }} - {{ mention.1 }} /
-
-            {% endfor %}
-
-        <br />
-
-      {% endfor %}
-
-
-  </>
+      <div class="graph full"></div>
 
 </div>
 
 </div>
+
+<script>
+    var data_set = {{ entities|safe }};
+    console.log(data_set);
+
+
+
+    $(document).ready(function(){
+
+        graph = d3.select(".graph").append("svg").attr("width","100%").attr("height", "100%");
+
+        /* viewbox svg centrée? "+ var +" */
+
+        basis = graph.selectAll("g node").data(data_set);
+        node = basis.enter().append("g").attr("transform", function(d){return "translate("+d[2]+",80)"});
+        circle = node.append("circle").attr("r", function (d) { return d[2]/2; }).attr("fill", "#3498db");
+        text = node.append("text").text(function (d) { return d[1]; }); /* .attr("dx", function(d){return d[2]/2;}) */
+    })
+</script>
 
 </body>
 </html>
