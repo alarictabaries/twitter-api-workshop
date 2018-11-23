@@ -15,20 +15,6 @@
 
   <div class="sub-content full">
 
-    <!--<p>
-      You can explore the selected data set and visualize information about it by clicking on the links below.<br />
-      <i>Data set header : {{header.1}} (filename), {{header.2}} (subject), {{header.3}} (count), {{header.4}} (language), {{header.5}} (RT included), {{header.6}} (creation date).</i>
-    </p>
-
-      <div class="actions">
-        <a href="#"><i class="material-icons">bubble_chart</i>Visualize</a>
-        <a href="#"><i class="material-icons">graphic_eq</i>View processed data</a>
-        <a href="{{url}}"><i class="material-icons">open_in_new</i>Export to CSV</a>
-        <input id="tw-search" class="field" placeholder="search"/>
-      </div>
-
-     -->
-
       <div class="graph full"></div>
 
 </div>
@@ -36,22 +22,24 @@
 </div>
 
 <script>
-    var data_set = {{ entities|safe }};
+
+    function IsJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+    }
+
+    var data_set = {{ interactions|safe }};
     console.log(data_set);
-
-
+    console.log(IsJsonString(data_set));
 
     $(document).ready(function(){
 
-        graph = d3.select(".graph").append("svg").attr("width","100%").attr("height", "100%");
-
-        /* viewbox svg centrée? "+ var +" */
-
-        basis = graph.selectAll("g node").data(data_set);
-        node = basis.enter().append("g").attr("transform", function(d){return "translate("+d[2]+",80)"});
-        circle = node.append("circle").attr("r", function (d) { return d[2]/2; }).attr("fill", "#3498db");
-        text = node.append("text").text(function (d) { return d[1]; }); /* .attr("dx", function(d){return d[2]/2;}) */
     })
+
 </script>
 
 </body>

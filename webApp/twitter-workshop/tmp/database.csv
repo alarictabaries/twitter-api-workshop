@@ -1,3 +1,5 @@
 seed,filename,query,count,rt,lang,creation_date
-F25AACDA,tweets_F25AACDA.json,Macron,8,True,fr,2018-11-20 15:07
-C5BA0E4A,tweets_C5BA0E4A.json,Macron,7800,True,fr,2018-11-20 16:17
+1EDC84FC,tweets_1EDC84FC.json,Macron,13300,True,fr,2018-11-20 17:55
+03741685,tweets_03741685.json,Macron,25000,True,fr,2018-11-20 19:56
+5B1E91E2,tweets_5B1E91E2.json,Macron,2500,True,fr,2018-11-23 19:53
+

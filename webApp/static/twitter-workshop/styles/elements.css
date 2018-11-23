@@ -139,11 +139,11 @@ input[type="number"] {
 select {
   color: #34495e;
   text-decoration: none;
-  font-size: 12px;
+  font-size: 12px !important;
   background: rgba(236,240,241 ,1);
   border-top-right-radius: 2px;
   border-bottom-right-radius: 2px;
-  padding: 7px 12px;
+  padding: 8px 12px;
   margin-right: 12px;
   margin-bottom: 12px;
   border: 0;

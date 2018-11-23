@@ -1,8 +1,10 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.http import JsonResponse
 
 import pandas as pd
+import json
 import re
 
 from .parts import TwitterQuery
@@ -78,7 +80,6 @@ def download_json(request):
 
     return response
 
-
 # /visualize
 def visualize(request):
 
@@ -91,34 +92,64 @@ def visualize(request):
         if row[0] == request.GET['seed']:
             header = row
 
-    entities = []
+    interactions = {}
+    nodes = []
+    links = []
 
     with open("twitter-workshop/tmp/" + file) as json_data:
         data = json.load(json_data)
         for tweet in data:
-            mentions = []
+            tmp_node = {}
+            tmp_node["id"] = tweet["user"]["id"]
+            tmp_node["alias"] = tweet["user"]["screen_name"]
+            tmp_node["type"] = 1 # 1 for author (active)
+            nodes.append(tmp_node)
             for user in tweet['entities']['user_mentions']:
                 if user:
-                    mentions.append([user['id_str'], user['screen_name']])
-            entities.append([tweet["user"]["screen_name"], tweet["user"]["id_str"], mentions])
+                    tmp_node = {}
+                    tmp_link = {}
+                    tmp_link["source"] = tweet["user"]["id"]
+                    tmp_link["target"] = user['id']
+                    tmp_link["value"] = 1
+                    tmp_node["id"] = user['id']
+                    tmp_node["alias"] = user["screen_name"]
+                    tmp_node["type"] = 2  # 2 for mention (inactive)
+                    nodes.append(tmp_node)
+                    links.append(tmp_link)
         json_data.close()
 
-    engaged_entities = []
-    tmp_entities = []
+        unique_nodes = []
+        for node in nodes :
+            duplicated = 0
+            tmp_node = {}
+            tmp_node["id"] = node["id"]
+            tmp_node["alias"] = node["alias"]
+            tmp_node["type"] = node["type"]
+            for unique_node in unique_nodes:
+                if(node["id"] == unique_node["id"]) and (node["type"] == unique_node["type"]):
+                    duplicated += 1
+            if duplicated == 0:
+                unique_nodes.append(tmp_node)
 
-    for tweet in entities:
-        for engaged in tweet[2]:
-            if engaged[0] in tmp_entities:
-                index = tmp_entities.index(engaged[0])
-                engaged_entities[index][2] = engaged_entities[index][2] + 1
-            else:
-                tmp_entities.append(engaged[0])
-                engaged_entities.append([engaged[0], engaged[1], 1])
+        # Unique links ? what if a same user tweets 5 times "@mention wtf", should we keep it?
 
-        engaged_entities = sorted(engaged_entities, key=lambda x: x[2], reverse=True)
+        unique_links = []
+        for link in links:
+            duplicated = 0
+            tmp_link = {}
+            tmp_link["source"] = link["source"]
+            tmp_link["target"] = link["target"]
+            tmp_link["value"] = link["value"]
+            for unique_link in unique_links:
+                if (link["source"] == unique_link["source"]) and (link["target"] == unique_link["target"]):
+                    duplicated += 1
+            if duplicated == 0:
+                unique_links.append(tmp_link)
 
-        # top can be reworked
-        # it actually return the 15 first without paying attention to the count column
-        top_engaged_entities = engaged_entities[:15]
+        nodes = unique_nodes
+        links = unique_links
 
-    return render(request, 'visualize.html', {'header': header, 'entities': top_engaged_entities})
+        interactions["nodes"] = nodes
+        interactions["links"] = links
+
+    return render(request, 'visualize.html', {'header': header, 'interactions': interactions})
