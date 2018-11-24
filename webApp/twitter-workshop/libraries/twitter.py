@@ -38,7 +38,7 @@ def scrape_twitter(query, count, rt, lang):
                    [seed, query_file, query, count, rt, lang, date_now.strftime("%Y-%m-%d %H:%M")])
 
     with open("twitter-workshop/tmp/" + query_file, 'w') as outfile:
-        json.dump(tweets, outfile)
+        json.dump(tweets, outfile, indent=4, sort_keys=True)
         outfile.close()
     return seed
 

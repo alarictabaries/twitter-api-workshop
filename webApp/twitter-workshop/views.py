@@ -80,6 +80,7 @@ def download_json(request):
 
     return response
 
+
 # /visualize
 def visualize(request):
 
@@ -99,21 +100,12 @@ def visualize(request):
     with open("twitter-workshop/tmp/" + file) as json_data:
         data = json.load(json_data)
         for tweet in data:
-            tmp_node = {}
-            tmp_node["id"] = tweet["user"]["id"]
-            tmp_node["alias"] = tweet["user"]["screen_name"]
-            tmp_node["type"] = 1 # 1 for author (active)
+            tmp_node = {"id": tweet["user"]["id"], "alias": tweet["user"]["screen_name"], "type": 1, "freq":1}
             nodes.append(tmp_node)
             for user in tweet['entities']['user_mentions']:
                 if user:
-                    tmp_node = {}
-                    tmp_link = {}
-                    tmp_link["source"] = tweet["user"]["id"]
-                    tmp_link["target"] = user['id']
-                    tmp_link["value"] = 1
-                    tmp_node["id"] = user['id']
-                    tmp_node["alias"] = user["screen_name"]
-                    tmp_node["type"] = 2  # 2 for mention (inactive)
+                    tmp_node = {"id" : user['id'], "alias" : user["screen_name"], "type" : 2, "freq":1}
+                    tmp_link = {"source": tweet["user"]["id"], "target": user['id'], "value": 1}
                     nodes.append(tmp_node)
                     links.append(tmp_link)
         json_data.close()
@@ -121,14 +113,17 @@ def visualize(request):
         unique_nodes = []
         for node in nodes :
             duplicated = 0
-            tmp_node = {}
-            tmp_node["id"] = node["id"]
-            tmp_node["alias"] = node["alias"]
-            tmp_node["type"] = node["type"]
+            active = 0
             for unique_node in unique_nodes:
                 if(node["id"] == unique_node["id"]) and (node["type"] == unique_node["type"]):
                     duplicated += 1
+                if (node["id"] == unique_node["id"]) and (node["type"] == 1):
+                    active = 1
             if duplicated == 0:
+                if active == 1:
+                    tmp_node = {"id": node["id"], "alias": node["alias"], "type": 1, "freq": node["freq"]}
+                else:
+                    tmp_node = {"id": node["id"], "alias": node["alias"], "type": node["type"], "freq": node["freq"]}
                 unique_nodes.append(tmp_node)
 
         # Unique links ? what if a same user tweets 5 times "@mention wtf", should we keep it?
@@ -136,10 +131,7 @@ def visualize(request):
         unique_links = []
         for link in links:
             duplicated = 0
-            tmp_link = {}
-            tmp_link["source"] = link["source"]
-            tmp_link["target"] = link["target"]
-            tmp_link["value"] = link["value"]
+            tmp_link = {"source": link["source"], "target": link["target"], "value": link["value"]}
             for unique_link in unique_links:
                 if (link["source"] == unique_link["source"]) and (link["target"] == unique_link["target"]):
                     duplicated += 1
@@ -149,7 +141,16 @@ def visualize(request):
         nodes = unique_nodes
         links = unique_links
 
+        for link in unique_links:
+            for node in nodes:
+                if node["id"] == link["target"]:
+                    node["freq"] += 1
+
         interactions["nodes"] = nodes
         interactions["links"] = links
+
+        # Develop a "caching system" ?
+        with open('twitter-workshop/tmp/interactions_' + request.GET['seed'] + ".json", 'w') as outfile:
+            json.dump(interactions, outfile, indent=4, sort_keys=True)
 
     return render(request, 'visualize.html', {'header': header, 'interactions': interactions})

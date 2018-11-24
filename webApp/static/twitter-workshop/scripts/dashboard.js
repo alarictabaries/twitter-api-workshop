@@ -24,6 +24,10 @@ $( document ).ready(function() {
         toggleNavbar(mobileScreen, "right");
     });
 
+    $("p.full").click(function() {
+        $("p.full").fadeToggle(120)
+    });
+
 });
 
 (function ($) {
