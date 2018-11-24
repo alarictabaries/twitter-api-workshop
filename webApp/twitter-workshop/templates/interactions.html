@@ -9,13 +9,13 @@
             <i class="material-icons">chevron_right</i>
         </div>
 
-        <i class="material-icons">bubble_chart</i> Visualize : {{ header.2 }}
+        <i class="material-icons">bubble_chart</i> Visualize interactions : {{ header.2 }}
 
     </div>
 
     <div class="sub-content full">
 
-        <p class="full">Blue nodes are active users (who tweeted at least one time), grey are inactives.<br />
+        <p class="full">Blue nodes are active users (who tweeted at least one time), grey are inactive ones.<br />
             Use the scroll wheel to zoom, hold the shift key to select nodes.</p>
 
         <div class="graph full"></div>
@@ -724,8 +724,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
             .attr("cy", function(d) { return d.y; });
     }
 
-    var brushMode = false;
-    var brushing = false;
+    var brushMode = true;
+    var brushing = true;
 
     var brush = d3v4.brush()
         .on("start", brushstarted)

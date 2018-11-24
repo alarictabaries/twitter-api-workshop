@@ -81,8 +81,8 @@ def download_json(request):
     return response
 
 
-# /visualize
-def visualize(request):
+# /interactions
+def interactions(request):
 
     file = "tweets_" + request.GET['seed'] + ".json"
     data_base = csv.get_data("twitter-workshop/tmp/database.csv",
@@ -115,7 +115,7 @@ def visualize(request):
             duplicated = 0
             active = 0
             for unique_node in unique_nodes:
-                if(node["id"] == unique_node["id"]) and (node["type"] == unique_node["type"]):
+                if(node["id"] == unique_node["id"]):
                     duplicated += 1
                 if (node["id"] == unique_node["id"]) and (node["type"] == 1):
                     active = 1
@@ -153,4 +153,4 @@ def visualize(request):
         with open('twitter-workshop/tmp/interactions_' + request.GET['seed'] + ".json", 'w') as outfile:
             json.dump(interactions, outfile, indent=4, sort_keys=True)
 
-    return render(request, 'visualize.html', {'header': header, 'interactions': interactions})
+    return render(request, 'interactions.html', {'header': header, 'interactions': interactions})
