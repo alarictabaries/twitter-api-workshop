@@ -187,6 +187,23 @@ circle.inactive {
   fill:#7f8c8d;
 }
 
+.card {
+  position: absolute;
+  right: 25px;
+  top: 25px;
+  background: rgba(236,240,241 ,0.6);
+  border: 0;
+  padding: 8px 12px;
+  border-radius: 2px;
+  color:#546E7A;
+  font-size: 13px;
+  display: none;
+}
+
+.card a {
+  color: #3498db;
+}
+
 @media only screen and (max-width: 580px) {
   input:after {
     content: '\A';

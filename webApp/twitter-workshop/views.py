@@ -118,13 +118,16 @@ def interactions(request):
                 if(node["id"] == unique_node["id"]):
                     duplicated += 1
                 if (node["id"] == unique_node["id"]) and (node["type"] == 1):
-                    active = 1
+                    active += 1
+
             if duplicated == 0:
-                if active == 1:
-                    tmp_node = {"id": node["id"], "alias": node["alias"], "type": 1, "freq": node["freq"]}
-                else:
-                    tmp_node = {"id": node["id"], "alias": node["alias"], "type": node["type"], "freq": node["freq"]}
+                tmp_node = {"id": node["id"], "alias": node["alias"], "type": node["type"], "freq": node["freq"]}
                 unique_nodes.append(tmp_node)
+
+            for unique_node in unique_nodes:
+                if active > 0:
+                    if unique_node["id"] == node["id"]:
+                        unique_node["type"] = 1
 
         # Unique links ? what if a same user tweets 5 times "@mention wtf", should we keep it?
 

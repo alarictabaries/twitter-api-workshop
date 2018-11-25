@@ -3,4 +3,3 @@ seed,filename,query,count,rt,lang,creation_date
 03741685,tweets_03741685.json,Macron,25000,True,fr,2018-11-20 19:56
 5B1E91E2,tweets_5B1E91E2.json,Macron,2500,True,fr,2018-11-23 19:53
 C03EE464,tweets_C03EE464.json,Macron,250,True,fr,2018-11-24 00:20
-
