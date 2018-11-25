@@ -1,7 +1,7 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.http import JsonResponse
+from django.http import HttpResponseNotAllowed
 
 import pandas as pd
 import json
@@ -19,7 +19,6 @@ import json
 # /
 def index(request):
     return render(request, 'index.html')
-
 
 # /database
 def data_base(request):

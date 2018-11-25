@@ -1,163 +1,163 @@
 /* classic */
 
 p {
-  margin-bottom: 18px;
-  font-size: 13px;
-  text-align: justify;
-  border-left: 2px solid #ecf0f1;
-  padding-left: 12px;
-  color: #2c3e50;
+    margin-bottom: 18px;
+    font-size: 13px;
+    text-align: justify;
+    border-left: 2px solid #ecf0f1;
+    padding-left: 12px;
+    color: #2c3e50;
 }
 
 p a {
-  color: #3498db;
+    color: #3498db;
 }
 
 /* table */
 
 .actions a {
-  display: inline-block;
-  color: #34495e;
-  text-decoration: none;
-  font-size: 12px;
-  background: rgba(236,240,241 ,1);
-  border-radius: 2px;
-  padding: 8px 12px;
-  margin-right: 12px;
-  margin-bottom: 12px;
+    display: inline-block;
+    color: #34495e;
+    text-decoration: none;
+    font-size: 12px;
+    background: rgba(236,240,241 ,1);
+    border-radius: 2px;
+    padding: 8px 12px;
+    margin-right: 12px;
+    margin-bottom: 12px;
 }
 
 .actions a i {
-  font-size: 12px;
-  vertical-align: -2px;
-  padding-right: 8px;
+    font-size: 12px;
+    vertical-align: -2px;
+    padding-right: 8px;
 }
 
 .actions input.field {
-  padding: 8px 12px;
-  border: 0px;
-  color: #34495e;
-  background: rgba(236,240,241 ,1);
-  font-size: 12px;
-  border-radius: 2px;
-  margin-right: 12px;
+    padding: 8px 12px;
+    border: 0px;
+    color: #34495e;
+    background: rgba(236,240,241 ,1);
+    font-size: 12px;
+    border-radius: 2px;
+    margin-right: 12px;
 }
 
 .actions input.field::placeholder {
-  font-family:"Material Icons";
-  color: #34495e;
+    font-family:"Material Icons";
+    color: #34495e;
 }
 
 .list {
-  width: 100%;
-  margin-top: 13px; /* -12px used in actions elements */
+    width: 100%;
+    margin-top: 13px; /* -12px used in actions elements */
 }
 
 .list tr.top {
-  background: rgba(52,152,219 ,0.8);
-  color: #fff;
+    background: rgba(52,152,219 ,0.8);
+    color: #fff;
 }
 
 .list th {
-  text-align: left;
-  font-size: 12px;
-  font-weight: 400;
-  padding: 8px 8px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 400;
+    padding: 8px 8px;
 }
 
 .list th:first-child {
-  border-top-left-radius: 2px;
+    border-top-left-radius: 2px;
 }
 
 .list th:last-child {
-  border-top-right-radius: 2px;
+    border-top-right-radius: 2px;
 }
 
 .list tr {
-  font-size: 13px;
-  background: rgba(236,240,241 ,0.7)
+    font-size: 13px;
+    background: rgba(236,240,241 ,0.7)
 }
 
 .list tr:nth-child(2n) {
-  background: rgba(236,240,241 ,0.2)
+    background: rgba(236,240,241 ,0.2)
 }
 
 .list tr td {
-  padding: 6px 8px;
+    padding: 6px 8px;
 }
 
 .list tr td a {
-  color: #3498db;
-  text-decoration: none;
+    color: #3498db;
+    text-decoration: none;
 }
 
 /* form */
 
 label {
-  display: inline-block;
-  color: #34495e;
-  text-decoration: none;
-  font-size: 12px;
-  background: rgba(236,240,241 ,1);
-  border-top-left-radius: 2px;
-  border-bottom-left-radius: 2px;
-  padding: 8px 12px;
-  margin-bottom: 12px;
-  padding-right: 0;
-  border: 0;
+    display: inline-block;
+    color: #34495e;
+    text-decoration: none;
+    font-size: 12px;
+    background: rgba(236,240,241 ,1);
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    padding-right: 0;
+    border: 0;
 }
 
 input[type="submit"] {display: block;
-  color: #34495e;
-  text-decoration: none;
-  font-size: 12px;
-  background: rgba(236,240,241 ,1);
-  border-radius: 2px;
-  padding: 8px 12px;
-  margin-right: 12px;
-  margin-bottom: 12px;
-  border: 0;
+    color: #34495e;
+    text-decoration: none;
+    font-size: 12px;
+    background: rgba(236,240,241 ,1);
+    border-radius: 2px;
+    padding: 8px 12px;
+    margin-right: 12px;
+    margin-bottom: 12px;
+    border: 0;
 }
 
 input {
-  color: #34495e;
-  text-decoration: none;
-  font-size: 12px;
-  background: rgba(236,240,241 ,1);
-  border-top-right-radius: 2px;
-  border-bottom-right-radius: 2px;
-  padding: 8px 12px;
-  margin-right: 12px;
-  margin-bottom: 12px;
-  border: 0;
+    color: #34495e;
+    text-decoration: none;
+    font-size: 12px;
+    background: rgba(236,240,241 ,1);
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    padding: 8px 12px;
+    margin-right: 12px;
+    margin-bottom: 12px;
+    border: 0;
 }
 
 input[type="number"] {
-  width: 75px;
+    width: 75px;
 }
 
 select {
-  color: #34495e;
-  text-decoration: none;
-  font-size: 12px !important;
-  background: rgba(236,240,241 ,1);
-  border-top-right-radius: 2px;
-  border-bottom-right-radius: 2px;
-  padding: 8px 12px;
-  margin-right: 12px;
-  margin-bottom: 12px;
-  border: 0;
+    color: #34495e;
+    text-decoration: none;
+    font-size: 12px !important;
+    background: rgba(236,240,241 ,1);
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    padding: 8px 12px;
+    margin-right: 12px;
+    margin-bottom: 12px;
+    border: 0;
 }
 
 /* Graphs */
 
 .graph {
-  display: block;
+    display: block;
 }
 
 .graph.full {
-  width: 100%;
-  height: calc(100vh - 45px);
+    width: 100%;
+    height: calc(100vh - 45px);
 }
 
 #d3_selectable_force_directed_graph svg {
@@ -167,46 +167,51 @@ select {
 }
 
 #d3_selectable_force_directed_graph .node {
-  stroke: #fff;
-  stroke-width: 1.5px;
+    stroke: #fff;
+    stroke-width: 1.5px;
 }
 
 .node .selected {
-  stroke: black;
+    stroke: black;
 }
 
 .link {
-  stroke: #bdc3c7;
+    stroke: #bdc3c7;
 }
 
 circle.active {
-  fill: #3498db;
+    fill: #3498db;
 }
 
 circle.inactive {
-  fill:#7f8c8d;
+    fill:#7f8c8d;
 }
 
 .card {
-  position: absolute;
-  right: 25px;
-  top: 25px;
-  background: rgba(236,240,241 ,0.6);
-  border: 0;
-  padding: 8px 12px;
-  border-radius: 2px;
-  color:#546E7A;
-  font-size: 13px;
-  display: none;
+    position: absolute;
+    bottom: 25px;
+    background: rgba(236,240,241 ,0.6);
+    border: 0;
+    padding: 8px 12px;
+    border-radius: 2px;
+    color:#546E7A;
+    font-size: 13px;
+    display: none;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor:pointer;
 }
 
 .card a {
-  color: #3498db;
+    color: #3498db;
 }
 
 @media only screen and (max-width: 580px) {
-  input:after {
-    content: '\A';
-    white-space: pre;
-  }
+    input:after {
+        content: '\A';
+        white-space: pre;
+    }
+    .card {
+        bottom: 75px;
+    }
 }

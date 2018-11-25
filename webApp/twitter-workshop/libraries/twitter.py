@@ -1,7 +1,6 @@
 # Operations with Twitter's API
 
 import tweepy
-import pandas as pd
 import uuid
 import datetime
 import json

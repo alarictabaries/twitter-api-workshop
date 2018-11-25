@@ -2,7 +2,6 @@
 
 import os
 from os import listdir
-from os.path import isfile, join
 
 # Return a list of files in a directory
 def list_dir(dir, prefix):

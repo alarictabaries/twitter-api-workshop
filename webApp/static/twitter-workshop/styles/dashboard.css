@@ -139,6 +139,7 @@ p.full {
   padding: 8px 12px;
   border-radius: 2px;
   color:#546E7A;
+  cursor:pointer;
 }
 
 @media only screen and (max-width: 580px) {
