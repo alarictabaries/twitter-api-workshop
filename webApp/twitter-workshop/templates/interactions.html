@@ -31,6 +31,7 @@
 </div>
 
 <script>
+
     var data_set = {{ interactions|safe }};
     /* JSON.stringify ? */
 
@@ -46,9 +47,9 @@
             }
         }
 
-        $(".card").click(function() {
+        /*$(".card").click(function() {
             displayInfo(false);
-        });
+        });*/
 
         (function (global, factory) {
             typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-dispatch'), require('d3-drag'), require('d3-interpolate'), require('d3-selection'), require('d3-transition')) :
@@ -718,7 +719,7 @@
                         //var dist = 20 / d.value;
                         //console.log('dist:', dist);
 
-                        return dist;
+                        //return dist;
                     })
                 )
                 .force("charge", d3v4.forceManyBody())
