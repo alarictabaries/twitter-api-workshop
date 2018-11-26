@@ -172,7 +172,7 @@ select {
 }
 
 .node .selected {
-    stroke: black;
+    fill: #1abc9c;
 }
 
 .link {
@@ -190,20 +190,63 @@ circle.inactive {
 .card {
     position: absolute;
     bottom: 25px;
-    background: rgba(236,240,241 ,0.6);
     border: 0;
-    padding: 8px 12px;
     border-radius: 2px;
-    color:#546E7A;
     font-size: 13px;
     display: none;
     left: 50%;
     transform: translateX(-50%);
-    cursor:pointer;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.13);
+	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
 }
 
 .card a {
     color: #3498db;
+}
+
+.card .background {
+    background: #3498db;
+    height: 38px;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+}
+
+.card .user {
+    position: relative;
+    background: #ffffff;
+}
+
+.card .user .user-details {
+    margin-left: 46px;
+    padding: 6px 12px 8px 12px;
+}
+
+.card .user .pic {
+    position: absolute;
+    border-radius: 50%;
+    width: 38px;
+    top: -23px;
+    left: 10px;
+}
+
+.card .details .item:first-child {
+    margin-left: 0px;
+}
+
+.card .user .item {
+    display: inline-block;
+    margin-left: 8px;
+    margin-top: 4px;
+}
+
+.card .user .label {
+    font-size: 11px;
+    color: #34495e;
+}
+
+.card .user .freq {
+    color: #3498db;
+    font-weight: 600;
 }
 
 @media only screen and (max-width: 580px) {

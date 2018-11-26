@@ -99,11 +99,11 @@ def interactions(request):
     with open("twitter-workshop/tmp/" + file) as json_data:
         data = json.load(json_data)
         for tweet in data:
-            tmp_node = {"id": tweet["user"]["id"], "alias": tweet["user"]["screen_name"], "type": 1, "freq":1}
+            tmp_node = {"id": tweet["user"]["id"], "id_str":tweet["user"]["id_str"], "alias": tweet["user"]["screen_name"], "type": 1, "freq":1}
             nodes.append(tmp_node)
             for user in tweet['entities']['user_mentions']:
                 if user:
-                    tmp_node = {"id" : user['id'], "alias" : user["screen_name"], "type" : 2, "freq":1}
+                    tmp_node = {"id" : user['id'], "id_str" : user['id_str'], "alias" : user["screen_name"], "type" : 2, "freq":1}
                     tmp_link = {"source": tweet["user"]["id"], "target": user['id'], "value": 1}
                     nodes.append(tmp_node)
                     links.append(tmp_link)
@@ -120,7 +120,7 @@ def interactions(request):
                     active += 1
 
             if duplicated == 0:
-                tmp_node = {"id": node["id"], "alias": node["alias"], "type": node["type"], "freq": node["freq"]}
+                tmp_node = {"id": node["id"], "id_str": node["id_str"], "alias": node["alias"], "type": node["type"], "freq": node["freq"]}
                 unique_nodes.append(tmp_node)
 
             for unique_node in unique_nodes:

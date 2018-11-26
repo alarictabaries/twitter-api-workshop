@@ -1,4 +1,3 @@
 seed,filename,query,count,rt,lang,creation_date
-6E63F067,tweets_6E63F067.json,Macron,200,False,fr,2018-11-21 14:33
-5956CACC,tweets_5956CACC.json,Macron,2665,True,fr,2018-11-26 09:11
-691BDDA6,tweets_691BDDA6.json,GiletsJaunes,2500,True,fr,2018-11-26 09:55
+09D997B9,tweets_09D997B9.json,Macron,750,False,fr,2018-11-26 17:24
+5CF1D399,tweets_5CF1D399.json,#InSight,1500,True,fr,2018-11-26 18:58
