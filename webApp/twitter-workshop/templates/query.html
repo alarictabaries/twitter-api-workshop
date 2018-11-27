@@ -14,9 +14,12 @@
 
     <div class="sub-content">
 
+              <div id="overlay"></div>
+
+
         <p>Fill the form bellow to generate a data set meeting your search criteria. <br />Due to the API limit rate, this application can scrape up to 2,665 tweets per 15 minutes.</p>
 
-        <form action="" method="post">
+        <form class="query" action="" method="post">
             {% csrf_token %}
             {{ form|linebreaksbr }}
             <input type="submit" value="Query">

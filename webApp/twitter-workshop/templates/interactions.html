@@ -1,4 +1,4 @@
-{% include "header.html" with subtitle="Visualize interactions" d3js="bubbles.js"%}
+{% include "header.html" with subtitle="Visualize interactions" d3js="true"%}
 
 
 <div class="content">
@@ -14,6 +14,9 @@
     </div>
 
     <div class="sub-content full">
+
+              <div id="overlay"></div>
+
 
         <p class="full">Blue nodes are active users (who tweeted at least one time), grey are inactive ones.<br />
             Use the scroll wheel to zoom, select a specific node by clicking on it.</p>

@@ -167,3 +167,7 @@ function basicToggleNavbar() {
         $( ".content .toggle-nav .material-icons" ).html('chevron_left');
     }
 }
+
+$( window ).bind( 'load', function() {
+	$('#overlay').fadeOut(125);
+} );

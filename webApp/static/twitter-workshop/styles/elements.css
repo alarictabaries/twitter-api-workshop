@@ -53,7 +53,7 @@ p a {
     margin-top: 13px; /* -12px used in actions elements */
 }
 
-.list tr.top {
+.list tr.top th {
     background: rgba(52,152,219 ,0.8);
     color: #fff;
 }
@@ -91,9 +91,97 @@ p a {
     text-decoration: none;
 }
 
+/* table restyle for datatables jquery */
+
+table.dataTable thead th, table.dataTable thead td {
+    border: 0;
+    padding: 8px 8px;
+    font-weight: 400;
+}
+
+table.dataTable tbody th, table.dataTable tbody td {
+    padding: 8px 8px;
+}
+
+table.dataTable.no-footer {
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.dataTables_length, .dataTables_filter {
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_processing, .dataTables_wrapper .dataTables_paginate {
+    color: #34495e;
+}
+
+.dataTables_wrapper label {
+    display: inline-block;
+    color: #34495e;
+    text-decoration: none;
+    font-size: 12px;
+    background: rgba(236,240,241 ,1);
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
+    padding: 0px 12px;
+    border: 0;
+    height: 31px;
+    line-height: 31px;
+}
+
+.dataTables_wrapper input {
+    color: #34495e;
+    text-decoration: none;
+    font-size: 12px;
+    background: rgba(236,240,241 ,1);
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    padding: 0px 12px;
+    margin-right: 0px;
+    margin-bottom: 0px;
+    border: 0;
+}
+
+.dataTables_wrapper select {
+    color: #34495e;
+    text-decoration: none;
+    font-size: 12px;
+    background: rgba(236,240,241 ,1);
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    padding: 0px 12px;
+    margin-right: 2px;
+    margin-bottom: 0px;
+    border: 0;
+}
+
+.dataTables_info {
+    font-size: 13px;
+}
+
+.dataTables_paginate {
+    font-size: 13px;
+    margin-top: 2px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    border: 0;
+    background: #ecf0f1;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: #3498db;
+    border: 0;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 4px 4px;
+}
+
 /* form */
 
-label {
+.query label {
     display: inline-block;
     color: #34495e;
     text-decoration: none;
@@ -107,7 +195,7 @@ label {
     border: 0;
 }
 
-input[type="submit"] {display: block;
+.query input[type="submit"] {display: block;
     color: #34495e;
     text-decoration: none;
     font-size: 12px;
@@ -119,7 +207,7 @@ input[type="submit"] {display: block;
     border: 0;
 }
 
-input {
+.query input {
     color: #34495e;
     text-decoration: none;
     font-size: 12px;
@@ -132,11 +220,11 @@ input {
     border: 0;
 }
 
-input[type="number"] {
+.query input[type="number"] {
     width: 75px;
 }
 
-select {
+.query select {
     color: #34495e;
     text-decoration: none;
     font-size: 12px !important;
@@ -147,6 +235,9 @@ select {
     margin-right: 12px;
     margin-bottom: 12px;
     border: 0;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
 /* Graphs */
@@ -172,7 +263,8 @@ select {
 }
 
 .node .selected {
-    fill: #1abc9c;
+    stroke: #fff;
+    stroke-width: 2px;
 }
 
 .link {

@@ -1,3 +1,5 @@
 seed,filename,query,count,rt,lang,creation_date
-09D997B9,tweets_09D997B9.json,Macron,750,False,fr,2018-11-26 17:24
-5CF1D399,tweets_5CF1D399.json,#InSight,1500,True,fr,2018-11-26 18:58
+07968A69,tweets_07968A69.json,#InSight,1500,True,fr,2018-11-27 09:08
+4DA146FA,tweets_4DA146FA.json,#BourdinDirect,1500,True,fr,2018-11-27 09:36
+8E7479FC,tweets_8E7479FC.json,#MardiConseil,2500,True,fr,2018-11-27 09:44
+107AA47A,tweets_107AA47A.json,#ForumSmartCity,1250,True,fr,2018-11-27 09:56

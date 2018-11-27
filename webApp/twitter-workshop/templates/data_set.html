@@ -1,4 +1,4 @@
-{% include "header.html" with subtitle="Data set" %}
+{% include "header.html" with subtitle="Data set" datatable="true" %}
 
 <div class="content">
 
@@ -14,6 +14,8 @@
 
   <div class="sub-content">
 
+      <div id="overlay"></div>
+
     <p>
       You can explore the selected data set and visualize information about it by clicking on the links below.<br />
       <i>Data set header : {{header.1}} (filename), {{header.2}} (subject), {{header.3}} (count), {{header.4}} (language), {{header.5}} (RT included), {{header.6}} (creation date).</i>
@@ -23,15 +25,17 @@
         <a href="interactions?seed={{header.0}}"><i class="material-icons">bubble_chart</i>Visualize interactions</a>
         <a href="#"><i class="material-icons">graphic_eq</i>View processed data</a>
         <a href="download_json?seed={{header.0}}"><i class="material-icons">open_in_new</i>Export to JSON</a>
-        <input id="tw-search" class="field" placeholder="search"/>
       </div>
 
       <table class="list">
+        <thead>
         <tr class="top">
-          <th>Text</th>
+          <th>Tweet content</th>
           <th>Author</th>
           <th>Date</th>
         </tr>
+        </thead>
+        <tbody>
           {% for tweet in data %}
         <tr>
           <td class="text"><a target="_BLANK" href="https://twitter.com/{{ tweet.4 }}/status/{{ tweet.2 }}">{{ tweet.1 }}</a></td>
@@ -39,6 +43,7 @@
           <td class="date">{{ tweet.5 }}</td>
         </tr>
           {% endfor %}
+        </tbody>
       </table>
 
   </div>
@@ -46,6 +51,14 @@
 </div>
 
 </div>
+
+<script>
+  $(document).ready(function() {
+      window.$('.list').DataTable({
+          responsive: true,
+      });
+  });
+</script>
 
 </body>
 </html>

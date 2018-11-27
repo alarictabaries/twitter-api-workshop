@@ -439,14 +439,5 @@ select {
 		background-position: calc(100% - 3px) 50%;
 		background-repeat: no-repeat;
 		background-size: 16px;
-		-webkit-appearance: none;
-		-moz-appearance: none;
-}
-select::-ms-expand {
-     display: none;
-}
-select{
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
+  cursor: pointer;
 }
