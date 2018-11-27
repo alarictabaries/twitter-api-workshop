@@ -30,6 +30,7 @@ html, body {
     background: #34495e;
     font-size: 13px;
     position: fixed;
+    z-index: 200;
 }
 
 .sidebar header {
@@ -82,7 +83,7 @@ html, body {
 
 .content .title {
     display: flex;
-    z-index: 9999;
+    z-index: 150;
     height: 45px;
     line-height: 45px;
     background: #ecf0f1;
@@ -137,18 +138,6 @@ html, body {
     overflow: hidden;
 }
 
-p.full {
-    position: absolute;
-    top: 25px;
-    left: 25px;
-    background: rgba(236,240,241 ,0.6);
-    border: 0;
-    padding: 8px 12px;
-    border-radius: 2px;
-    color:#546E7A;
-    cursor:pointer;
-}
-
 #overlay {
     position: absolute;
     top:0;
@@ -156,7 +145,7 @@ p.full {
     right:0;
     bottom:0;
     background: rgba(255, 255, 255, 1);
-    z-index: 999;
+    z-index: 100;
 }
 
 

@@ -1,16 +1,10 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.http import HttpResponseNotAllowed
-
-import pandas as pd
-import json
-import re
 
 from .parts import TwitterQuery
 
 from .libraries import twitter
-from .libraries import dir
 from .libraries import csv
 
 import json
@@ -55,13 +49,7 @@ def data_set(request):
         if row[0] == request.GET['seed']:
             header = row
 
-    tweet_data = []
-    with open("twitter-workshop/tmp/" + file) as json_data:
-        data = json.load(json_data)
-        for tweet in data:
-            short_text = (tweet["full_text"][:125] + '..') if len(tweet["full_text"]) > 125 else tweet["full_text"]
-            tweet_data.append([tweet["full_text"], short_text, tweet["id_str"], tweet["user"]["screen_name"], tweet["user"]["id_str"], tweet["created_at"]])
-        json_data.close()
+    tweet_data = twitter.get_tweets(request.GET['seed'])
 
     # data : full_text, short_text, id_str, alias, alias_id, created_at
     return render(request, 'data_set.html', {'header': header, 'data': tweet_data})
@@ -94,5 +82,6 @@ def interactions(request):
 
     interactions = twitter.get_interactions(request.GET['seed'])
 
+    most_engaged_nodes = twitter.get_most_engaged(interactions, 5)
 
-    return render(request, 'interactions.html', {'header': header, 'interactions': interactions})
+    return render(request, 'interactions.html', {'header': header, 'interactions': interactions, 'most_engaged_nodes':most_engaged_nodes})

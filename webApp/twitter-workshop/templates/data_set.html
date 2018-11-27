@@ -16,21 +16,16 @@
 
       <div id="overlay"></div>
 
-    <p>
-      You can explore the selected data set and visualize information about it by clicking on the links below.<br />
-      <i>Data set header : {{header.1}} (filename), {{header.2}} (subject), {{header.3}} (count), {{header.4}} (language), {{header.5}} (RT included), {{header.6}} (creation date).</i>
-    </p>
-
       <div class="actions">
         <a href="interactions?seed={{header.0}}"><i class="material-icons">bubble_chart</i>Visualize interactions</a>
         <a href="#"><i class="material-icons">graphic_eq</i>View processed data</a>
         <a href="download_json?seed={{header.0}}"><i class="material-icons">open_in_new</i>Export to JSON</a>
       </div>
 
-      <table class="list">
+      <table class="list ds">
         <thead>
         <tr class="top">
-          <th>Tweet content</th>
+          <th>Content</th>
           <th>Author</th>
           <th>Date</th>
         </tr>
@@ -53,11 +48,11 @@
 </div>
 
 <script>
-  $(document).ready(function() {
-      window.$('.list').DataTable({
+    window.$('.list').DataTable({
           responsive: true,
+          "order": [],
+          "pageLength": 50
       });
-  });
 </script>
 
 </body>

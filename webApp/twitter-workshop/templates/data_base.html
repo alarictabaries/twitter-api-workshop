@@ -1,4 +1,4 @@
-{% include "header.html" with subtitle="Query database" %}
+{% include "header.html" with subtitle="Query database" datatable="true" %}
 
 <div class="content">
 
@@ -14,14 +14,10 @@
 
     <div class="sub-content">
 
-              <div id="overlay"></div>
+        <div id="overlay"></div>
 
-
-        <p>
-            You can find below the list of previous queries.
-        </p>
-
-        <table class="list">
+        <table class="list db">
+        <thead>
             <tr class="top">
                 <th>Subject</th>
                 <th>Count</th>
@@ -30,6 +26,8 @@
                 <th>Date</th>
                 <th>File</th>
             </tr>
+            </thead>
+        <tbody>
             {% for item in database %}
             <tr>
                 <td class="subject">{{ item.2 }}</td>
@@ -40,6 +38,7 @@
                 <td class="file"><a href="data_set?seed={{ item.0 }}">{{ item.1 }}</a></td>
             </tr>
             {% endfor %}
+        </tbody>
         </table>
 
     </div>
@@ -47,6 +46,14 @@
 </div>
 
 </div>
+
+<script>
+  window.$('.list').DataTable({
+          responsive: true,
+          "order": [],
+          "pageLength": 50
+      });
+</script>
 
 </body>
 </html>

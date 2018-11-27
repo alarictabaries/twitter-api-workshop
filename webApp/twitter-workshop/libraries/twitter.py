@@ -6,6 +6,8 @@ import datetime
 import json
 import os.path
 from . import csv
+import datetime
+import pytz
 
 
 # Create random string
@@ -115,4 +117,29 @@ def get_interactions(seed):
         with open('twitter-workshop/tmp/interactions_' + seed + ".json", 'w') as outfile:
             json.dump(interactions, outfile, indent=4, sort_keys=True)
 
-    return(interactions)
+    return interactions
+
+
+def get_tweets(seed):
+    tweet_data = []
+
+    with open("twitter-workshop/tmp/tweets_" + seed + ".json") as json_data:
+        data = json.load(json_data)
+        for tweet in data:
+            short_text = (tweet["full_text"][:125] + '..') if len(tweet["full_text"]) > 125 else tweet["full_text"]
+            datetime_obj = datetime.datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
+            datetime_obj = datetime_obj.replace(tzinfo=pytz.timezone('UTC'))
+            datetime_obj = datetime_obj.strftime("%Y-%m-%d %H:%M")
+            tweet_data.append([tweet["full_text"], short_text, tweet["id_str"], tweet["user"]["screen_name"], tweet["user"]["id_str"],datetime_obj])
+    json_data.close()
+
+    return tweet_data
+
+def get_most_engaged(interactions, count):
+    nodes = interactions["nodes"]
+
+    nodes.sort(key=lambda e: e['freq'], reverse=True)
+
+    most_engaged_nodes =  nodes[:count]
+
+    return most_engaged_nodes

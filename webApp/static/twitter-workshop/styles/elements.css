@@ -1,19 +1,9 @@
-/* classic */
-
-p {
-    margin-bottom: 18px;
-    font-size: 13px;
-    text-align: justify;
-    border-left: 2px solid #ecf0f1;
-    padding-left: 12px;
-    color: #2c3e50;
-}
-
-p a {
-    color: #3498db;
-}
-
 /* table */
+
+.actions {
+    position: absolute;
+    z-index: 50;
+}
 
 .actions a {
     display: inline-block;
@@ -150,7 +140,7 @@ table.dataTable.no-footer {
     background: rgba(236,240,241 ,1);
     border-top-right-radius: 2px;
     border-bottom-right-radius: 2px;
-    padding: 0px 12px;
+    padding: 0px 0px;
     margin-right: 2px;
     margin-bottom: 0px;
     border: 0;
@@ -177,6 +167,15 @@ table.dataTable.no-footer {
 
 .dataTables_wrapper .dataTables_paginate .paginate_button {
     padding: 4px 4px;
+}
+
+.dataTables_wrapper .dataTables_length {
+    float: right;
+}
+.dataTables_wrapper .dataTables_filter {
+    float: right;
+    text-align: left;
+    margin-right: 12px;
 }
 
 /* form */
@@ -263,12 +262,16 @@ table.dataTable.no-footer {
 }
 
 .node .selected {
-    stroke: #fff;
+    stroke: #ecf0f1;
     stroke-width: 2px;
 }
 
 .link {
     stroke: #bdc3c7;
+}
+
+.link .hl {
+    stroke: #7f8c8d;
 }
 
 circle.active {
@@ -279,13 +282,69 @@ circle.inactive {
     fill:#7f8c8d;
 }
 
-.card {
+circle.influencer {
+    stroke-width: 2px;
+    stroke: #7f8c8d;
+}
+
+.cards {
     position: absolute;
-    bottom: 25px;
+    left: 25px;
+    top: 18px;
+}
+
+.cards .col-label {
+    font-size: 13px;
+    text-align: center;
+}
+
+.cards .col-label i {
+    font-size: 13px;
+    vertical-align: -2px;
+    margin-right: 4px;
+}
+
+.cards .card:first-child {
+    margin-top: 0;
+}
+
+.cards .card {
+    margin-top: 12px;
+    border-radius: 2px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.13);
+	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+}
+
+.cards .col-actions {
+    text-align: center;
+    margin-top: 12px;
+}
+
+.cards .col-actions a {
+    border-radius: 50%;
+    padding: 8px 10px;
+    display: inline-block;
+    color: #34495e;
+    text-decoration: none;
+    font-size: 12px;
+    background: rgba(236,240,241 ,1);
+    margin-right: 12px;
+    margin-bottom: 12px;
+}
+
+.cards .col-actions i {
+    font-size: 12px;
+    vertical-align: -2px;
+}
+
+.card.node {
+    display: none;
+    position: absolute;
+    top: 25px;
     border: 0;
     border-radius: 2px;
     font-size: 13px;
-    display: none;
     left: 50%;
     transform: translateX(-50%);
     border-bottom: 1px solid rgba(0, 0, 0, 0.13);
@@ -296,7 +355,7 @@ circle.inactive {
     color: #3498db;
 }
 
-.card .background {
+.card .cover {
     background: #3498db;
     height: 38px;
     border-top-left-radius: 2px;
@@ -341,12 +400,30 @@ circle.inactive {
     font-weight: 600;
 }
 
+/* cards simplebar theming */
+.simplebar-track {
+    left: -12px;
+}
+
+.simplebar-scrollbar {
+    left: 2px;
+    width: 3px;
+}
+
+.simplebar-scrollbar:before {
+    background: #3498db;
+    border-radius: 2px;
+}
+
+@media only screen and (max-width: 1080px) {
+    .actions {
+        position: inherit;
+    }
+}
+
 @media only screen and (max-width: 580px) {
     input:after {
         content: '\A';
         white-space: pre;
-    }
-    .card {
-        bottom: 75px;
     }
 }

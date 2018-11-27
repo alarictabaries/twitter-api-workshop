@@ -1,19 +1,26 @@
-function displayInfo(d) {
+function show_info(d) {
     if(d == false) {
-        $(".card").fadeOut(85);
+        $(".card.node").fadeOut(85);
     } else {
 
-        $(".card .pic").attr("src", "https://avatars.io/twitter/" + d.alias + "/small")
-        $(".card .alias").html("<a target=\"_BLANK\" href=\"https://twitter.com/intent/user?user_id=" + d.id_str + "\">@" + d.alias + "</a>");
-        $(".card .freq").html("<span class=\"label\">Mentionned</span><br />" + (d.freq-1));
-        $(".card").fadeIn(115);
+        $(".card.node .pic").attr("src", "https://avatars.io/twitter/" + d.alias + "/small")
+        $(".card.node .alias").html("<a target=\"_BLANK\" href=\"https://twitter.com/intent/user?user_id=" + d.id_str + "\">@" + d.alias + "</a>");
+        $(".card.node .freq").html("<span class=\"label\">Mentionned</span><br />" + (d.freq-1));
+        $(".card.node").fadeIn(115);
     }
 }
 
-function createV4SelectableForceDirectedGraph(svg, graph) {
+function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
     // if both d3v3 and d3v4 are loaded, we'll assume
     // that d3v4 is called d3v4, otherwise we'll assume
     // that d3v4 is the default (d3)
+
+    defs = svg.append("defs");
+
+    for(node in most_engaged_nodes) {
+        defs.append("pattern").attr("id", most_engaged_nodes[node]["alias"]).attr("viewBox", "0 0 1 1").attr("patternUnits", "objectBoundingBox").attr("preserveAspectRatio", "xMidYMid slice").attr("height", 1).attr("width", 1)
+            .append("image").attr("height",1).attr("width",1).attr("preserveAspectRatio", "xMidYMid slice").attr("xlink:href","https://avatars.io/twitter/" + most_engaged_nodes[node]["alias"] + "/medium")
+    }
 
     if (typeof d3v4 == 'undefined')
         d3v4 = d3;
@@ -86,6 +93,11 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
             return Math.sqrt(d.freq*3.14);
         })
         .attr("class", function(d) {
+            for(i in most_engaged_nodes) {
+                if(d.id_str == most_engaged_nodes[i]["id_str"]) {
+                    return("influencer");
+                }
+            }
             if (d.type == 1) {
                 return("active")
             } else {
@@ -93,6 +105,11 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
             }
         })
         .attr("fill", function(d) {
+            for(i in most_engaged_nodes) {
+                if(d.id_str == most_engaged_nodes[i]["id_str"]) {
+                    return "url(#" + d.alias + ")";
+                }
+            }
             if ('color' in d)
                 return d.color;
             else
@@ -102,7 +119,6 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
             .on("start", dragstarted)
             .on("drag", dragged)
             .on("end", dragended));
-
 
     // add titles for mouseover blurbs
     /*node.append("title").attr("class", "label")
@@ -168,7 +184,8 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
     }
 
     rect.on('click', () => {
-        displayInfo(false);
+        show_info(false);
+        d3v4.selectAll("line").attr("class", "link");
         node.each(function(d) {
             d.selected = false;
             d.previouslySelected = false;
@@ -251,9 +268,18 @@ function createV4SelectableForceDirectedGraph(svg, graph) {
             node.classed("selected", function(p) { return p.selected =  p.previouslySelected = false; });
         }
 
-        d3v4.select(this).classed("selected", function(p) {displayInfo(d); d.previouslySelected = d.selected; return d.selected = true; });
+        d3v4.select(this).classed("selected", function(p) {show_info(d); d.previouslySelected = d.selected; return d.selected = true; });
+        nodeObj = d;
+        d3v4.selectAll("line").attr("class", "link");
+        d3v4.selectAll("line").filter(function(d) {
+            console.log(d)
+             return (d.source === nodeObj) || (d.target === nodeObj);
+           })
+          .attr("class", "hl")
 
-        node.filter(function(d) { return d.selected; })
+        node.filter(function(d) {
+            return d.selected;
+        })
             .each(function(d) { //d.fixed |= 2;
                 d.fx = d.x;
                 d.fy = d.y;
