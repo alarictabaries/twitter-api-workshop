@@ -92,67 +92,7 @@ def interactions(request):
         if row[0] == request.GET['seed']:
             header = row
 
-    interactions = {}
-    nodes = []
-    links = []
+    interactions = twitter.get_interactions(request.GET['seed'])
 
-    with open("twitter-workshop/tmp/" + file) as json_data:
-        data = json.load(json_data)
-        for tweet in data:
-            tmp_node = {"id": tweet["user"]["id"], "id_str":tweet["user"]["id_str"], "alias": tweet["user"]["screen_name"], "type": 1, "freq":1}
-            nodes.append(tmp_node)
-            for user in tweet['entities']['user_mentions']:
-                if user:
-                    tmp_node = {"id" : user['id'], "id_str" : user['id_str'], "alias" : user["screen_name"], "type" : 2, "freq":1}
-                    tmp_link = {"source": tweet["user"]["id"], "target": user['id'], "value": 1}
-                    nodes.append(tmp_node)
-                    links.append(tmp_link)
-        json_data.close()
-
-        unique_nodes = []
-        for node in nodes :
-            duplicated = 0
-            active = 0
-            for unique_node in unique_nodes:
-                if(node["id"] == unique_node["id"]):
-                    duplicated += 1
-                if (node["id"] == unique_node["id"]) and (node["type"] == 1):
-                    active += 1
-
-            if duplicated == 0:
-                tmp_node = {"id": node["id"], "id_str": node["id_str"], "alias": node["alias"], "type": node["type"], "freq": node["freq"]}
-                unique_nodes.append(tmp_node)
-
-            for unique_node in unique_nodes:
-                if active > 0:
-                    if unique_node["id"] == node["id"]:
-                        unique_node["type"] = 1
-
-        # Unique links ? what if a same user tweets 5 times "@mention wtf", should we keep it?
-
-        unique_links = []
-        for link in links:
-            duplicated = 0
-            tmp_link = {"source": link["source"], "target": link["target"], "value": link["value"]}
-            for unique_link in unique_links:
-                if (link["source"] == unique_link["source"]) and (link["target"] == unique_link["target"]):
-                    duplicated += 1
-            if duplicated == 0:
-                unique_links.append(tmp_link)
-
-        nodes = unique_nodes
-        links = unique_links
-
-        for link in unique_links:
-            for node in nodes:
-                if node["id"] == link["target"]:
-                    node["freq"] += 1
-
-        interactions["nodes"] = nodes
-        interactions["links"] = links
-
-        # Develop a "caching system" ?
-        with open('twitter-workshop/tmp/interactions_' + request.GET['seed'] + ".json", 'w') as outfile:
-            json.dump(interactions, outfile, indent=4, sort_keys=True)
 
     return render(request, 'interactions.html', {'header': header, 'interactions': interactions})
