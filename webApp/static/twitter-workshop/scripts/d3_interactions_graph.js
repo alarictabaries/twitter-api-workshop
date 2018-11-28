@@ -84,11 +84,13 @@ function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
         .enter().append("line")
         .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
 
+    // Dirty method to hide unlinked circles, work needed on it, filter before append?
     var node = gDraw.append("g")
         .attr("class", "node")
         .selectAll("circle")
         .data(graph.nodes)
-        .enter().append("circle")
+        .enter()
+        .append("circle")
         .attr("r", function(d) {
             return Math.sqrt(d.freq*3.14);
         })
@@ -98,11 +100,16 @@ function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
                     return("influencer");
                 }
             }
-            if (d.type == 1) {
-                return("active")
-            } else {
-                return("inactive")
+            for(i in graph.links) {
+                if ((d.id == graph.links[i]["source"]) || (d.id == graph.links[i]["target"])) {
+                    if (d.type == 1) {
+                        return ("active");
+                    } else {
+                        return ("inactive");
+                    }
+                }
             }
+            return("void");
         })
         .attr("fill", function(d) {
             for(i in most_engaged_nodes) {
@@ -120,15 +127,16 @@ function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
             .on("drag", dragged)
             .on("end", dragended));
 
+    $("circle.void").remove();
+
     // add titles for mouseover blurbs
-    /*node.append("title").attr("class", "label")
+    node.append("title").attr("class", "label")
         .text(function(d) {
             if ('alias' in d)
-                return d.alias;
+                return "@" + d.alias;
             else
                 return d.id;
         });
-    */
 
     var simulation = d3v4.forceSimulation()
         .force("link", d3v4.forceLink()
@@ -307,7 +315,6 @@ function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
                 d.fy = null;
             })
     }
-
 
     return graph;
 };

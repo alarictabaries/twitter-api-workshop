@@ -8,6 +8,7 @@ import os.path
 from . import csv
 import datetime
 import pytz
+import sys
 
 
 # Create random string
@@ -47,8 +48,10 @@ def scrape_twitter(query, count, rt, lang):
 
 def get_interactions(seed):
 
+    debug = False
+
     # Caching system
-    if os.path.isfile('twitter-workshop/tmp/interactions_' + seed + '.json'):
+    if (os.path.isfile('twitter-workshop/tmp/interactions_' + seed + '.json')) and (debug == False):
         json_data = json.loads(open('twitter-workshop/tmp/interactions_' + seed + '.json').read())
         return json_data;
 
@@ -110,6 +113,19 @@ def get_interactions(seed):
             for node in nodes:
                 if node["id"] == link["target"]:
                     node["freq"] += 1
+
+        # engaged_nodes = []
+
+        # Removing not connected nodes
+        # for node in nodes:
+        #     connected = 0
+        #     for link in links:
+        #         if (node["id"] == link["source"]) or node["id"] == link["target"]:
+        #             connected += 1
+        #     if connected > 0:
+        #         engaged_nodes.append(node)
+
+        #nodes = engaged_nodes
 
         interactions["nodes"] = nodes
         interactions["links"] = links

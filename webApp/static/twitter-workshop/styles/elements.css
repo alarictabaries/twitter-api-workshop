@@ -284,7 +284,11 @@ circle.inactive {
 
 circle.influencer {
     stroke-width: 2px;
-    stroke: #7f8c8d;
+    stroke: #3498db;
+}
+
+circle.void {
+    fill: red;
 }
 
 .cards {
