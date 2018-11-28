@@ -69,7 +69,7 @@
 }
 
 .list tr:nth-child(2n) {
-    background: rgba(236,240,241 ,0.2)
+    background: rgba(236,240,241 ,0.3)
 }
 
 .list tr td {
@@ -341,7 +341,7 @@ circle.influencer {
 .card.node {
     display: none;
     position: absolute;
-    top: 25px;
+    bottom: 25px;
     border: 0;
     border-radius: 2px;
     font-size: 13px;

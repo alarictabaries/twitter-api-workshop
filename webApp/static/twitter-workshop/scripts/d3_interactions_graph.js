@@ -274,7 +274,6 @@ function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
         nodeObj = d;
         d3v4.selectAll("line").attr("class", "link");
         d3v4.selectAll("line").filter(function(d) {
-            console.log(d)
              return (d.source === nodeObj) || (d.target === nodeObj);
            })
           .attr("class", "hl")

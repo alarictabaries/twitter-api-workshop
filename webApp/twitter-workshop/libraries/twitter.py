@@ -59,7 +59,6 @@ def get_interactions(seed, start_time, end_time):
     nodes = []
     links = []
 
-    print(start_time)
     if start_time is None:
         with open("twitter-workshop/tmp/tweets_" + seed + ".json") as json_data:
             data = json.load(json_data)

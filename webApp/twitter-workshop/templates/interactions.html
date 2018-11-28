@@ -77,6 +77,7 @@
         createV4SelectableForceDirectedGraph(svg, data_set, most_engaged_nodes);
         $( ".col-label" ).on( "click", function() {
             $('#overlay').fadeIn(125);
+            show_info(false);
             $.ajax({
                 type: "POST",
                 url: '/update_interactions?seed=' + getUrlVars()["seed"],
