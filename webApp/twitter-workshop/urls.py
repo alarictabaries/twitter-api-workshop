@@ -23,5 +23,6 @@ urlpatterns = [
     path('data_base', views.data_base, name='data_base'),
     path('data_set', views.data_set, name='data_set'),
     path('interactions', views.interactions, name='interactions'),
+    path('update_interactions', views.update_interactions, name='update_interactions'),
     path('download_json', views.download_json, name='download_json'),
 ]

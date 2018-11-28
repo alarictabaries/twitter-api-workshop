@@ -53,7 +53,6 @@ function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
 
     gMain.call(zoom);
 
-
     function zoomed() {
         gDraw.attr('transform', d3v4.event.transform);
     }
@@ -100,16 +99,11 @@ function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
                     return("influencer");
                 }
             }
-            for(i in graph.links) {
-                if ((d.id == graph.links[i]["source"]) || (d.id == graph.links[i]["target"])) {
-                    if (d.type == 1) {
-                        return ("active");
-                    } else {
-                        return ("inactive");
-                    }
-                }
+            if (d.type == 1) {
+                return ("active");
+            } else {
+                return ("inactive");
             }
-            return("void");
         })
         .attr("fill", function(d) {
             for(i in most_engaged_nodes) {
@@ -127,7 +121,7 @@ function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
             .on("drag", dragged)
             .on("end", dragended));
 
-    $("circle.void").remove();
+    /*$("circle.void").remove();*/
 
     // add titles for mouseover blurbs
     node.append("title").attr("class", "label")

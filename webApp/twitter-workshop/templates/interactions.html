@@ -15,7 +15,7 @@
 
     <div class="sub-content full">
 
-        <div id="overlay"></div>
+        <div id="overlay"><div class="typing_loader"></div></div>
 
         <div class="graph full"></div>
 
@@ -23,7 +23,7 @@
 
             <div class="col-label"><i class="material-icons">show_chart</i>Top influencers</div>
 
-            {% for node in most_engaged_nodes %}
+            {% for node in interactions.1 %}
 
             <div class="card">
                 <div class="cover"></div>
@@ -67,13 +67,41 @@
 
 <script>
 
-    var data_set = {{ interactions|safe }};
-    var most_engaged_nodes = {{ most_engaged_nodes|safe }};
+    var data = {{ interactions|safe }};
+    data_set = data[0]
+    most_engaged_nodes = data[1]
 
     $(document).ready(function() {
 
         var svg = d3.select('.graph').append("svg");
         createV4SelectableForceDirectedGraph(svg, data_set, most_engaged_nodes);
+        $( ".col-label" ).on( "click", function() {
+            $('#overlay').fadeIn(125);
+            $.ajax({
+                type: "POST",
+                url: '/update_interactions?seed=' + getUrlVars()["seed"],
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    start_time: "2018-11-27 18:30",
+                    end_time: "2018-11-27 19:00"
+                },
+                success: function (response) {
+                    var data_set = response[0];
+                    var most_engaged_nodes = response[1];
+                    cards = $(".cards .card");
+                    for (i in most_engaged_nodes) {
+                        jQuery(cards[i]).find(".pic").attr("src", 'https://avatars.io/twitter/' + most_engaged_nodes[i]["alias"] + '/small');
+                        jQuery(cards[i]).find(".alias").html('<a target="_BLANK" href="https://twitter.com/intent/user?user_id=' + most_engaged_nodes[i]["id_str"] + '">@' + most_engaged_nodes[i]["alias"] + '</a>');
+                        jQuery(cards[i]).find(".freq").html('<span class="label">Mentionned</span><br>' + most_engaged_nodes[i]["freq"] + '</span>');
+                        console.log(most_engaged_nodes[i]);
+                    }
+                    createV4SelectableForceDirectedGraph(svg, data_set, most_engaged_nodes);
+                },
+                complete: function(){
+                    $('#overlay').fadeOut(125);
+                }
+            });
+        });
 
     });
 
