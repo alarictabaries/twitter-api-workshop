@@ -15,7 +15,7 @@
 
     <div class="sub-content full">
 
-        <div id="overlay"><div class="typing_loader"></div></div>
+        <div id="overlay"></div>
 
         <div class="graph full"></div>
 
@@ -94,6 +94,12 @@
                         jQuery(cards[i]).find(".alias").html('<a target="_BLANK" href="https://twitter.com/intent/user?user_id=' + most_engaged_nodes[i]["id_str"] + '">@' + most_engaged_nodes[i]["alias"] + '</a>');
                         jQuery(cards[i]).find(".freq").html('<span class="label">Mentionned</span><br>' + most_engaged_nodes[i]["freq"] + '</span>');
                         console.log(most_engaged_nodes[i]);
+                    }
+                    if(cards.length >= most_engaged_nodes.length) {
+                        for(i=most_engaged_nodes.length; i<cards.length; i++) {
+                            jQuery(cards[i]).remove();
+                        }
+
                     }
                     createV4SelectableForceDirectedGraph(svg, data_set, most_engaged_nodes);
                 },

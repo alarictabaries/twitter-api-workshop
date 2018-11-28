@@ -148,34 +148,6 @@ html, body {
     z-index: 100;
 }
 
-.typing_loader{
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    animation: typing 1s linear infinite alternate;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-}
-
-@keyframes typing{
-   0%{
-        background-color: rgba(44,62,80 ,1);
-        box-shadow: 12px 0px 0px 0px rgba(44,62,80 ,0.2),
-                    24px 0px 0px 0px rgba(44,62,80 ,0.2);
-      }
-    25%{
-        background-color: rgba(44,62,80 ,0.4);
-        box-shadow: 12px 0px 0px 0px rgba(44,62,80 ,0.2),
-                    24px 0px 0px 0px rgba(44,62,80 ,0.2);
-    }
-    75%{ background-color: rgba(44,62,80 ,0.4);
-        box-shadow: 12px 0px 0px 0px rgba(44,62,80 ,0.2),
-                    24px 0px 0px 0px rgba(44,62,80 ,1);
-      }
-}
-
 @media only screen and (max-width: 580px) {
     .toggle-nav {
         display: none;
