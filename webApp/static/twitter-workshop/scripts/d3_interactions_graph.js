@@ -2,7 +2,6 @@ function show_info(d) {
     if(d == false) {
         $(".card.node").fadeOut(85);
     } else {
-
         $(".card.node .pic").attr("src", "https://avatars.io/twitter/" + d.alias + "/small")
         $(".card.node .alias").html("<a target=\"_BLANK\" href=\"https://twitter.com/intent/user?user_id=" + d.id_str + "\">@" + d.alias + "</a>");
         $(".card.node .freq").html("<span class=\"label\">Mentionned</span><br />" + (d.freq-1));
@@ -19,7 +18,7 @@ function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
 
     for(node in most_engaged_nodes) {
         defs.append("pattern").attr("id", most_engaged_nodes[node]["alias"]).attr("viewBox", "0 0 1 1").attr("patternUnits", "objectBoundingBox").attr("preserveAspectRatio", "xMidYMid slice").attr("height", 1).attr("width", 1)
-            .append("image").attr("height",1).attr("width",1).attr("preserveAspectRatio", "xMidYMid slice").attr("xlink:href","https://avatars.io/twitter/" + most_engaged_nodes[node]["alias"] + "/medium")
+            .append("image").attr("height",1).attr("width",1).attr("preserveAspectRatio", "xMidYMid slice").attr("xlink:href","https://avatars.io/twitter/" + most_engaged_nodes[node]["alias"] + "")
     }
 
     if (typeof d3v4 == 'undefined')
@@ -136,14 +135,16 @@ function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
         .force("link", d3v4.forceLink()
             .id(function(d) { return d.id; })
             .distance(function(d) {
-                return 30;
-                //var dist = 20 / d.value;
+                //return 30;
+                var dist = (d.value);
                 //console.log('dist:', dist);
 
                 return dist;
             })
         )
         .force("charge", d3v4.forceManyBody())
+        // if nodes < X,
+        // .force("charge", d3v4.forceManyBody().strength(-120))
         .force("center", d3v4.forceCenter(parentWidth / 2, parentHeight / 2))
         .force("x", d3v4.forceX(parentWidth/2))
         .force("y", d3v4.forceY(parentHeight/2));

@@ -59,44 +59,36 @@ def get_interactions(seed, start_time, end_time, threshold):
     nodes = []
     links = []
 
-    print(start_time)
-    if start_time is None:
-        with open("twitter-workshop/tmp/tweets_" + seed + ".json") as json_data:
-            data = json.load(json_data)
-            for tweet in data:
-                datetime_obj = datetime.datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
-                datetime_obj = datetime_obj.replace(tzinfo=pytz.timezone('UTC'))
-                datetime_obj = datetime_obj.strftime("%Y-%m-%d %H:%M")
-                tmp_node = {"id": tweet["user"]["id"], "id_str": tweet["user"]["id_str"],
-                            "alias": tweet["user"]["screen_name"], "type": 1, "freq": 1}
+    with open("twitter-workshop/tmp/tweets_" + seed + ".json") as json_data:
+        data = json.load(json_data)
+        for tweet in data:
+            datetime_obj = datetime.datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
+            datetime_obj = datetime_obj.replace(tzinfo=pytz.timezone('UTC'))
+            datetime_obj = datetime_obj.strftime("%Y-%m-%d %H:%M")
+            tmp_node = {"id": tweet["user"]["id"], "id_str": tweet["user"]["id_str"],
+                        "alias": tweet["user"]["screen_name"], "type": 1, "freq": 1}
+            if start_time is None:
                 nodes.append(tmp_node)
-                for user in tweet['entities']['user_mentions']:
-                    if user:
-                        tmp_node = {"id": user['id'], "id_str": user['id_str'], "alias": user["screen_name"], "type": 2,
-                                    "freq": 1}
-                        tmp_link = {"source": tweet["user"]["id"], "target": user['id'], "value": 1}
+            else:
+                if (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") > datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M")) and (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") < datetime.datetime.strptime(end_time, "%Y-%m-%d %H:%M")):
+                    nodes.append(tmp_node)
+
+            for user in tweet['entities']['user_mentions']:
+                if user and (user['id'] != tweet["user"]["id"]):
+                    tmp_node = {"id": user['id'], "id_str": user['id_str'], "alias": user["screen_name"], "type": 2,
+                                "freq": 1}
+                    tmp_link = {"source": tweet["user"]["id"], "target": user['id'], "value": 1}
+                    if start_time is None:
                         nodes.append(tmp_node)
                         links.append(tmp_link)
-            json_data.close()
-    else:
-        with open("twitter-workshop/tmp/tweets_" + seed + ".json") as json_data:
-            data = json.load(json_data)
-            for tweet in data:
-                datetime_obj = datetime.datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
-                datetime_obj = datetime_obj.replace(tzinfo=pytz.timezone('UTC'))
-                datetime_obj = datetime_obj.strftime("%Y-%m-%d %H:%M")
-                tmp_node = {"id": tweet["user"]["id"], "id_str": tweet["user"]["id_str"],
-                            "alias": tweet["user"]["screen_name"], "type": 1, "freq": 1}
-                nodes.append(tmp_node)
-                for user in tweet['entities']['user_mentions']:
-                    if user:
-                        tmp_node = {"id": user['id'], "id_str": user['id_str'], "alias": user["screen_name"], "type": 2,
-                                    "freq": 1}
-                        tmp_link = {"source": tweet["user"]["id"], "target": user['id'], "value": 1}
-                        if (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") > datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M")) and (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") < datetime.datetime.strptime(end_time, "%Y-%m-%d %H:%M")):
+                    else:
+                        if (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") > datetime.datetime.strptime(
+                                start_time, "%Y-%m-%d %H:%M")) and (
+                                datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") < datetime.datetime.strptime(
+                                end_time, "%Y-%m-%d %H:%M")):
                             nodes.append(tmp_node)
                             links.append(tmp_link)
-            json_data.close()
+        json_data.close()
 
     unique_nodes = []
     for node in nodes:
@@ -140,19 +132,28 @@ def get_interactions(seed, start_time, end_time, threshold):
     engaged_nodes = []
     engaged_links = []
 
-    # Removing not connected nodes
+    # Removing not connected nodes and useless nodes
     for node in nodes:
         connected = 0
         for link in links:
-            if (node["freq"] > threshold) and (node["id"] == link["source"]):
-                engaged_links.append(link)
+            if (node["id"] == link["source"]) and (node["freq"] > threshold):
+                connected += 1
+                engaged_links.append({"source": link["source"], "target": link["target"], "value": connected})
+
+    links = engaged_links
+
+    for node in nodes:
+        connected = 0
+        for link in links:
             if ((node["id"] == link["source"]) or (node["id"] == link["target"])) and (node["freq"] > threshold):
                 connected += 1
         if connected > 0:
             engaged_nodes.append(node)
 
     nodes = engaged_nodes
-    links = engaged_links
+
+    # Chrome sorting automatically JS objects so we're fucked
+    # nodes.sort(key=lambda e: e['freq'], reverse=False)
 
     interactions["nodes"] = nodes
     interactions["links"] = links
