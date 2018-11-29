@@ -46,9 +46,9 @@ def scrape_twitter(query, count, rt, lang):
     return seed
 
 
-def get_interactions(seed, start_time, end_time):
+def get_interactions(seed, start_time, end_time, threshold):
 
-    debug = False
+    debug = True
 
     # Caching system
     if (os.path.isfile('twitter-workshop/tmp/interactions_' + seed + '.json')) and (start_time is None) and (debug is False):
@@ -59,6 +59,7 @@ def get_interactions(seed, start_time, end_time):
     nodes = []
     links = []
 
+    print(start_time)
     if start_time is None:
         with open("twitter-workshop/tmp/tweets_" + seed + ".json") as json_data:
             data = json.load(json_data)
@@ -137,17 +138,21 @@ def get_interactions(seed, start_time, end_time):
                 node["freq"] += 1
 
     engaged_nodes = []
+    engaged_links = []
 
     # Removing not connected nodes
     for node in nodes:
         connected = 0
         for link in links:
-            if (node["id"] == link["source"]) or node["id"] == link["target"]:
+            if (node["freq"] > threshold) and (node["id"] == link["source"]):
+                engaged_links.append(link)
+            if ((node["id"] == link["source"]) or (node["id"] == link["target"])) and (node["freq"] > threshold):
                 connected += 1
         if connected > 0:
             engaged_nodes.append(node)
 
     nodes = engaged_nodes
+    links = engaged_links
 
     interactions["nodes"] = nodes
     interactions["links"] = links
@@ -183,5 +188,8 @@ def get_most_engaged(interactions, count):
     nodes.sort(key=lambda e: e['freq'], reverse=True)
 
     most_engaged_nodes = nodes[:count]
+
+    for node in most_engaged_nodes:
+        node["freq"] -= 1
 
     return most_engaged_nodes

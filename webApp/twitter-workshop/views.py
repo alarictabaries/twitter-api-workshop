@@ -79,7 +79,7 @@ def interactions(request):
         if row[0] == request.GET['seed']:
             header = row
 
-    interactions = twitter.get_interactions(request.GET['seed'], None, None)
+    interactions = twitter.get_interactions(request.GET['seed'], None, None, 0)
     most_engaged_nodes = twitter.get_most_engaged(interactions, 5)
 
     return render(request, 'interactions.html', {'header': header, 'interactions': [interactions, most_engaged_nodes]})
@@ -90,8 +90,9 @@ def update_interactions(request):
 
     start_time = request.POST['start_time']
     end_time = request.POST['end_time']
+    threshold = request.POST['threshold']
 
-    interactions = twitter.get_interactions(request.GET['seed'], start_time, end_time)
+    interactions = twitter.get_interactions(request.GET['seed'], start_time, end_time, threshold)
     most_engaged_nodes = twitter.get_most_engaged(interactions, 5)
 
     interactions = [interactions, most_engaged_nodes]

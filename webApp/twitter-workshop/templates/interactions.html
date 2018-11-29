@@ -19,6 +19,11 @@
 
         <div class="graph full"></div>
 
+        <div class="data">
+            <span class="tweets">Tweets analyzed : 512</span>
+            <span class="nodes">Nodes : 125</span>
+        </div>
+
         <div class="cards">
 
             <div class="col-label"><i class="material-icons">show_chart</i>Top influencers</div>
@@ -84,7 +89,8 @@
                 data: {
                     csrfmiddlewaretoken: '{{ csrf_token }}',
                     start_time: "2018-11-27 18:30",
-                    end_time: "2018-11-27 19:00"
+                    end_time: "2018-11-27 19:00",
+                    threshold: 0
                 },
                 success: function (response) {
                     var data_set = response[0];
@@ -93,7 +99,7 @@
                     for (i in most_engaged_nodes) {
                         jQuery(cards[i]).find(".pic").attr("src", 'https://avatars.io/twitter/' + most_engaged_nodes[i]["alias"] + '/small');
                         jQuery(cards[i]).find(".alias").html('<a target="_BLANK" href="https://twitter.com/intent/user?user_id=' + most_engaged_nodes[i]["id_str"] + '">@' + most_engaged_nodes[i]["alias"] + '</a>');
-                        jQuery(cards[i]).find(".freq").html('<span class="label">Mentionned</span><br>' + most_engaged_nodes[i]["freq"] + '</span>');
+                        jQuery(cards[i]).find(".freq").html('<span class="label">Mentionned</span><br>' + (most_engaged_nodes[i]["freq"] - 1) + '</span>');
                         console.log(most_engaged_nodes[i]);
                     }
                     if(cards.length >= most_engaged_nodes.length) {
