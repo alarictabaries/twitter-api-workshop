@@ -4,7 +4,7 @@ function show_info(d) {
     } else {
         $(".card.node .pic").attr("src", "https://avatars.io/twitter/" + d.alias + "/small")
         $(".card.node .alias").html("<a target=\"_BLANK\" href=\"https://twitter.com/intent/user?user_id=" + d.id_str + "\">@" + d.alias + "</a>");
-        $(".card.node .freq").html("<span class=\"label\">Mentionned</span><br />" + (d.freq-1));
+        $(".card.node .freq").html("<span class=\"label\">Mentionned</span><br />" + d.freq);
         $(".card.node").fadeIn(115);
     }
 }
@@ -90,7 +90,7 @@ function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
         .enter()
         .append("circle")
         .attr("r", function(d) {
-            return Math.sqrt(d.freq*3.14);
+            return Math.sqrt((d.freq+1)*3.14);
         })
         .attr("class", function(d) {
             for(i in most_engaged_nodes) {

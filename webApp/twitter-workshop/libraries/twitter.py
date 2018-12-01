@@ -1,22 +1,23 @@
 # Operations with Twitter's API
 
 import tweepy
-import json
-import os.path
 from . import mongodb
 import datetime
 import pytz
 from bson.objectid import ObjectId
 
+
 # Save tweets meeting the criteria to a CSV file
 def scrape_twitter(keyword, count, lang):
     date_now = datetime.datetime.now()
 
+    # Connect to Twitter's API
     auth = tweepy.OAuthHandler('y3fvWam4738fGFCSuVJpIhtwp', 'czDAPY4XnYe4fp4n6FMwrHSFGtF0nY15PgnmozeBAsnObHiKJr')
     auth.set_access_token('229596006-BzKTTM85v2Ca0xf7d11CPM7AKhIOnx03EsUNjgsk',
                           'FnyvhnqiKtRCroJ1iX1qaLxtrn7uEDgXONGplAxZv230V')
     api = tweepy.API(auth, wait_on_rate_limit=True)
 
+    # Write tweets
     db = mongodb.db_connect()
     col = db["tweets"]
     _tweets = col.insert_one({"tweets": []})
@@ -26,6 +27,7 @@ def scrape_twitter(keyword, count, lang):
 
     col = db["index"]
 
+    # Write metadata
     col.insert_one({
         "keyword": keyword,
         "options": {
@@ -39,23 +41,28 @@ def scrape_twitter(keyword, count, lang):
     return 1
 
 
-def get_metadata(id):
+# Read metadata from DB
+def get_metadata(_id):
 
     db = mongodb.db_connect()
     col = db["index"]
 
-    doc = col.find_one({"_id": ObjectId(id)})
+    # Read the metadata document
+    doc = col.find_one({"_id": ObjectId(_id)})
 
     return doc
 
 
-def get_tweets(id):
+# Get tweets from DB
+def get_tweets(_id):
     tweet_data = []
 
+    # Read the tweets document
     db = mongodb.db_connect()
     col = db["tweets"]
-    doc = col.find_one({"_id": ObjectId(id)})
+    doc = col.find_one({"_id": ObjectId(_id)})
 
+    # Iterate over tweets
     for tweet in doc["tweets"]:
         short_text = (tweet["full_text"][:125] + '..') if len(tweet["full_text"]) > 125 else tweet["full_text"]
         datetime_obj = datetime.datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
@@ -68,8 +75,10 @@ def get_tweets(id):
     return tweet_data
 
 
-def get_interactions(id, **options):
+# Get interactions
+def get_interactions(_id, **options):
 
+    # If options are set
     start_date = options.get('start_date', None)
     end_date = options.get('end_date', None)
     simplified = options.get('simplified', None)
@@ -78,30 +87,37 @@ def get_interactions(id, **options):
     nodes = []
     links = []
 
+    # Read the tweets document
     db = mongodb.db_connect()
     col = db["tweets"]
-    doc = col.find_one({"_id": ObjectId(id)})
+    doc = col.find_one({"_id": ObjectId(_id)})
 
+    # Iterate over tweets
     for tweet in doc["tweets"]:
         datetime_obj = datetime.datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
         datetime_obj = datetime_obj.replace(tzinfo=pytz.timezone('UTC'))
         datetime_obj = datetime_obj.strftime("%Y-%m-%d %H:%M")
         tmp_node = {"id": tweet["user"]["id"], "id_str": tweet["user"]["id_str"],
-                    "alias": tweet["user"]["screen_name"], "type": 1, "freq": 1}
+                    "alias": tweet["user"]["screen_name"], "type": 1, "freq": 0}
+        # If date is set
         if start_date:
-            if (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") > datetime.datetime.strptime(start_date,"%Y-%m-%d %H:%M")) and (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") < datetime.datetime.strptime(end_date, "%Y-%m-%d %H:%M")):
+            # If the tweet is in the specified time frame
+            if (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") >= datetime.datetime.strptime(start_date,"%Y-%m-%d %H:%M")) and (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") <= datetime.datetime.strptime(end_date, "%Y-%m-%d %H:%M")):
                 nodes.append(tmp_node)
         else:
             nodes.append(tmp_node)
 
+        # Iterate over mentions
         for user in tweet['entities']['user_mentions']:
-            if user and (user['id'] != tweet["user"]["id"]):
-                tmp_node = {"id": user['id'], "id_str": user['id_str'], "alias": user["screen_name"], "type": 2,"freq": 1}
+            if user and (user['id'] != tweet["user"]["id"]): # The user can't mention himself
+                tmp_node = {"id": user['id'], "id_str": user['id_str'], "alias": user["screen_name"], "type": 2,"freq": 0}
                 tmp_link = {"source": tweet["user"]["id"], "target": user['id'], "value": 1}
+                # If date is set
                 if start_date:
-                    if (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") > datetime.datetime.strptime(
+                    # If the tweet is in the specified time frame
+                    if (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") >= datetime.datetime.strptime(
                             start_date, "%Y-%m-%d %H:%M")) and (
-                            datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") < datetime.datetime.strptime(
+                            datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") <= datetime.datetime.strptime(
                             end_date, "%Y-%m-%d %H:%M")):
                         nodes.append(tmp_node)
                         links.append(tmp_link)
@@ -109,6 +125,8 @@ def get_interactions(id, **options):
                     nodes.append(tmp_node)
                     links.append(tmp_link)
 
+    # Create unique nodes array
+    # and determine active et inactive ones
     unique_nodes = []
     for node in nodes:
         duplicated = 0
@@ -118,19 +136,20 @@ def get_interactions(id, **options):
                 duplicated += 1
             if (node["id"] == unique_node["id"]) and (node["type"] == 1):
                 active += 1
-
+        # Append if node read for the first time
         if duplicated == 0:
             tmp_node = {"id": node["id"], "id_str": node["id_str"], "alias": node["alias"], "type": node["type"],
                         "freq": node["freq"]}
             unique_nodes.append(tmp_node)
-
+        # Set the type if the node is at least one time active
         for unique_node in unique_nodes:
             if active > 0:
                 if unique_node["id"] == node["id"]:
                     unique_node["type"] = 1
 
-    # Unique links ? what if a same user tweets 5 times "@mention wtf", should we keep it?
+    # Unique links ? what if a same user tweets 5 times "@mention wtf", should we keep it? For the moment, no
 
+    # Create unique links array
     unique_links = []
     for link in links:
         duplicated = 0
@@ -144,6 +163,7 @@ def get_interactions(id, **options):
     nodes = unique_nodes
     links = unique_links
 
+    # Calculate mentions frequency for nodes
     for link in unique_links:
         for node in nodes:
             if node["id"] == link["target"]:
@@ -152,29 +172,26 @@ def get_interactions(id, **options):
     engaged_nodes = []
     engaged_links = []
 
+    # If simplified is set
     threshold = 0
     if simplified:
         threshold = 1
 
-    # Removing not connected nodes and useless nodes
+    # Remove not connected nodes and superfluous nodes
+    # Superfluous : small nodes (<1 mentioned) or has only one link
     for node in nodes:
+        link_stroke = 0
         connected = 0
         for link in links:
-            if (node["id"] == link["source"]) and (node["freq"] > threshold):
-                connected += 1
-                engaged_links.append({"source": link["source"], "target": link["target"], "value": connected})
-
-    links = engaged_links
-
-    for node in nodes:
-        connected = 0
-
-        for link in links:
-            if (node["id"] == link["source"]) or (node["id"] == link["target"]):
+            if (node["id"] == link["source"]) and (node["freq"] >= threshold):
+                link_stroke += 1
+                engaged_links.append({"source": link["source"], "target": link["target"], "value": link_stroke})
+            if (node["id"] == link["source"]) or (node["id"] == link["target"]) and (node["freq"] >= threshold):
                 connected += 1
         if connected > 0:
             engaged_nodes.append(node)
 
+    links = engaged_links
     nodes = engaged_nodes
 
     # Chrome sorting automatically JS objects so we're fucked
@@ -186,13 +203,14 @@ def get_interactions(id, **options):
     return interactions
 
 
+# Define X (count) most engaged nodes in an interactions list
 def get_most_engaged(interactions, count):
+
     nodes = interactions["nodes"]
 
+    # Descending sort
     nodes.sort(key=lambda e: e['freq'], reverse=True)
+    # Take the X first
     most_engaged_nodes = nodes[:count]
-
-    for node in most_engaged_nodes:
-        node["freq"] -= 1
 
     return most_engaged_nodes

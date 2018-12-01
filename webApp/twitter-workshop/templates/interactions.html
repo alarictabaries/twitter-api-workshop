@@ -74,6 +74,7 @@
 
     var data = {{ interactions|safe }};
     data_set = data[0]
+    console.log(data_set)
     most_engaged_nodes = data[1]
 
     $(document).ready(function() {
@@ -97,7 +98,7 @@
                     for (i in most_engaged_nodes) {
                         jQuery(cards[i]).find(".pic").attr("src", 'https://avatars.io/twitter/' + most_engaged_nodes[i]["alias"] + '/small');
                         jQuery(cards[i]).find(".alias").html('<a target="_BLANK" href="https://twitter.com/intent/user?user_id=' + most_engaged_nodes[i]["id_str"] + '">@' + most_engaged_nodes[i]["alias"] + '</a>');
-                        jQuery(cards[i]).find(".freq").html('<span class="label">Mentionned</span><br>' + (most_engaged_nodes[i]["freq"] - 1) + '</span>');
+                        jQuery(cards[i]).find(".freq").html('<span class="label">Mentionned</span><br>' + (most_engaged_nodes[i]["freq"]) + '</span>');
                         console.log(most_engaged_nodes[i]);
                     }
                     if(cards.length >= most_engaged_nodes.length) {

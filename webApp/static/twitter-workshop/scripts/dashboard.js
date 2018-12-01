@@ -43,9 +43,7 @@ $( document ).ready(function() {
         // Target element which should detect swipes.
         var swipeTarget = this;
         var defaultSettings = {
-            // Amount of pixels, when swipe don't count.
             swipeThreshold: 70,
-            // Flag that indicates that plugin should react only on touch events.
             // Not on mouse events too.
             useOnlyTouch: false
         };

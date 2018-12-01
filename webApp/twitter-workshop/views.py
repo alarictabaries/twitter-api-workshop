@@ -1,8 +1,6 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-
 from .parts import TwitterQuery
-
 from .libraries import twitter
 from .libraries import mongodb
 from django.http import JsonResponse
@@ -14,6 +12,7 @@ def index(request):
 
 
 # /database
+# Display a the list of created queries
 def database(request):
 
     db = mongodb.db_connect()
@@ -32,6 +31,7 @@ def database(request):
 
 
 # /query
+# Create a query
 def query(request):
     if request.method == 'POST':
         form = TwitterQuery.TwitterQuery(request.POST)
@@ -50,6 +50,7 @@ def query(request):
 
 
 # /dataset
+# Display the list of query's tweets
 def dataset(request):
 
     metadata = twitter.get_metadata(request.GET['id'])
@@ -61,10 +62,11 @@ def dataset(request):
 
 
 # /interactions
+# Display interactions graph
 def interactions(request):
 
     metadata = twitter.get_metadata(request.GET['id'])
-    interactions = twitter.get_interactions(metadata["_tweets"])
+    interactions = twitter.get_interactions(metadata["_tweets"], simplified=False)
     metadata = [metadata["_id"], metadata["_tweets"], metadata["keyword"]]
 
     most_engaged_nodes = twitter.get_most_engaged(interactions, 3)
@@ -73,15 +75,22 @@ def interactions(request):
 
 
 # /update_interactions (ajax)
+# Update interactions graph
 def update_interactions(request):
 
+    # Check if request is called from ajax
+    if request.is_ajax() is False:
+        return -1
+
+    # Initialize options
     start_date = request.POST.get('start_date')
     end_date = request.POST.get('end_date')
-
     simplified = request.POST.get('simplified')
 
+    # Read metadata
     metadata = twitter.get_metadata(request.GET['id'])
 
+    # Update interactions list and most engaged nodes
     interactions = twitter.get_interactions(metadata["_tweets"], start_date=start_date, end_date=end_date, simplified=simplified)
     most_engaged_nodes = twitter.get_most_engaged(interactions, 3)
 
