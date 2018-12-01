@@ -375,8 +375,9 @@ circle.influencer {
 .card .user .pic {
     position: absolute;
     border-radius: 50%;
+    border: 2px solid #fff;
     width: 38px;
-    top: -23px;
+    top: -19px;
     left: 10px;
 }
 

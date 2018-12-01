@@ -21,21 +21,17 @@
             <tr class="top">
                 <th>Subject</th>
                 <th>Count</th>
-                <th>RT included</th>
                 <th>Language</th>
                 <th>Date</th>
-                <th>File</th>
             </tr>
             </thead>
         <tbody>
-            {% for item in database %}
+            {% for item in index %}
             <tr>
-                <td class="subject">{{ item.2 }}</td>
+                <td class="subject"><a href="dataset?id={{ item.0 }}">{{ item.1 }}</a></td>
                 <td class="count">{{ item.3 }}</td>
-                <td class="rt">{{ item.4 }}</td>
-                <td class="language">{{ item.5 }}</td>
-                <td class="date">{{ item.6 }}</td>
-                <td class="file"><a href="data_set?seed={{ item.0 }}">{{ item.1 }}</a></td>
+                <td class="language">{{ item.4 }}</td>
+                <td class="date">{{ item.2 }}</td>
             </tr>
             {% endfor %}
         </tbody>

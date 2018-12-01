@@ -1,94 +1,113 @@
 # Operations with Twitter's API
 
 import tweepy
-import uuid
-import datetime
 import json
 import os.path
-from . import csv
+from . import mongodb
 import datetime
 import pytz
-import sys
-
-
-# Create random string
-def random_seed(length):
-    return uuid.uuid4().hex[:length].upper()
-
+from bson.objectid import ObjectId
 
 # Save tweets meeting the criteria to a CSV file
-def scrape_twitter(query, count, rt, lang):
-    seed = random_seed(8)
+def scrape_twitter(keyword, count, lang):
     date_now = datetime.datetime.now()
-
-    query_file = "tweets_" + seed + ".json"
-    tweets = []
 
     auth = tweepy.OAuthHandler('y3fvWam4738fGFCSuVJpIhtwp', 'czDAPY4XnYe4fp4n6FMwrHSFGtF0nY15PgnmozeBAsnObHiKJr')
     auth.set_access_token('229596006-BzKTTM85v2Ca0xf7d11CPM7AKhIOnx03EsUNjgsk',
                           'FnyvhnqiKtRCroJ1iX1qaLxtrn7uEDgXONGplAxZv230V')
     api = tweepy.API(auth, wait_on_rate_limit=True)
 
-    if rt:
-        for tweet in tweepy.Cursor(api.search, q=query, lang=lang, tweet_mode='extended', result_type="recent",
-                                   include_entities=True).items(count):
-            tweets.append(tweet._json)
-    else:
-        for tweet in tweepy.Cursor(api.search, q=query + '-filter:retweets', lang=lang, tweet_mode='extended',
-                                   result_type="recent", include_entities=True).items(count):
-            tweets.append(tweet._json)
-    csv.append_csv("twitter-workshop/tmp/database.csv",
-                   [seed, query_file, query, count, rt, lang, date_now.strftime("%Y-%m-%d %H:%M")])
+    db = mongodb.db_connect()
+    col = db["tweets"]
+    _tweets = col.insert_one({"tweets": []})
 
-    with open("twitter-workshop/tmp/" + query_file, 'w') as outfile:
-        json.dump(tweets, outfile, indent=4, sort_keys=True)
-        outfile.close()
-    return seed
+    for tweet in tweepy.Cursor(api.search, q=keyword, lang=lang, tweet_mode='extended', result_type="recent",include_entities=True).items(count):
+        col.update_one({'_id': _tweets.inserted_id}, {'$push': {'tweets': tweet._json}})
+
+    col = db["index"]
+
+    col.insert_one({
+        "keyword": keyword,
+        "options": {
+            "count": count,
+            "lang": lang,
+        },
+        "_tweets": _tweets.inserted_id,
+        "created_at": date_now.strftime("%Y-%m-%d %H:%M")
+    })
+
+    return 1
 
 
-def get_interactions(seed, start_time, end_time, threshold):
+def get_metadata(id):
 
-    debug = True
+    db = mongodb.db_connect()
+    col = db["index"]
 
-    # Caching system
-    if (os.path.isfile('twitter-workshop/tmp/interactions_' + seed + '.json')) and (start_time is None) and (debug is False):
-        json_data = json.loads(open('twitter-workshop/tmp/interactions_' + seed + '.json').read())
-        return json_data
+    doc = col.find_one({"_id": ObjectId(id)})
+
+    return doc
+
+
+def get_tweets(id):
+    tweet_data = []
+
+    db = mongodb.db_connect()
+    col = db["tweets"]
+    doc = col.find_one({"_id": ObjectId(id)})
+
+    for tweet in doc["tweets"]:
+        short_text = (tweet["full_text"][:125] + '..') if len(tweet["full_text"]) > 125 else tweet["full_text"]
+        datetime_obj = datetime.datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
+        datetime_obj = datetime_obj.replace(tzinfo=pytz.timezone('UTC'))
+        datetime_obj = datetime_obj.strftime("%Y-%m-%d %H:%M")
+        tweet_data.append(
+            [tweet["full_text"], short_text, tweet["id_str"], tweet["user"]["screen_name"], tweet["user"]["id_str"],
+             datetime_obj])
+
+    return tweet_data
+
+
+def get_interactions(id, **options):
+
+    start_date = options.get('start_date', None)
+    end_date = options.get('end_date', None)
+    simplified = options.get('simplified', None)
 
     interactions = {}
     nodes = []
     links = []
 
-    with open("twitter-workshop/tmp/tweets_" + seed + ".json") as json_data:
-        data = json.load(json_data)
-        for tweet in data:
-            datetime_obj = datetime.datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
-            datetime_obj = datetime_obj.replace(tzinfo=pytz.timezone('UTC'))
-            datetime_obj = datetime_obj.strftime("%Y-%m-%d %H:%M")
-            tmp_node = {"id": tweet["user"]["id"], "id_str": tweet["user"]["id_str"],
-                        "alias": tweet["user"]["screen_name"], "type": 1, "freq": 1}
-            if start_time is None:
-                nodes.append(tmp_node)
-            else:
-                if (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") > datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M")) and (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") < datetime.datetime.strptime(end_time, "%Y-%m-%d %H:%M")):
-                    nodes.append(tmp_node)
+    db = mongodb.db_connect()
+    col = db["tweets"]
+    doc = col.find_one({"_id": ObjectId(id)})
 
-            for user in tweet['entities']['user_mentions']:
-                if user and (user['id'] != tweet["user"]["id"]):
-                    tmp_node = {"id": user['id'], "id_str": user['id_str'], "alias": user["screen_name"], "type": 2,
-                                "freq": 1}
-                    tmp_link = {"source": tweet["user"]["id"], "target": user['id'], "value": 1}
-                    if start_time is None:
+    for tweet in doc["tweets"]:
+        datetime_obj = datetime.datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
+        datetime_obj = datetime_obj.replace(tzinfo=pytz.timezone('UTC'))
+        datetime_obj = datetime_obj.strftime("%Y-%m-%d %H:%M")
+        tmp_node = {"id": tweet["user"]["id"], "id_str": tweet["user"]["id_str"],
+                    "alias": tweet["user"]["screen_name"], "type": 1, "freq": 1}
+        if start_date:
+            if (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") > datetime.datetime.strptime(start_date,"%Y-%m-%d %H:%M")) and (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") < datetime.datetime.strptime(end_date, "%Y-%m-%d %H:%M")):
+                nodes.append(tmp_node)
+        else:
+            nodes.append(tmp_node)
+
+        for user in tweet['entities']['user_mentions']:
+            if user and (user['id'] != tweet["user"]["id"]):
+                tmp_node = {"id": user['id'], "id_str": user['id_str'], "alias": user["screen_name"], "type": 2,"freq": 1}
+                tmp_link = {"source": tweet["user"]["id"], "target": user['id'], "value": 1}
+                if start_date:
+                    if (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") > datetime.datetime.strptime(
+                            start_date, "%Y-%m-%d %H:%M")) and (
+                            datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") < datetime.datetime.strptime(
+                            end_date, "%Y-%m-%d %H:%M")):
                         nodes.append(tmp_node)
                         links.append(tmp_link)
-                    else:
-                        if (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") > datetime.datetime.strptime(
-                                start_time, "%Y-%m-%d %H:%M")) and (
-                                datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") < datetime.datetime.strptime(
-                                end_time, "%Y-%m-%d %H:%M")):
-                            nodes.append(tmp_node)
-                            links.append(tmp_link)
-        json_data.close()
+                else:
+                    nodes.append(tmp_node)
+                    links.append(tmp_link)
 
     unique_nodes = []
     for node in nodes:
@@ -101,7 +120,8 @@ def get_interactions(seed, start_time, end_time, threshold):
                 active += 1
 
         if duplicated == 0:
-            tmp_node = {"id": node["id"], "id_str": node["id_str"], "alias": node["alias"], "type": node["type"],"freq": node["freq"]}
+            tmp_node = {"id": node["id"], "id_str": node["id_str"], "alias": node["alias"], "type": node["type"],
+                        "freq": node["freq"]}
             unique_nodes.append(tmp_node)
 
         for unique_node in unique_nodes:
@@ -132,6 +152,10 @@ def get_interactions(seed, start_time, end_time, threshold):
     engaged_nodes = []
     engaged_links = []
 
+    threshold = 0
+    if simplified:
+        threshold = 1
+
     # Removing not connected nodes and useless nodes
     for node in nodes:
         connected = 0
@@ -144,8 +168,9 @@ def get_interactions(seed, start_time, end_time, threshold):
 
     for node in nodes:
         connected = 0
+
         for link in links:
-            if ((node["id"] == link["source"]) or (node["id"] == link["target"])) and (node["freq"] > threshold):
+            if (node["id"] == link["source"]) or (node["id"] == link["target"]):
                 connected += 1
         if connected > 0:
             engaged_nodes.append(node)
@@ -158,36 +183,13 @@ def get_interactions(seed, start_time, end_time, threshold):
     interactions["nodes"] = nodes
     interactions["links"] = links
 
-    if start_time is None:
-        with open('twitter-workshop/tmp/interactions_' + seed + ".json", 'w') as outfile:
-            json.dump(interactions, outfile, indent=4, sort_keys=True)
-
     return interactions
-
-
-def get_tweets(seed):
-    tweet_data = []
-
-    with open("twitter-workshop/tmp/tweets_" + seed + ".json") as json_data:
-        data = json.load(json_data)
-        for tweet in data:
-            short_text = (tweet["full_text"][:125] + '..') if len(tweet["full_text"]) > 125 else tweet["full_text"]
-            datetime_obj = datetime.datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
-            datetime_obj = datetime_obj.replace(tzinfo=pytz.timezone('UTC'))
-            datetime_obj = datetime_obj.strftime("%Y-%m-%d %H:%M")
-            tweet_data.append(
-                [tweet["full_text"], short_text, tweet["id_str"], tweet["user"]["screen_name"], tweet["user"]["id_str"],
-                 datetime_obj])
-    json_data.close()
-
-    return tweet_data
 
 
 def get_most_engaged(interactions, count):
     nodes = interactions["nodes"]
 
     nodes.sort(key=lambda e: e['freq'], reverse=True)
-
     most_engaged_nodes = nodes[:count]
 
     for node in most_engaged_nodes:
