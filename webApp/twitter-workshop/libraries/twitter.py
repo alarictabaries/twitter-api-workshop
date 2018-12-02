@@ -5,6 +5,7 @@ from . import mongodb
 import datetime
 import pytz
 from bson.objectid import ObjectId
+import json
 
 
 # Save tweets meeting the criteria to a CSV file
@@ -20,10 +21,15 @@ def scrape_twitter(keyword, count, lang):
     # Write tweets
     db = mongodb.db_connect()
     col = db["tweets"]
-    _tweets = col.insert_one({"tweets": []})
+    _docs = []
 
-    for tweet in tweepy.Cursor(api.search, q=keyword, lang=lang, tweet_mode='extended', result_type="recent",include_entities=True).items(count):
-        col.update_one({'_id': _tweets.inserted_id}, {'$push': {'tweets': tweet._json}})
+    i = 0
+    for tweet in tweepy.Cursor(api.search, q=keyword, lang=lang, tweet_mode='extended', result_type="recent", include_entities=True).items(count):
+        if i%5 == 0:
+            _tweets = col.insert_one({"tweets": []})
+            _docs.append(_tweets.inserted_id)
+        col.update_one({'_id': ObjectId(_tweets.inserted_id)}, {'$push': {'tweets': tweet._json}})
+        i += 1
 
     col = db["index"]
 
@@ -34,7 +40,7 @@ def scrape_twitter(keyword, count, lang):
             "count": count,
             "lang": lang,
         },
-        "_tweets": _tweets.inserted_id,
+        "_tweets": _docs,
         "created_at": date_now.strftime("%Y-%m-%d %H:%M")
     })
 
@@ -54,29 +60,33 @@ def get_metadata(_id):
 
 
 # Get tweets from DB
-def get_tweets(_id):
+def get_tweets(_ids):
+
     tweet_data = []
 
     # Read the tweets document
     db = mongodb.db_connect()
     col = db["tweets"]
-    doc = col.find_one({"_id": ObjectId(_id)})
 
-    # Iterate over tweets
-    for tweet in doc["tweets"]:
-        short_text = (tweet["full_text"][:125] + '..') if len(tweet["full_text"]) > 125 else tweet["full_text"]
-        datetime_obj = datetime.datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
-        datetime_obj = datetime_obj.replace(tzinfo=pytz.timezone('UTC'))
-        datetime_obj = datetime_obj.strftime("%Y-%m-%d %H:%M")
-        tweet_data.append(
-            [tweet["full_text"], short_text, tweet["id_str"], tweet["user"]["screen_name"], tweet["user"]["id_str"],
-             datetime_obj])
+    for _id in _ids:
+
+        doc = col.find_one({"_id": ObjectId(_id)})
+
+        # Iterate over tweets
+        for tweet in doc["tweets"]:
+            short_text = (tweet["full_text"][:125] + '..') if len(tweet["full_text"]) > 125 else tweet["full_text"]
+            datetime_obj = datetime.datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
+            datetime_obj = datetime_obj.replace(tzinfo=pytz.timezone('UTC'))
+            datetime_obj = datetime_obj.strftime("%Y-%m-%d %H:%M")
+            tweet_data.append(
+                [tweet["full_text"], short_text, tweet["id_str"], tweet["user"]["screen_name"], tweet["user"]["id_str"],
+                 datetime_obj])
 
     return tweet_data
 
 
 # Get interactions
-def get_interactions(_id, **options):
+def get_interactions(_ids, **options):
 
     # If options are set
     start_date = options.get('start_date', None)
@@ -90,40 +100,43 @@ def get_interactions(_id, **options):
     # Read the tweets document
     db = mongodb.db_connect()
     col = db["tweets"]
-    doc = col.find_one({"_id": ObjectId(_id)})
 
-    # Iterate over tweets
-    for tweet in doc["tweets"]:
-        datetime_obj = datetime.datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
-        datetime_obj = datetime_obj.replace(tzinfo=pytz.timezone('UTC'))
-        datetime_obj = datetime_obj.strftime("%Y-%m-%d %H:%M")
-        tmp_node = {"id": tweet["user"]["id"], "id_str": tweet["user"]["id_str"],
-                    "alias": tweet["user"]["screen_name"], "type": 1, "freq": 0}
-        # If date is set
-        if start_date:
-            # If the tweet is in the specified time frame
-            if (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") >= datetime.datetime.strptime(start_date,"%Y-%m-%d %H:%M")) and (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") <= datetime.datetime.strptime(end_date, "%Y-%m-%d %H:%M")):
+    for _id in _ids:
+
+        doc = col.find_one({"_id": ObjectId(_id)})
+
+        # Iterate over tweets
+        for tweet in doc["tweets"]:
+            datetime_obj = datetime.datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
+            datetime_obj = datetime_obj.replace(tzinfo=pytz.timezone('UTC'))
+            datetime_obj = datetime_obj.strftime("%Y-%m-%d %H:%M")
+            tmp_node = {"id": tweet["user"]["id"], "id_str": tweet["user"]["id_str"],
+                        "alias": tweet["user"]["screen_name"], "type": 1, "freq": 0}
+            # If date is set
+            if start_date:
+                # If the tweet is in the specified time frame
+                if (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") >= datetime.datetime.strptime(start_date,"%Y-%m-%d %H:%M")) and (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") <= datetime.datetime.strptime(end_date, "%Y-%m-%d %H:%M")):
+                    nodes.append(tmp_node)
+            else:
                 nodes.append(tmp_node)
-        else:
-            nodes.append(tmp_node)
 
-        # Iterate over mentions
-        for user in tweet['entities']['user_mentions']:
-            if user and (user['id'] != tweet["user"]["id"]): # The user can't mention himself
-                tmp_node = {"id": user['id'], "id_str": user['id_str'], "alias": user["screen_name"], "type": 2,"freq": 0}
-                tmp_link = {"source": tweet["user"]["id"], "target": user['id'], "value": 1}
-                # If date is set
-                if start_date:
-                    # If the tweet is in the specified time frame
-                    if (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") >= datetime.datetime.strptime(
-                            start_date, "%Y-%m-%d %H:%M")) and (
-                            datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") <= datetime.datetime.strptime(
-                            end_date, "%Y-%m-%d %H:%M")):
+            # Iterate over mentions
+            for user in tweet['entities']['user_mentions']:
+                if user and (user['id'] != tweet["user"]["id"]): # The user can't mention himself
+                    tmp_node = {"id": user['id'], "id_str": user['id_str'], "alias": user["screen_name"], "type": 2,"freq": 0}
+                    tmp_link = {"source": tweet["user"]["id"], "target": user['id'], "value": 1}
+                    # If date is set
+                    if start_date:
+                        # If the tweet is in the specified time frame
+                        if (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") >= datetime.datetime.strptime(
+                                start_date, "%Y-%m-%d %H:%M")) and (
+                                datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") <= datetime.datetime.strptime(
+                                end_date, "%Y-%m-%d %H:%M")):
+                            nodes.append(tmp_node)
+                            links.append(tmp_link)
+                    else:
                         nodes.append(tmp_node)
                         links.append(tmp_link)
-                else:
-                    nodes.append(tmp_node)
-                    links.append(tmp_link)
 
     # Create unique nodes array
     # and determine active et inactive ones
@@ -181,8 +194,6 @@ def get_interactions(_id, **options):
 
     # Remove not connected nodes and superfluous nodes
     # Superfluous : small nodes (<1 mentioned) or has only one link
-
-
     nodes = engaged_nodes
     links = engaged_links
 
