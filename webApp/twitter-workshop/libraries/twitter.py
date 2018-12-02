@@ -23,9 +23,11 @@ def scrape_twitter(keyword, count, lang):
     col = db["tweets"]
     _docs = []
 
+    # Create new document every 1k tweets
     i = 0
-    for tweet in tweepy.Cursor(api.search, q=keyword, lang=lang, tweet_mode='extended', result_type="recent", include_entities=True).items(count):
-        if i%5 == 0:
+    for tweet in tweepy.Cursor(api.search, q=keyword, lang=lang, tweet_mode='extended', result_type="recent",
+                               include_entities=True).items(count):
+        if i % 1000 == 0:
             _tweets = col.insert_one({"tweets": []})
             _docs.append(_tweets.inserted_id)
         col.update_one({'_id': ObjectId(_tweets.inserted_id)}, {'$push': {'tweets': tweet._json}})
@@ -49,7 +51,6 @@ def scrape_twitter(keyword, count, lang):
 
 # Read metadata from DB
 def get_metadata(_id):
-
     db = mongodb.db_connect()
     col = db["index"]
 
@@ -61,7 +62,6 @@ def get_metadata(_id):
 
 # Get tweets from DB
 def get_tweets(_ids):
-
     tweet_data = []
 
     # Read the tweets document
@@ -87,11 +87,10 @@ def get_tweets(_ids):
 
 # Get interactions
 def get_interactions(_ids, **options):
-
     # If options are set
     start_date = options.get('start_date', None)
     end_date = options.get('end_date', None)
-    simplified = options.get('simplified', None)
+    threshold = options.get('threshold', None)
 
     interacts = {}
     nodes = []
@@ -115,23 +114,28 @@ def get_interactions(_ids, **options):
             # If date is set
             if start_date:
                 # If the tweet is in the specified time frame
-                if (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") >= datetime.datetime.strptime(start_date,"%Y-%m-%d %H:%M")) and (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") <= datetime.datetime.strptime(end_date, "%Y-%m-%d %H:%M")):
+                if (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") >= datetime.datetime.strptime(start_date,
+                                                                                                             "%Y-%m-%d %H:%M")) and (
+                        datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") <= datetime.datetime.strptime(
+                        end_date, "%Y-%m-%d %H:%M")):
                     nodes.append(tmp_node)
             else:
                 nodes.append(tmp_node)
 
             # Iterate over mentions
             for user in tweet['entities']['user_mentions']:
-                if user and (user['id'] != tweet["user"]["id"]): # The user can't mention himself
-                    tmp_node = {"id": user['id'], "id_str": user['id_str'], "alias": user["screen_name"], "type": 2,"freq": 0}
+                if user and (user['id'] != tweet["user"]["id"]):  # The user can't mention himself
+                    tmp_node = {"id": user['id'], "id_str": user['id_str'], "alias": user["screen_name"], "type": 2,
+                                "freq": 0}
                     tmp_link = {"source": tweet["user"]["id"], "target": user['id'], "value": 1}
                     # If date is set
                     if start_date:
                         # If the tweet is in the specified time frame
                         if (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") >= datetime.datetime.strptime(
                                 start_date, "%Y-%m-%d %H:%M")) and (
-                                datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") <= datetime.datetime.strptime(
-                                end_date, "%Y-%m-%d %H:%M")):
+                                datetime.datetime.strptime(datetime_obj,
+                                                           "%Y-%m-%d %H:%M") <= datetime.datetime.strptime(
+                            end_date, "%Y-%m-%d %H:%M")):
                             nodes.append(tmp_node)
                             links.append(tmp_link)
                     else:
@@ -183,7 +187,7 @@ def get_interactions(_ids, **options):
                 node["freq"] += 1
 
     # If simplified is set
-    if simplified is None:
+    if threshold is None:
         interacts["nodes"] = nodes
         interacts["links"] = links
 
@@ -194,7 +198,26 @@ def get_interactions(_ids, **options):
 
     # Remove not connected nodes and superfluous nodes
     # Superfluous : small nodes (<1 mentioned) or has only one link
+    for node in nodes:
+        connected = 0
+        for link in links:
+            if (node["id"] == link["target"]) and (node["freq"] >= threshold):
+                connected += 1
+        if connected > 0:
+            engaged_nodes.append(node)
+
     nodes = engaged_nodes
+
+    for link in links:
+        connected = 0
+        for node in nodes:
+            if node["id"] == link["target"]:
+                connected += 1
+            if node["id"] == link["source"]:
+                connected += 1
+        if (connected != 0) and (connected%2 == 0):
+            engaged_links.append(link)
+
     links = engaged_links
 
     # Chrome sorting automatically JS objects so we're fucked
@@ -208,7 +231,6 @@ def get_interactions(_ids, **options):
 
 # Define X (count) most engaged nodes in an interactions list
 def get_most_engaged(interacts, count):
-
     nodes = interacts["nodes"]
 
     # Descending sort

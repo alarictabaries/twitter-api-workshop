@@ -84,13 +84,13 @@ def update_interactions(request):
     # Initialize options
     start_date = request.POST.get('start_date')
     end_date = request.POST.get('end_date')
-    simplified = request.POST.get('simplified')
+    threshold = int(request.POST.get('threshold'))
 
     # Read metadata
     metadata = twitter.get_metadata(request.GET['id'])
 
     # Update interactions list and most engaged nodes
-    interacts = twitter.get_interactions(metadata["_tweets"], start_date=start_date, end_date=end_date, simplified=simplified)
+    interacts = twitter.get_interactions(metadata["_tweets"], start_date=start_date, end_date=end_date, threshold=threshold)
     most_engaged_nodes = twitter.get_most_engaged(interacts, 3)
 
     interacts = [interacts, most_engaged_nodes]

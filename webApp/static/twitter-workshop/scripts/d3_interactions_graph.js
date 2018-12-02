@@ -9,6 +9,40 @@ function show_info(d) {
     }
 }
 
+function update_interactions(threshold, token) {
+    $('#overlay').fadeIn(125);
+            show_info(false);
+            $.ajax({
+                type: "POST",
+                url: '/update_interactions?id=' + getUrlVars()["id"],
+                data: {
+                    csrfmiddlewaretoken: token,
+                    threshold: threshold
+                },
+                success: function (response) {
+                    var data_set = response[0];
+                    var most_engaged_nodes = response[1];
+                    cards = $(".cards .card");
+                    for (i in most_engaged_nodes) {
+                        jQuery(cards[i]).find(".pic").attr("src", 'https://avatars.io/twitter/' + most_engaged_nodes[i]["alias"] + '/small');
+                        jQuery(cards[i]).find(".alias").html('<a target="_BLANK" href="https://twitter.com/intent/user?user_id=' + most_engaged_nodes[i]["id_str"] + '">@' + most_engaged_nodes[i]["alias"] + '</a>');
+                        jQuery(cards[i]).find(".freq").html('<span class="label">Mentionned</span><br>' + (most_engaged_nodes[i]["freq"]) + '</span>');
+                    }
+                    if(cards.length >= most_engaged_nodes.length) {
+                        for(i=most_engaged_nodes.length; i<cards.length; i++) {
+                            jQuery(cards[i]).remove();
+                        }
+
+                    }
+                     svg = d3.select('.graph').append("svg");
+                    createV4SelectableForceDirectedGraph(svg, data_set, most_engaged_nodes);
+                },
+                complete: function(){
+                    $('#overlay').fadeOut(125);
+                }
+            });
+}
+
 function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
     // if both d3v3 and d3v4 are loaded, we'll assume
     // that d3v4 is called d3v4, otherwise we'll assume
@@ -145,9 +179,9 @@ function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
                 return dist;
             })
         )
-        .force("charge", d3v4.forceManyBody())
+        //.force("charge", d3v4.forceManyBody())
         // if nodes < X,
-        //.force("charge", d3v4.forceManyBody().strength(-300))
+        .force("charge", d3v4.forceManyBody().strength(-300))
         .force("center", d3v4.forceCenter(parentWidth / 2, parentHeight / 2))
         .force("x", d3v4.forceX(parentWidth/2))
         .force("y", d3v4.forceY(parentHeight/2));
