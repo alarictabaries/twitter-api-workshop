@@ -22,7 +22,6 @@ def database(request):
     index = []
 
     for doc in docs:
-        print(doc["_id"])
         index.append([doc["_id"], doc["keyword"], doc["created_at"], doc["options"]["count"], doc["options"]["lang"]])
 
     index = reversed(index)
@@ -66,7 +65,7 @@ def dataset(request):
 def interactions(request):
 
     metadata = twitter.get_metadata(request.GET['id'])
-    interactions = twitter.get_interactions(metadata["_tweets"], simplified=False)
+    interactions = twitter.get_interactions(metadata["_tweets"])
     metadata = [metadata["_id"], metadata["_tweets"], metadata["keyword"]]
 
     most_engaged_nodes = twitter.get_most_engaged(interactions, 3)
@@ -91,9 +90,9 @@ def update_interactions(request):
     metadata = twitter.get_metadata(request.GET['id'])
 
     # Update interactions list and most engaged nodes
-    interactions = twitter.get_interactions(metadata["_tweets"], start_date=start_date, end_date=end_date, simplified=simplified)
-    most_engaged_nodes = twitter.get_most_engaged(interactions, 3)
+    interacts = twitter.get_interactions(metadata["_tweets"], start_date=start_date, end_date=end_date, simplified=simplified)
+    most_engaged_nodes = twitter.get_most_engaged(interacts, 3)
 
-    interactions = [interactions, most_engaged_nodes]
+    interacts = [interacts, most_engaged_nodes]
 
-    return JsonResponse(interactions, safe=False)
+    return JsonResponse(interacts, safe=False)

@@ -19,29 +19,24 @@
 
         <div class="graph full"></div>
 
-        <div class="data">
-            <span class="tweets">Tweets analyzed : 512</span>
-            <span class="nodes">Nodes : 125</span>
-        </div>
-
         <div class="cards">
 
             <div class="col-label"><i class="material-icons">show_chart</i>Top influencers</div>
 
             {% for node in interactions.1 %}
 
-            <div class="card">
-                <div class="cover"></div>
-                <div class="user">
-                    <img class="pic" src="https://avatars.io/twitter/{{ node.alias }}/small">
-                    <div class="user-details">
-                        <span class="alias"><a target="_BLANK" href="https://twitter.com/intent/user?user_id={{ node.id_str }}">@{{ node.alias }}</a></span><br>
-                        <div class="details">
-                            <div class="item"><span class="freq"><span class="label">Mentionned</span><br>{{ node.freq }}</span></div>
+                <div class="card">
+                    <div class="cover"></div>
+                    <div class="user">
+                        <img class="pic" src="https://avatars.io/twitter/{{ node.alias }}/small">
+                        <div class="user-details">
+                            <span class="alias"><a target="_BLANK" href="https://twitter.com/intent/user?user_id={{ node.id_str }}">@{{ node.alias }}</a></span><br>
+                            <div class="details">
+                                <div class="item"><span class="freq"><span class="label">Mentionned</span><br>{{ node.freq }}</span></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
             {% endfor %}
 

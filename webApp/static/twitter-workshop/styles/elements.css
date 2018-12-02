@@ -248,6 +248,7 @@ table.dataTable.no-footer {
 .graph.full {
     width: 100%;
     height: calc(100vh - 45px);
+    overflow: hidden;
 }
 
 #d3_selectable_force_directed_graph svg {
@@ -313,7 +314,7 @@ circle.influencer {
     border-radius: 2px;
     font-size: 13px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.13);
-	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
 }
 
 .cards .col-actions {
@@ -348,7 +349,7 @@ circle.influencer {
     left: 50%;
     transform: translateX(-50%);
     border-bottom: 1px solid rgba(0, 0, 0, 0.13);
-	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
 }
 
 .card a {
@@ -399,21 +400,6 @@ circle.influencer {
 .card .user .freq {
     color: #3498db;
     font-weight: 600;
-}
-
-/* cards simplebar theming */
-.simplebar-track {
-    left: -12px;
-}
-
-.simplebar-scrollbar {
-    left: 2px;
-    width: 3px;
-}
-
-.simplebar-scrollbar:before {
-    background: #3498db;
-    border-radius: 2px;
 }
 
 @media only screen and (max-width: 1080px) {

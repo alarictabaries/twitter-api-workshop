@@ -14,6 +14,9 @@ function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
     // that d3v4 is called d3v4, otherwise we'll assume
     // that d3v4 is the default (d3)
 
+    $(".settings .data .nodes").html("Nodes: " + graph.nodes.length);
+    $(".settings .data .links").html("Links analyzed: " + graph.links.length);
+
     defs = svg.append("defs");
 
     for(node in most_engaged_nodes) {
@@ -144,7 +147,7 @@ function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
         )
         .force("charge", d3v4.forceManyBody())
         // if nodes < X,
-        //.force("charge", d3v4.forceManyBody().strength(-120))
+        //.force("charge", d3v4.forceManyBody().strength(-300))
         .force("center", d3v4.forceCenter(parentWidth / 2, parentHeight / 2))
         .force("x", d3v4.forceX(parentWidth/2))
         .force("y", d3v4.forceY(parentHeight/2));

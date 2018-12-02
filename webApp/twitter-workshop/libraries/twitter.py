@@ -83,7 +83,7 @@ def get_interactions(_id, **options):
     end_date = options.get('end_date', None)
     simplified = options.get('simplified', None)
 
-    interactions = {}
+    interacts = {}
     nodes = []
     links = []
 
@@ -169,44 +169,36 @@ def get_interactions(_id, **options):
             if node["id"] == link["target"]:
                 node["freq"] += 1
 
+    # If simplified is set
+    if simplified is None:
+        interacts["nodes"] = nodes
+        interacts["links"] = links
+
+        return interacts
+
     engaged_nodes = []
     engaged_links = []
 
-    # If simplified is set
-    threshold = 0
-    if simplified:
-        threshold = 1
-
     # Remove not connected nodes and superfluous nodes
     # Superfluous : small nodes (<1 mentioned) or has only one link
-    for node in nodes:
-        link_stroke = 0
-        connected = 0
-        for link in links:
-            if (node["id"] == link["source"]) and (node["freq"] >= threshold):
-                link_stroke += 1
-                engaged_links.append({"source": link["source"], "target": link["target"], "value": link_stroke})
-            if (node["id"] == link["source"]) or (node["id"] == link["target"]) and (node["freq"] >= threshold):
-                connected += 1
-        if connected > 0:
-            engaged_nodes.append(node)
 
-    links = engaged_links
+
     nodes = engaged_nodes
+    links = engaged_links
 
     # Chrome sorting automatically JS objects so we're fucked
     # nodes.sort(key=lambda e: e['freq'], reverse=False)
 
-    interactions["nodes"] = nodes
-    interactions["links"] = links
+    interacts["nodes"] = nodes
+    interacts["links"] = links
 
-    return interactions
+    return interacts
 
 
 # Define X (count) most engaged nodes in an interactions list
-def get_most_engaged(interactions, count):
+def get_most_engaged(interacts, count):
 
-    nodes = interactions["nodes"]
+    nodes = interacts["nodes"]
 
     # Descending sort
     nodes.sort(key=lambda e: e['freq'], reverse=True)
