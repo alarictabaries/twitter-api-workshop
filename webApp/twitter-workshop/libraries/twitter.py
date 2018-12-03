@@ -87,6 +87,7 @@ def get_tweets(_ids):
 
 # Get interactions
 def get_interactions(_ids, **options):
+
     # If options are set
     start_date = options.get('start_date', None)
     end_date = options.get('end_date', None)
@@ -200,7 +201,7 @@ def get_interactions(_ids, **options):
     nodes = engaged_nodes
 
     # If simplified is set
-    if threshold is None:
+    if threshold is None or threshold is 0:
         interacts["nodes"] = nodes
         interacts["links"] = links
 
@@ -231,9 +232,6 @@ def get_interactions(_ids, **options):
             engaged_links.append(link)
 
     links = engaged_links
-
-    # Chrome sorting automatically JS objects so we're fucked
-    # nodes.sort(key=lambda e: e['freq'], reverse=False)
 
     interacts["nodes"] = nodes
     interacts["links"] = links

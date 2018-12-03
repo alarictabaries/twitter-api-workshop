@@ -19,14 +19,19 @@
 
         <div class="graph full"></div>
 
+        <div class="settings full">
+            <div class="threshold">
+                <label>Freq. threshold:</label><input id="threshold" type="number" min="0" value="0">
+            </div>
+        </div>
+
         <div class="cards">
 
-            <div class="col-label"><i class="material-icons">show_chart</i>Top influencers</div>
+            <div class="col-label">Top influencers</div>
 
             {% for node in interactions.1 %}
 
                 <div class="card">
-                    <div class="cover"></div>
                     <div class="user">
                         <img class="pic" src="https://avatars.io/twitter/{{ node.alias }}/small">
                         <div class="user-details">
@@ -49,7 +54,6 @@
         </div>
 
         <div class="node card">
-            <div class="cover"></div>
             <div class="user">
                 <img class="pic"/>
                 <div class="user-details">
@@ -68,17 +72,17 @@
 <script>
 
     var data = {{ interactions|safe }};
-    data_set = data[0]
-    most_engaged_nodes = data[1]
+    data_set = data[0];
+    most_engaged_nodes = data[1];
 
     $(document).ready(function() {
 
+        $("#threshold").on("keyup", function() {
+           update_interactions($(this).val(), '{{ csrf_token }}')
+        });
+
         var svg = d3.select('.graph').append("svg");
         createV4SelectableForceDirectedGraph(svg, data_set, most_engaged_nodes);
-
-        $( ".col-label" ).on( "click", function() {
-            update_interactions(2, '{{ csrf_token }}')
-        });
 
     });
 

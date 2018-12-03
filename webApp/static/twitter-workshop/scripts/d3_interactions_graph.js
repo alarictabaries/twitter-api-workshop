@@ -2,9 +2,9 @@ function show_info(d) {
     if(d == false) {
         $(".card.node").fadeOut(85);
     } else {
-        $(".card.node .pic").attr("src", "https://avatars.io/twitter/" + d.alias + "/small")
+        $(".card.node .pic").attr("src", "https://avatars.io/twitter/" + d.alias + "/small");
         $(".card.node .alias").html("<a target=\"_BLANK\" href=\"https://twitter.com/intent/user?user_id=" + d.id_str + "\">@" + d.alias + "</a>");
-        $(".card.node .freq").html("<span class=\"label\">Mentionned</span><br />" + d.freq);
+        $(".card.node .freq").html("<span class=\"label\">Mentioned</span><br />" + d.freq);
         $(".card.node").fadeIn(115);
     }
 }
@@ -21,19 +21,6 @@ function update_interactions(threshold, token) {
                 },
                 success: function (response) {
                     var data_set = response[0];
-                    var most_engaged_nodes = response[1];
-                    cards = $(".cards .card");
-                    for (i in most_engaged_nodes) {
-                        jQuery(cards[i]).find(".pic").attr("src", 'https://avatars.io/twitter/' + most_engaged_nodes[i]["alias"] + '/small');
-                        jQuery(cards[i]).find(".alias").html('<a target="_BLANK" href="https://twitter.com/intent/user?user_id=' + most_engaged_nodes[i]["id_str"] + '">@' + most_engaged_nodes[i]["alias"] + '</a>');
-                        jQuery(cards[i]).find(".freq").html('<span class="label">Mentionned</span><br>' + (most_engaged_nodes[i]["freq"]) + '</span>');
-                    }
-                    if(cards.length >= most_engaged_nodes.length) {
-                        for(i=most_engaged_nodes.length; i<cards.length; i++) {
-                            jQuery(cards[i]).remove();
-                        }
-
-                    }
                      svg = d3.select('.graph').append("svg");
                     createV4SelectableForceDirectedGraph(svg, data_set, most_engaged_nodes);
                 },
@@ -47,6 +34,8 @@ function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
     // if both d3v3 and d3v4 are loaded, we'll assume
     // that d3v4 is called d3v4, otherwise we'll assume
     // that d3v4 is the default (d3)
+
+    graph.nodes = graph.nodes.reverse();
 
     $(".settings .data .nodes").html("Nodes: " + graph.nodes.length);
     $(".settings .data .links").html("Links analyzed: " + graph.links.length);

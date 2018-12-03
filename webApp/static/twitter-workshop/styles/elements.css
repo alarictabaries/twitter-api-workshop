@@ -188,19 +188,24 @@ table.dataTable.no-footer {
     background: rgba(236,240,241 ,1);
     border-top-left-radius: 2px;
     border-bottom-left-radius: 2px;
-    padding: 8px 12px;
+    padding: 0px 12px;
+    height: 31px;
+    line-height: 31px;
     margin-bottom: 12px;
     padding-right: 0;
     border: 0;
 }
 
-.query input[type="submit"] {display: block;
+.query input[type="submit"] {
+    display: block;
     color: #34495e;
     text-decoration: none;
     font-size: 12px;
     background: rgba(236,240,241 ,1);
     border-radius: 2px;
-    padding: 8px 12px;
+    padding: 0px 12px;
+    height: 31px;
+    line-height: 31px;
     margin-right: 12px;
     margin-bottom: 12px;
     border: 0;
@@ -290,16 +295,16 @@ circle.influencer {
 
 .cards {
     position: absolute;
-    left: 25px;
-    top: 16px;
+    left: 32px;
+    top: 22px;
 }
 
-.cards .col-label {
-    font-size: 13px;
+.col-label {
+    font-size: 12px;
     text-align: center;
 }
 
-.cards .col-label i {
+.col-label i {
     font-size: 13px;
     vertical-align: -2px;
     margin-right: 4px;
@@ -317,14 +322,16 @@ circle.influencer {
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
 }
 
-.cards .col-actions {
+.col-actions {
     text-align: center;
     margin-top: 12px;
 }
 
-.cards .col-actions a {
+.col-actions a {
     border-radius: 50%;
-    padding: 8px 10px;
+    width:31px;
+    height:31px;
+    line-height:31px;
     display: inline-block;
     color: #34495e;
     text-decoration: none;
@@ -334,7 +341,7 @@ circle.influencer {
     margin-bottom: 12px;
 }
 
-.cards .col-actions i {
+.col-actions i {
     font-size: 12px;
     vertical-align: -2px;
 }
@@ -342,7 +349,7 @@ circle.influencer {
 .card.node {
     display: none;
     position: absolute;
-    bottom: 45px;
+    top: 25px;
     border: 0;
     border-radius: 2px;
     font-size: 13px;
@@ -356,13 +363,6 @@ circle.influencer {
     color: #3498db;
 }
 
-.card .cover {
-    background: #3498db;
-    height: 38px;
-    border-top-left-radius: 2px;
-    border-top-right-radius: 2px;
-}
-
 .card .user {
     position: relative;
     background: #ffffff;
@@ -370,16 +370,16 @@ circle.influencer {
 
 .card .user .user-details {
     margin-left: 46px;
-    padding: 6px 12px 8px 12px;
+    padding: 8px 12px;
 }
 
 .card .user .pic {
     position: absolute;
     border-radius: 50%;
+    width: 36px;
+    top: 8px;
+    left: 12px;
     border: 2px solid #fff;
-    width: 38px;
-    top: -19px;
-    left: 10px;
 }
 
 .card .details .item:first-child {
@@ -400,6 +400,40 @@ circle.influencer {
 .card .user .freq {
     color: #3498db;
     font-weight: 600;
+}
+
+.settings.full {
+    position: absolute;
+    right: 32px;
+    top: 25px;
+    text-align: right;
+}
+
+.settings.full .threshold {
+
+}
+
+.settings.full label {
+    text-decoration: none;
+    font-size: 12px;
+    color: #bdc3c7;
+}
+
+.settings.full input {
+    color: #bdc3c7;
+    text-decoration: none;
+    font-size: 12px;
+    text-align: right;
+    border: 0;
+}
+
+.settings.full input[type="number"] {
+    width: 28px;
+}
+
+.settings.full input[type="number"]::-webkit-inner-spin-button,
+.settings.full input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
 }
 
 @media only screen and (max-width: 1080px) {
