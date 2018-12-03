@@ -186,6 +186,19 @@ def get_interactions(_ids, **options):
             if node["id"] == link["target"]:
                 node["freq"] += 1
 
+    engaged_nodes = []
+
+    # Remove isolated nodes
+    for node in nodes:
+        connected = 0
+        for link in links:
+            if node["id"] == link["source"] or node["id"] == link["target"] :
+                connected += 1
+        if connected > 0:
+            engaged_nodes.append(node)
+
+    nodes = engaged_nodes
+
     # If simplified is set
     if threshold is None:
         interacts["nodes"] = nodes
@@ -196,8 +209,7 @@ def get_interactions(_ids, **options):
     engaged_nodes = []
     engaged_links = []
 
-    # Remove not connected nodes and superfluous nodes
-    # Superfluous : small nodes (<1 mentioned) or has only one link
+    # Remove small nodes (with freq < threshold
     for node in nodes:
         connected = 0
         for link in links:

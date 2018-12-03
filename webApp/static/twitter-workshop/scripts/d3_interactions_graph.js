@@ -179,9 +179,9 @@ function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
                 return dist;
             })
         )
-        //.force("charge", d3v4.forceManyBody())
+        .force("charge", d3v4.forceManyBody())
         // if nodes < X,
-        .force("charge", d3v4.forceManyBody().strength(-160))
+        //.force("charge", d3v4.forceManyBody().strength(-160))
         .force("center", d3v4.forceCenter(parentWidth / 2, parentHeight / 2))
         .force("x", d3v4.forceX(parentWidth/2))
         .force("y", d3v4.forceY(parentHeight/2));
