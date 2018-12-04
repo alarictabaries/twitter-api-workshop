@@ -1,0 +1,175 @@
+.graph {
+    display: block;
+    width: 100%;
+    height: calc(100vh - 45px);
+    overflow: hidden;
+}
+
+#d3_selectable_force_directed_graph svg {
+    border: 1px solid;
+    font: 13px sans-serif;
+    text-anchor: end;
+}
+
+#d3_selectable_force_directed_graph .node {
+    stroke: #fff;
+    stroke-width: 1.5px;
+}
+
+.node .selected {
+    stroke: #2c3e50;
+    stroke-width: 2px;
+}
+
+.link {
+    stroke: #bdc3c7;
+}
+
+.link .hl {
+    stroke: #95a5a6;
+}
+
+circle.active {
+    fill: #3498db;
+}
+
+circle.inactive {
+    fill:#7f8c8d;
+}
+
+circle.influencer {
+    stroke-width: 2px;
+    stroke: #2980b9;
+}
+
+circle.alone {
+    display: none;
+}
+
+.col-label {
+    font-size: 12px;
+    text-align: center;
+}
+
+.col-label i {
+    font-size: 13px;
+    vertical-align: -2px;
+    margin-right: 4px;
+}
+
+.cards {
+    position: absolute;
+    left: 32px;
+    top: 22px;
+}
+
+.cards .card:first-child {
+    margin-top: 0;
+}
+
+.cards .card {
+    margin-top: 12px;
+    border-radius: 2px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.13);
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+}
+
+.col-actions {
+    text-align: center;
+    margin-top: 14px;
+}
+
+.col-actions a {
+    border-radius: 2px;
+    height:31px;
+    line-height:31px;
+    padding: 0px 8px;
+    display: inline-block;
+    color: #34495e;
+    text-decoration: none;
+    font-size: 12px;
+    background: rgba(236,240,241 ,1);
+    margin-right: 12px;
+    margin-bottom: 12px;
+}
+
+.col-actions i {
+    font-size: 12px;
+    padding-right: 4px;
+    vertical-align: -2px;
+}
+
+.card.node {
+    display: none;
+    position: absolute;
+    top: 25px;
+    border: 0;
+    border-radius: 2px;
+    font-size: 13px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.13);
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+}
+
+.card a {
+    color: #3498db;
+}
+
+.card .user {
+    position: relative;
+    background: #ffffff;
+}
+
+.card .user .user-details {
+    margin-left: 46px;
+    padding: 8px 12px;
+}
+
+.card .user .pic {
+    position: absolute;
+    border-radius: 50%;
+    width: 36px;
+    top: 8px;
+    left: 12px;
+    border: 2px solid #fff;
+}
+
+.card .details .item:first-child {
+    margin-left: 0px;
+}
+
+.card .user .item {
+    display: inline-block;
+    margin-left: 8px;
+    margin-top: 4px;
+}
+
+.card .user .label {
+    font-size: 11px;
+    color: #34495e;
+}
+
+.card .user .freq {
+    color: #3498db;
+    font-weight: 600;
+}
+
+.settings {
+    position: absolute;
+    right: 32px;
+    top: 25px;
+    text-align: right;
+}
+
+.settings .display label {
+    font-size: 12px;
+}
+
+.settings .display input[type="checkbox"] {
+    border: 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.13);
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+    background: #ffffff;
+}

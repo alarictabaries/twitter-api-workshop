@@ -9,25 +9,25 @@ function show_info(d) {
     }
 }
 
-function update_interactions(threshold, token) {
+function update_interactions(threshold, lonely_nodes, token) {
     $('#overlay').fadeIn(125);
-            show_info(false);
-            $.ajax({
-                type: "POST",
-                url: '/update_interactions?id=' + getUrlVars()["id"],
-                data: {
-                    csrfmiddlewaretoken: token,
-                    threshold: threshold
-                },
-                success: function (response) {
-                    var data_set = response[0];
-                     svg = d3.select('.graph').append("svg");
-                    createV4SelectableForceDirectedGraph(svg, data_set, most_engaged_nodes);
-                },
-                complete: function(){
-                    $('#overlay').fadeOut(125);
-                }
-            });
+    show_info(false);
+    $.ajax({
+        type: "POST",
+        url: '/update_interactions?id=' + getUrlVars()["id"],
+        data: {
+            csrfmiddlewaretoken: token,
+            threshold: threshold
+        },
+        success: function (response) {
+            var data_set = response[0];
+            svg = d3.select('.graph').append("svg");
+            createV4SelectableForceDirectedGraph(svg, data_set, most_engaged_nodes);
+        },
+        complete: function(){
+            $('#overlay').fadeOut(125);
+        }
+    });
 }
 
 function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
