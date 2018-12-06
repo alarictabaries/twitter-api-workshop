@@ -15,9 +15,12 @@ function getCookie(c_name)
  }
 
 function get_user_profile_picture(id) {
+    console.log(Date.now());
     $.ajax({
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
         type: "POST",
         url: '/get_user_profile_picture',
+        async: false,
         data: {
             id: id
         },
@@ -25,8 +28,9 @@ function get_user_profile_picture(id) {
 
         },
         complete: function (response) {
-            console.log(response);
-            return response;
+            profile_picture_url =  response.responseJSON;
         }
     });
+console.log(Date.now());
+    return profile_picture_url;
 }

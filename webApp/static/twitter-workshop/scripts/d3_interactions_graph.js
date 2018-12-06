@@ -2,10 +2,12 @@ function show_info(d) {
     if(d == false) {
         $(".card.node").fadeOut(85);
     } else {
-        $(".card.node .pic").attr("src", "https://avatars.io/twitter/" + d.alias + "/small");
+
         $(".card.node .alias").html("<a target=\"_BLANK\" href=\"https://twitter.com/intent/user?user_id=" + d.id_str + "\">@" + d.alias + "</a>");
         $(".card.node .freq").html("<span class=\"label\">Mentioned</span><br />" + d.freq);
         $(".card.node").fadeIn(115);
+        user_profile_picture_url = get_user_profile_picture(d.id_str);
+        $(".card.node .pic").attr("src", user_profile_picture_url);
     }
 }
 
