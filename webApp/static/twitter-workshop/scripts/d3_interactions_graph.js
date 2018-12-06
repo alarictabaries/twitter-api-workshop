@@ -2,12 +2,28 @@ function show_info(d) {
     if(d == false) {
         $(".card.node").fadeOut(85);
     } else {
+        $(".card.node").fadeOut(85);
 
-        $(".card.node .alias").html("<a target=\"_BLANK\" href=\"https://twitter.com/intent/user?user_id=" + d.id_str + "\">@" + d.alias + "</a>");
-        $(".card.node .freq").html("<span class=\"label\">Mentioned</span><br />" + d.freq);
-        $(".card.node").fadeIn(115);
-        user_profile_picture_url = get_user_profile_picture(d.id_str);
-        $(".card.node .pic").attr("src", user_profile_picture_url);
+
+        $.ajax({
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
+        type: "POST",
+        url: '/get_user_profile_picture',
+        data: {
+            id: d.id_str,
+        },
+        success: function (response) {
+
+        },
+        complete: function (response) {
+                user_profile_picture_url =  response.responseJSON;
+                $(".card.node .pic").attr("src", user_profile_picture_url);
+                $(".card.node .alias").html("<a target=\"_BLANK\" href=\"https://twitter.com/intent/user?user_id=" + d.id_str + "\">@" + d.alias + "</a>");
+                $(".card.node .freq").html("<span class=\"label\">Mentioned</span><br />" + d.freq);
+                $(".card.node").fadeIn(85);
+            }
+        });
+
     }
 }
 

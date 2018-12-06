@@ -13,24 +13,3 @@ function getCookie(c_name)
     }
     return "";
  }
-
-function get_user_profile_picture(id) {
-    console.log(Date.now());
-    $.ajax({
-        headers: { "X-CSRFToken": getCookie("csrftoken") },
-        type: "POST",
-        url: '/get_user_profile_picture',
-        async: false,
-        data: {
-            id: id
-        },
-        success: function (response) {
-
-        },
-        complete: function (response) {
-            profile_picture_url =  response.responseJSON;
-        }
-    });
-console.log(Date.now());
-    return profile_picture_url;
-}
