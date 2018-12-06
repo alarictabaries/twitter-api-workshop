@@ -44,7 +44,7 @@ function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
 
     for(node in most_engaged_nodes) {
         defs.append("pattern").attr("id", most_engaged_nodes[node]["alias"]).attr("viewBox", "0 0 1 1").attr("patternUnits", "objectBoundingBox").attr("preserveAspectRatio", "xMidYMid slice").attr("height", 1).attr("width", 1)
-            .append("image").attr("height",1).attr("width",1).attr("preserveAspectRatio", "xMidYMid slice").attr("xlink:href","https://avatars.io/twitter/" + most_engaged_nodes[node]["alias"] + "")
+            .append("image").attr("height",1).attr("width",1).attr("preserveAspectRatio", "xMidYMid slice").attr("xlink:href",most_engaged_nodes[node]["profile_picture_url"])
     }
 
     if (typeof d3v4 == 'undefined')

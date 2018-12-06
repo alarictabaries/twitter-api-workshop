@@ -23,5 +23,7 @@ urlpatterns = [
     path('database', views.database, name='database'),
     path('dataset', views.dataset, name='dataset'),
     path('interactions', views.interactions, name='interactions'),
+    # Ajax calls
     path('update_interactions', views.update_interactions, name='update_interactions'),
+    path('get_user_profile_picture', views.get_user_profile_picture, name='get_user_profile_picture'),
 ]

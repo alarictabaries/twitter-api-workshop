@@ -87,7 +87,6 @@ def get_tweets(_ids):
 
 # Get interactions
 def get_interactions(_ids, **options):
-
     # If options are set
     start_date = options.get('start_date', None)
     end_date = options.get('end_date', None)
@@ -118,7 +117,7 @@ def get_interactions(_ids, **options):
                 if (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") >= datetime.datetime.strptime(start_date,
                                                                                                              "%Y-%m-%d %H:%M")) and (
                         datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") <= datetime.datetime.strptime(
-                        end_date, "%Y-%m-%d %H:%M")):
+                    end_date, "%Y-%m-%d %H:%M")):
                     nodes.append(tmp_node)
             else:
                 nodes.append(tmp_node)
@@ -193,7 +192,7 @@ def get_interactions(_ids, **options):
     for node in nodes:
         connected = 0
         for link in links:
-            if node["id"] == link["source"] or node["id"] == link["target"] :
+            if node["id"] == link["source"] or node["id"] == link["target"]:
                 connected += 1
         if connected > 0:
             engaged_nodes.append(node)
@@ -228,7 +227,7 @@ def get_interactions(_ids, **options):
                 connected += 1
             if node["id"] == link["source"]:
                 connected += 1
-        if (connected != 0) and (connected%2 == 0):
+        if (connected != 0) and (connected % 2 == 0):
             engaged_links.append(link)
 
     links = engaged_links
@@ -239,13 +238,34 @@ def get_interactions(_ids, **options):
     return interacts
 
 
+# Get user's profile picture
+def get_user_profile_picture(id):
+
+    # Connect to Twitter's API
+    auth = tweepy.OAuthHandler('y3fvWam4738fGFCSuVJpIhtwp', 'czDAPY4XnYe4fp4n6FMwrHSFGtF0nY15PgnmozeBAsnObHiKJr')
+    auth.set_access_token('229596006-BzKTTM85v2Ca0xf7d11CPM7AKhIOnx03EsUNjgsk',
+                          'FnyvhnqiKtRCroJ1iX1qaLxtrn7uEDgXONGplAxZv230V')
+    api = tweepy.API(auth, wait_on_rate_limit=True)
+
+    user = api.get_user(id)
+
+    profile_picture = user.profile_image_url.replace("_normal", "_bigger")
+
+    return profile_picture
+
+
 # Define X (count) most engaged nodes in an interactions list
 def get_most_engaged(interacts, count):
     nodes = interacts["nodes"]
 
     # Descending sort
     nodes.sort(key=lambda e: e['freq'], reverse=True)
+
     # Take the X first
     most_engaged_nodes = nodes[:count]
+
+    # Add user profile
+    for node in most_engaged_nodes:
+        node["profile_picture_url"] = get_user_profile_picture(node["id"])
 
     return most_engaged_nodes
