@@ -178,7 +178,7 @@ html, body {
 	margin: auto;
 	width: 8px;
 	height: 8px;
-	background: #ecf0f1;
+	background: #3498db;
 	border-radius: 50%;
 	-webkit-animation: loader-5-2 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
 	        animation: loader-5-2 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
@@ -202,7 +202,7 @@ html, body {
 	margin: auto;
 	width: 8px;
 	height: 8px;
-	background: #ecf0f1;
+	background: #3498db;
 	border-radius: 50%;
 	-webkit-animation: loader-5-3 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
 	        animation: loader-5-3 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
@@ -235,7 +235,7 @@ html, body {
 	margin: auto;
 	width: 8px;
 	height: 8px;
-	background: #ecf0f1;
+	background: #3498db;
 	border-radius: 50%;
 	-webkit-animation: loader-5-4 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
 	        animation: loader-5-4 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
@@ -259,7 +259,7 @@ html, body {
 	margin: auto;
 	width: 8px;
 	height: 8px;
-	background: #ecf0f1;
+	background: #3498db;
 	border-radius: 50%;
 	-webkit-animation: loader-5-5 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
 	        animation: loader-5-5 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;

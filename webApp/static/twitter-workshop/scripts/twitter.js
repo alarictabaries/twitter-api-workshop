@@ -13,3 +13,20 @@ function getCookie(c_name)
     }
     return "";
  }
+
+function get_user_profile_picture(id) {
+    $.ajax({
+        type: "POST",
+        url: '/get_user_profile_picture',
+        data: {
+            id: id
+        },
+        success: function (response) {
+
+        },
+        complete: function (response) {
+            console.log(response);
+            return response;
+        }
+    });
+}

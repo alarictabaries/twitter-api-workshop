@@ -9,14 +9,15 @@ function show_info(d) {
     }
 }
 
-function update_interactions(threshold, lonely_nodes, token) {
+function update_interactions(threshold) {
     $('#overlay').fadeIn(125);
     show_info(false);
     $.ajax({
+        headers: { "X-CSRFToken": getCookie("csrftoken") },
         type: "POST",
-        url: '/update_interactions?id=' + getUrlVars()["id"],
+        url: '/update_interactions',
         data: {
-            csrfmiddlewaretoken: token,
+            id: getUrlVars()["id"].replace("#", ""),
             threshold: threshold
         },
         success: function (response) {
