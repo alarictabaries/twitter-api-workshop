@@ -62,7 +62,7 @@ def get_metadata(_id):
 
 # Get tweets from DB
 def get_tweets(_ids):
-    tweet_data = []
+    tweets_data = []
 
     # Read the tweets document
     db = mongodb.db_connect()
@@ -78,11 +78,11 @@ def get_tweets(_ids):
             datetime_obj = datetime.datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
             datetime_obj = datetime_obj.replace(tzinfo=pytz.timezone('UTC'))
             datetime_obj = datetime_obj.strftime("%Y-%m-%d %H:%M")
-            tweet_data.append(
+            tweets_data.append(
                 [tweet["full_text"], short_text, tweet["id_str"], tweet["user"]["screen_name"], tweet["user"]["id_str"],
                  datetime_obj])
 
-    return tweet_data
+    return tweets_data
 
 
 # Get interactions
@@ -110,7 +110,7 @@ def get_interactions(_ids, **options):
             datetime_obj = datetime_obj.replace(tzinfo=pytz.timezone('UTC'))
             datetime_obj = datetime_obj.strftime("%Y-%m-%d %H:%M")
             tmp_node = {"id": tweet["user"]["id"], "id_str": tweet["user"]["id_str"],
-                        "screen_name": tweet["user"]["screen_name"], "type": 1, "freq": 0}
+                        "screen_name": tweet["user"]["screen_name"], "type": 1, "mentions": 0}
             # If date is set
             if start_date:
                 # If the tweet is in the specified time frame
@@ -126,7 +126,7 @@ def get_interactions(_ids, **options):
             for user in tweet['entities']['user_mentions']:
                 if user and (user['id'] != tweet["user"]["id"]):  # The user can't mention himself
                     tmp_node = {"id": user['id'], "id_str": user['id_str'], "screen_name": user["screen_name"], "type": 2,
-                                "freq": 0}
+                                "mentions": 0}
                     tmp_link = {"source": tweet["user"]["id"], "target": user['id'], "value": 1}
                     # If date is set
                     if start_date:
@@ -156,7 +156,7 @@ def get_interactions(_ids, **options):
         # Append if node read for the first time
         if duplicated == 0:
             tmp_node = {"id": node["id"], "id_str": node["id_str"], "screen_name": node["screen_name"], "type": node["type"],
-                        "freq": node["freq"]}
+                        "mentions": node["mentions"]}
             unique_nodes.append(tmp_node)
         # Set the type if the node is at least one time active
         for unique_node in unique_nodes:
@@ -184,7 +184,7 @@ def get_interactions(_ids, **options):
     for link in unique_links:
         for node in nodes:
             if node["id"] == link["target"]:
-                node["freq"] += 1
+                node["mentions"] += 1
 
     engaged_nodes = []
 
@@ -213,7 +213,7 @@ def get_interactions(_ids, **options):
     for node in nodes:
         connected = 0
         for link in links:
-            if (node["id"] == link["target"]) and (node["freq"] >= threshold):
+            if (node["id"] == link["target"]) and (node["mentions"] >= threshold):
                 connected += 1
         if connected > 0:
             engaged_nodes.append(node)
@@ -238,8 +238,8 @@ def get_interactions(_ids, **options):
     return interacts
 
 
-# Get user's profile picture
-def get_user_details(id):
+# Get user's details
+def get_user_details(_id):
 
     # Connect to Twitter's API
     auth = tweepy.OAuthHandler('y3fvWam4738fGFCSuVJpIhtwp', 'czDAPY4XnYe4fp4n6FMwrHSFGtF0nY15PgnmozeBAsnObHiKJr')
@@ -247,13 +247,9 @@ def get_user_details(id):
                           'FnyvhnqiKtRCroJ1iX1qaLxtrn7uEDgXONGplAxZv230V')
     api = tweepy.API(auth, wait_on_rate_limit=True)
 
-    user = api.get_user(id)
+    user = api.get_user(_id)
 
     return user._json
-
-    profile_picture = user.profile_image_url.replace("_normal", "_bigger")
-
-    return profile_picture
 
 
 # Define X (count) most engaged nodes in an interactions list
@@ -261,7 +257,7 @@ def get_most_engaged(interacts, count):
     nodes = interacts["nodes"]
 
     # Descending sort
-    nodes.sort(key=lambda e: e['freq'], reverse=True)
+    nodes.sort(key=lambda e: e['mentions'], reverse=True)
 
     # Take the X first
     most_engaged_nodes = nodes[:count]
@@ -271,5 +267,77 @@ def get_most_engaged(interacts, count):
         user = get_user_details(node["id"])
         node["profile_image_url"] = user["profile_image_url"].replace("_normal", "_bigger")
         node["name"] = user["name"]
+        node["followers_count"] = user["followers_count"]
 
     return most_engaged_nodes
+
+
+def ceil_dt(dt, delta):
+    return dt + (datetime.datetime.min - dt) % delta
+
+
+# Get tweets distribution by time
+def get_tweets_distribution(_ids):
+
+    tweets_data = []
+
+    # Read the tweets document
+    db = mongodb.db_connect()
+    col = db["tweets"]
+
+    for _id in _ids:
+
+        doc = col.find_one({"_id": ObjectId(_id)})
+
+        # Iterate over tweets
+        for tweet in doc["tweets"]:
+            datetime_obj = datetime.datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
+            datetime_obj = datetime_obj.replace(tzinfo=pytz.timezone('UTC'))
+            datetime_obj = datetime_obj.strftime("%Y-%m-%d %H:%M")
+            tweets_data.append([datetime_obj])
+
+    oldest_tweet = min(tweets_data)
+    newest_tweet = max(tweets_data)
+
+    delta = datetime.datetime.strptime(newest_tweet[0],"%Y-%m-%d %H:%M") - datetime.datetime.strptime(oldest_tweet[0],"%Y-%m-%d %H:%M")
+
+    distribution = []
+
+    if delta > datetime.timedelta(hours=72):
+        for tweet in tweets_data:
+            created = 0
+            tweet_created_at = datetime.datetime.strptime(tweet[0], "%Y-%m-%d %H:%M").replace(minute=0, hour=0)
+            for unit in distribution:
+                if tweet_created_at == unit[0]:
+                    unit[1] += 1
+                    created = 1
+            if created is 0:
+                distribution.append([tweet_created_at, 1])
+
+        return distribution
+
+    if delta <= datetime.timedelta(hours=72):
+        for tweet in tweets_data:
+            created = 0
+            tweet_created_at = datetime.datetime.strptime(tweet[0], "%Y-%m-%d %H:%M").replace(minute=0)
+            for unit in distribution:
+                if tweet_created_at == unit[0]:
+                    unit[1] += 1
+                    created = 1
+            if created is 0:
+                distribution.append([tweet_created_at, 1])
+
+        return distribution
+
+    if delta < datetime.timedelta(hours=6):
+        for tweet in tweets_data:
+            created = 0
+            tweet_created_at = ceil_dt(datetime.datetime.strptime(tweet[0],"%Y-%m-%d %H:%M"), datetime.timedelta(minutes=30))
+            for unit in distribution:
+                if tweet_created_at == unit[0]:
+                    unit[1] += 1
+                    created = 1
+            if created is 0:
+                distribution.append([tweet_created_at, 1])
+
+        return distribution

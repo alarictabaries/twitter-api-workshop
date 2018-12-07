@@ -115,6 +115,16 @@ circle.alone {
 
 .card a {
     color: #3498db;
+    text-decoration: none;
+}
+
+.card .name {
+    font-weight: 500;
+}
+
+.card .screen_name {
+    margin-top: 2px;
+    font-size: 12px;
 }
 
 .card .user {
@@ -146,12 +156,13 @@ circle.alone {
     margin-top: 4px;
 }
 
-.card .user .label {
+.card .user .item .label {
     font-size: 11px;
-    color: #34495e;
+    color: #7f8c8d;
+    font-weight: 600;
 }
 
-.card .user .freq {
+.card .user .item .count {
     color: #3498db;
     font-weight: 600;
 }

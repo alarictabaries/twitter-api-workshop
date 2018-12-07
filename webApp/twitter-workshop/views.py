@@ -8,7 +8,6 @@ from django.http import JsonResponse
 
 # /
 def index(request):
-    twitter.get_user_details(229596006)
     return render(request, 'index.html')
 
 
@@ -54,10 +53,13 @@ def query(request):
 def dataset(request):
 
     metadata = twitter.get_metadata(request.GET['id'])
-    tweet_data = twitter.get_tweets(metadata["_tweets"])
+    tweets_distribution = twitter.get_tweets_distribution(metadata["_tweets"])
+    twitter.get_tweets_distribution(metadata["_tweets"])
+
     metadata = [metadata["_id"], metadata["_tweets"], metadata["keyword"]]
 
-    return render(request, 'dataset.html', {'metadata': metadata, 'data': tweet_data})
+
+    return render(request, 'dataset.html', {'metadata': metadata, 'distribution': tweets_distribution})
 
 
 # /interactions
@@ -101,12 +103,14 @@ def update_interactions(request):
     return JsonResponse(interacts, safe=False)
 
 
+# /get_user_details (ajax)
+# Rerturn details of an user
 def get_user_details(request):
 
     # Check if request is called from ajax
     if request.is_ajax() is False:
         return -1
 
-    id = request.POST.get('id')
+    _id = request.POST.get('_id')
 
-    return JsonResponse(twitter.get_user_details(id), safe=False)
+    return JsonResponse(twitter.get_user_details(_id), safe=False)

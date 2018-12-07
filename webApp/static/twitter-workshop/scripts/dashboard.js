@@ -167,7 +167,7 @@ function basicToggleNavbar() {
 }
 
 $( window ).bind( 'load', function() {
-	$('#overlay').fadeOut(125);
+    $('#overlay').fadeOut(125);
 });
 
 function getUrlVars() {
@@ -192,4 +192,8 @@ function getCookie(c_name)
         }
     }
     return "";
- }
+}
+
+function numberWithSpaces(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+}

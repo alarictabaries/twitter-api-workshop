@@ -21,7 +21,7 @@
 
         <div class="settings">
             <div class="display">
-                <label>Freq. threshold:</label><input class="threshold_val" type="number" min="0" value="0"><br />
+                <label>Mentions threshold:</label><input class="threshold_val" type="number" min="0" value="0"><br />
                 <label>Hide non connected nodes:</label><input type="checkbox">
             </div>
         </div>
@@ -36,9 +36,11 @@
                     <div class="user">
                         <img class="pic" src="{{ node.profile_image_url }}">
                         <div class="user-details">
+                            <span class="name">{{ node.name }}</span><br />
                             <span class="screen_name"><a target="_BLANK" href="https://twitter.com/intent/user?user_id={{ node.id_str }}">@{{ node.screen_name }}</a></span><br>
                             <div class="details">
-                                <div class="item"><span class="freq"><span class="label">Mentionned</span><br>{{ node.freq }}</span></div>
+                                <div class="item"><span class="followers"><span class="label">Followers</span><br><span class="count">{{ node.followers_count }}</span></span></div>
+                                <div class="item"><span class="mentions"><span class="label">Mentions</span><br><span class="count">{{ node.mentions }}</span></span></div>
                             </div>
                         </div>
                     </div>
@@ -58,9 +60,11 @@
             <div class="user">
                 <img class="pic"/>
                 <div class="user-details">
+                    <span class="name"></span><br />
                     <span class="screen_name"></span><br />
                     <div class="details">
-                        <div class="item"><span class="freq"></span></div>
+                        <div class="item"><span class="followers"></span></div>
+                        <div class="item"><span class="mentions"></span></div>
                     </div>
                 </div>
             </div>
@@ -73,13 +77,21 @@
 <script>
 
     var data = {{ interactions|safe }};
-    data_set = data[0];
+    dataset = data[0];
     most_engaged_nodes = data[1];
+
+    console.log(dataset);
+
+    counts = $(".cards").find(".count");
+
+    $.each(counts, function(i, val) {
+        $(val).html( numberWithSpaces( $(val).text() ) );
+    });
 
     $(document).ready(function() {
 
         var svg = d3.select('.graph').append("svg");
-        createV4SelectableForceDirectedGraph(svg, data_set, most_engaged_nodes);
+        createV4SelectableForceDirectedGraph(svg, dataset, most_engaged_nodes);
 
     });
 
