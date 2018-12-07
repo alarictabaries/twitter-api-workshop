@@ -34,9 +34,9 @@
 
                 <div class="card">
                     <div class="user">
-                        <img class="pic" src="{{ node.profile_picture_url }}">
+                        <img class="pic" src="{{ node.profile_image_url }}">
                         <div class="user-details">
-                            <span class="alias"><a target="_BLANK" href="https://twitter.com/intent/user?user_id={{ node.id_str }}">@{{ node.alias }}</a></span><br>
+                            <span class="screen_name"><a target="_BLANK" href="https://twitter.com/intent/user?user_id={{ node.id_str }}">@{{ node.screen_name }}</a></span><br>
                             <div class="details">
                                 <div class="item"><span class="freq"><span class="label">Mentionned</span><br>{{ node.freq }}</span></div>
                             </div>
@@ -58,7 +58,7 @@
             <div class="user">
                 <img class="pic"/>
                 <div class="user-details">
-                    <span class="alias"></span><br />
+                    <span class="screen_name"></span><br />
                     <div class="details">
                         <div class="item"><span class="freq"></span></div>
                     </div>

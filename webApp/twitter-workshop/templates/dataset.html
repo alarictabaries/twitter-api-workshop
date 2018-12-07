@@ -33,7 +33,7 @@
           {% for tweet in data %}
         <tr>
           <td class="text"><a target="_BLANK" href="https://twitter.com/{{ tweet.4 }}/status/{{ tweet.2 }}">{{ tweet.1 }}</a></td>
-          <td class="alias"><a target="_BLANK" href="https://twitter.com/intent/user?user_id={{ tweet.4 }}">@{{ tweet.3 }}</a></td>
+          <td class="screen_name"><a target="_BLANK" href="https://twitter.com/intent/user?user_id={{ tweet.4 }}">@{{ tweet.3 }}</a></td>
           <td class="date">{{ tweet.5 }}</td>
         </tr>
           {% endfor %}

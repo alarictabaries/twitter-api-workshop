@@ -8,7 +8,7 @@ function show_info(d) {
         $.ajax({
         headers: { "X-CSRFToken": getCookie("csrftoken") },
         type: "POST",
-        url: '/get_user_profile_picture',
+        url: '/get_user_details',
         data: {
             id: d.id_str,
         },
@@ -16,12 +16,12 @@ function show_info(d) {
 
         },
         complete: function (response) {
-                user_profile_picture_url =  response.responseJSON;
-                $(".card.node .pic").attr("src", user_profile_picture_url);
-                $(".card.node .alias").html("<a target=\"_BLANK\" href=\"https://twitter.com/intent/user?user_id=" + d.id_str + "\">@" + d.alias + "</a>");
-                $(".card.node .freq").html("<span class=\"label\">Mentioned</span><br />" + d.freq);
-                $(".card.node").fadeIn(85);
-            }
+            profile_picture_url =  response.responseJSON.profile_image_url_https;
+            $(".card.node .pic").attr("src", profile_picture_url);
+            $(".card.node .screen_name").html("<a target=\"_BLANK\" href=\"https://twitter.com/intent/user?user_id=" + d.id_str + "\">@" + d.screen_name + "</a>");
+            $(".card.node .freq").html("<span class=\"label\">Mentioned</span><br />" + d.freq);
+            $(".card.node").fadeIn(85);
+        }
         });
 
     }
@@ -62,7 +62,7 @@ function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
     defs = svg.append("defs");
 
     for(node in most_engaged_nodes) {
-        defs.append("pattern").attr("id", most_engaged_nodes[node]["alias"]).attr("viewBox", "0 0 1 1").attr("patternUnits", "objectBoundingBox").attr("preserveAspectRatio", "xMidYMid slice").attr("height", 1).attr("width", 1)
+        defs.append("pattern").attr("id", most_engaged_nodes[node]["screen_name"]).attr("viewBox", "0 0 1 1").attr("patternUnits", "objectBoundingBox").attr("preserveAspectRatio", "xMidYMid slice").attr("height", 1).attr("width", 1)
             .append("image").attr("height",1).attr("width",1).attr("preserveAspectRatio", "xMidYMid slice").attr("xlink:href",most_engaged_nodes[node]["profile_picture_url"])
     }
 
@@ -152,7 +152,7 @@ function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
         .attr("fill", function(d) {
             for(i in most_engaged_nodes) {
                 if(d.id_str == most_engaged_nodes[i]["id_str"]) {
-                    return "url(#" + d.alias + ")";
+                    return "url(#" + d.screen_name + ")";
                 }
             }
             if ('color' in d)
@@ -170,8 +170,8 @@ function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
     // add titles for mouseover blurbs
     node.append("title").attr("class", "label")
         .text(function(d) {
-            if ('alias' in d)
-                return "@" + d.alias;
+            if ('screen_name' in d)
+                return "@" + d.screen_name;
             else
                 return d.id;
         });

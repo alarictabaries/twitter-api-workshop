@@ -110,7 +110,7 @@ def get_interactions(_ids, **options):
             datetime_obj = datetime_obj.replace(tzinfo=pytz.timezone('UTC'))
             datetime_obj = datetime_obj.strftime("%Y-%m-%d %H:%M")
             tmp_node = {"id": tweet["user"]["id"], "id_str": tweet["user"]["id_str"],
-                        "alias": tweet["user"]["screen_name"], "type": 1, "freq": 0}
+                        "screen_name": tweet["user"]["screen_name"], "type": 1, "freq": 0}
             # If date is set
             if start_date:
                 # If the tweet is in the specified time frame
@@ -125,7 +125,7 @@ def get_interactions(_ids, **options):
             # Iterate over mentions
             for user in tweet['entities']['user_mentions']:
                 if user and (user['id'] != tweet["user"]["id"]):  # The user can't mention himself
-                    tmp_node = {"id": user['id'], "id_str": user['id_str'], "alias": user["screen_name"], "type": 2,
+                    tmp_node = {"id": user['id'], "id_str": user['id_str'], "screen_name": user["screen_name"], "type": 2,
                                 "freq": 0}
                     tmp_link = {"source": tweet["user"]["id"], "target": user['id'], "value": 1}
                     # If date is set
@@ -155,7 +155,7 @@ def get_interactions(_ids, **options):
                 active += 1
         # Append if node read for the first time
         if duplicated == 0:
-            tmp_node = {"id": node["id"], "id_str": node["id_str"], "alias": node["alias"], "type": node["type"],
+            tmp_node = {"id": node["id"], "id_str": node["id_str"], "screen_name": node["screen_name"], "type": node["type"],
                         "freq": node["freq"]}
             unique_nodes.append(tmp_node)
         # Set the type if the node is at least one time active
@@ -239,7 +239,7 @@ def get_interactions(_ids, **options):
 
 
 # Get user's profile picture
-def get_user_profile_picture(id):
+def get_user_details(id):
 
     # Connect to Twitter's API
     auth = tweepy.OAuthHandler('y3fvWam4738fGFCSuVJpIhtwp', 'czDAPY4XnYe4fp4n6FMwrHSFGtF0nY15PgnmozeBAsnObHiKJr')
@@ -248,6 +248,8 @@ def get_user_profile_picture(id):
     api = tweepy.API(auth, wait_on_rate_limit=True)
 
     user = api.get_user(id)
+
+    return user._json
 
     profile_picture = user.profile_image_url.replace("_normal", "_bigger")
 
@@ -266,6 +268,8 @@ def get_most_engaged(interacts, count):
 
     # Add user profile
     for node in most_engaged_nodes:
-        node["profile_picture_url"] = get_user_profile_picture(node["id"])
+        user = get_user_details(node["id"])
+        node["profile_image_url"] = user["profile_image_url"].replace("_normal", "_bigger")
+        node["name"] = user["name"]
 
     return most_engaged_nodes
