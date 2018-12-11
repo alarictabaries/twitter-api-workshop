@@ -58,7 +58,6 @@ def dataset(request):
 
     metadata = [metadata["_id"], metadata["_tweets"], metadata["keyword"]]
 
-
     return render(request, 'dataset.html', {'metadata': metadata, 'distribution': tweets_distribution})
 
 

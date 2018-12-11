@@ -232,6 +232,19 @@ def get_interactions(_ids, **options):
 
     links = engaged_links
 
+    # Remove single nodes (better JS side to display or not?)
+    engaged_nodes = []
+    for node in nodes:
+        connected = 0
+        for link in links:
+            if node["id"] == link["source"] or node["id"] == link["target"]:
+                connected += 1
+        if connected > 0:
+            engaged_nodes.append(node)
+
+    # nodes = engaged_nodes
+
+
     interacts["nodes"] = nodes
     interacts["links"] = links
 
@@ -299,45 +312,19 @@ def get_tweets_distribution(_ids):
     oldest_tweet = min(tweets_data)
     newest_tweet = max(tweets_data)
 
-    delta = datetime.datetime.strptime(newest_tweet[0],"%Y-%m-%d %H:%M") - datetime.datetime.strptime(oldest_tweet[0],"%Y-%m-%d %H:%M")
+    # delta = datetime.datetime.strptime(newest_tweet[0],"%Y-%m-%d %H:%M") - datetime.datetime.strptime(oldest_tweet[0],"%Y-%m-%d %H:%M")
 
     distribution = []
 
-    if delta > datetime.timedelta(hours=72):
-        for tweet in tweets_data:
-            created = 0
-            tweet_created_at = datetime.datetime.strptime(tweet[0], "%Y-%m-%d %H:%M").replace(minute=0, hour=0)
-            for unit in distribution:
-                if tweet_created_at == unit[0]:
-                    unit[1] += 1
-                    created = 1
-            if created is 0:
-                distribution.append([tweet_created_at, 1])
+    # if delta <= datetime.timedelta(hours=72):
+    for tweet in tweets_data:
+        created = 0
+        tweet_created_at = datetime.datetime.strptime(tweet[0], "%Y-%m-%d %H:%M").replace(minute=0).strftime("%Y-%m-%d %H:%M")
+        for unit in distribution:
+            if tweet_created_at == unit["date"]:
+                unit["count"] += 1
+                created = 1
+        if created is 0:
+            distribution.append({"date" : tweet_created_at, "count" : 1})
 
-        return distribution
-
-    if delta <= datetime.timedelta(hours=72):
-        for tweet in tweets_data:
-            created = 0
-            tweet_created_at = datetime.datetime.strptime(tweet[0], "%Y-%m-%d %H:%M").replace(minute=0)
-            for unit in distribution:
-                if tweet_created_at == unit[0]:
-                    unit[1] += 1
-                    created = 1
-            if created is 0:
-                distribution.append([tweet_created_at, 1])
-
-        return distribution
-
-    if delta < datetime.timedelta(hours=6):
-        for tweet in tweets_data:
-            created = 0
-            tweet_created_at = ceil_dt(datetime.datetime.strptime(tweet[0],"%Y-%m-%d %H:%M"), datetime.timedelta(minutes=30))
-            for unit in distribution:
-                if tweet_created_at == unit[0]:
-                    unit[1] += 1
-                    created = 1
-            if created is 0:
-                distribution.append([tweet_created_at, 1])
-
-        return distribution
+    return distribution

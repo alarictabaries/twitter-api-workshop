@@ -4,31 +4,30 @@ function show_info(d) {
     } else {
         $(".card.node").fadeOut(85);
 
-
         $.ajax({
-        headers: { "X-CSRFToken": getCookie("csrftoken") },
-        type: "POST",
-        url: '/get_user_details',
-        data: {
-            _id: d.id_str,
-        },
-        success: function (response) {
+            headers: { "X-CSRFToken": getCookie("csrftoken") },
+            type: "POST",
+            url: '/get_user_details',
+            data: {
+                _id: d.id_str,
+            },
+            success: function (response) {
 
-        },
-        complete: function (response) {
-            $(".card.node .pic").attr("src", response.responseJSON.profile_image_url_https);
-            $(".card.node .name").html(response.responseJSON.name);
-            $(".card.node .screen_name").html("<a target=\"_BLANK\" href=\"https://twitter.com/intent/user?user_id=" + d.id_str + "\">@" + d.screen_name + "</a>");
-            $(".card.node .followers").html("<span class=\"label\">Followers</span><br /><span class=\"count\">" + numberWithSpaces(response.responseJSON.followers_count) + "</span>");
-            $(".card.node .mentions").html("<span class=\"label\">Mentions</span><br /><span class=\"count\">" + d.mentions + "</span>");
-            $(".card.node").fadeIn(85);
-        }
+            },
+            complete: function (response) {
+                $(".card.node .pic").attr("src", response.responseJSON.profile_image_url_https);
+                $(".card.node .name").html(response.responseJSON.name);
+                $(".card.node .screen_name").html("<a target=\"_BLANK\" href=\"https://twitter.com/intent/user?user_id=" + d.id_str + "\">@" + d.screen_name + "</a>");
+                $(".card.node .followers").html("<span class=\"label\">Followers</span><br /><span class=\"count\">" + numberWithSpaces(response.responseJSON.followers_count) + "</span>");
+                $(".card.node .mentions").html("<span class=\"label\">Mentions</span><br /><span class=\"count\">" + d.mentions + "</span>");
+                $(".card.node").fadeIn(85);
+            }
         });
 
     }
 }
 
-function update_interactions(threshold) {
+function update_interactions(threshold, gravity_modulator = -30, link_distance = 30) {
     $('#overlay').fadeIn(125);
     show_info(false);
     $.ajax({
@@ -41,8 +40,37 @@ function update_interactions(threshold) {
         },
         success: function (response) {
             var data_set = response[0];
+            var most_engaged_nodes = response[1];
+            cards = $(".cards .card");
+            for (i in most_engaged_nodes) {
+                var iter = i;
+                $.ajax({
+                    headers: { "X-CSRFToken": getCookie("csrftoken") },
+                    type: "POST",
+                    url: '/get_user_details',
+                    data: {
+                        _id: most_engaged_nodes[i]["id_str"],
+                    },
+                    success: function (response) {
+
+                    },
+                    complete: function (response) {
+                        jQuery(cards[i]).find(".pic").attr("src", response.responseJSON.profile_image_url_https);
+                        jQuery(cards[i]).find(".name").html(response.responseJSON.name);
+                        jQuery(cards[i]).find(".screen_name").html("<a target=\"_BLANK\" href=\"https://twitter.com/intent/user?user_id=" + most_engaged_nodes[iter]["id_str"] + "\">@" + most_engaged_nodes[iter]["screen_name"] + "</a>");
+                        jQuery(cards[i]).find(".followers").html("<span class=\"label\">Followers</span><br /><span class=\"count\">" + numberWithSpaces(response.responseJSON.followers_count) + "</span>");
+                        jQuery(cards[i]).find(".mentions").html("<span class=\"label\">Mentions</span><br /><span class=\"count\">" + most_engaged_nodes[iter]["freq"] + "</span>");
+                    }
+                });
+            }
+            if(cards.length >= most_engaged_nodes.length) {
+                for (i = most_engaged_nodes.length; i < cards.length; i++) {
+                    jQuery(cards[i]).remove();
+                }
+            }
+
             svg = d3.select('.graph').append("svg");
-            createV4SelectableForceDirectedGraph(svg, data_set, most_engaged_nodes);
+            createV4SelectableForceDirectedGraph(svg, data_set, most_engaged_nodes, gravity_modulator, link_distance);
         },
         complete: function(){
             $('#overlay').fadeOut(125);
@@ -50,7 +78,7 @@ function update_interactions(threshold) {
     });
 }
 
-function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
+function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes, gravity_modulator = -30, link_distance = 30) {
     // if both d3v3 and d3v4 are loaded, we'll assume
     // that d3v4 is called d3v4, otherwise we'll assume
     // that d3v4 is the default (d3)
@@ -138,10 +166,17 @@ function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
         .attr("r", function(d) {
             return Math.sqrt((d.mentions+1)*3.14);
         })
+        .attr("id", function(d) {
+            return d.id_str
+        })
         .attr("class", function(d) {
             for(i in most_engaged_nodes) {
                 if(d.id_str == most_engaged_nodes[i]["id_str"]) {
-                    return("influencer");
+                    if (d.type == 1) {
+                        return ("influencer_active influencer");
+                    } else {
+                        return ("influencer_inactive influencer");
+                    }
                 }
             }
             if (d.type == 1) {
@@ -181,16 +216,13 @@ function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
         .force("link", d3v4.forceLink()
             .id(function(d) { return d.id; })
             .distance(function(d) {
-                //return 30;
-                var dist = (d.value);
-                //console.log('dist:', dist);
-
-                return dist;
+                return link_distance;
+                // var dist = (d.value);
+                // return dist;
             })
         )
-        .force("charge", d3v4.forceManyBody())
-        // if nodes < X,
-        //.force("charge", d3v4.forceManyBody().strength(-160))
+        //.force("charge", d3v4.forceManyBody())
+        .force("charge", d3v4.forceManyBody().strength(gravity_modulator))
         .force("center", d3v4.forceCenter(parentWidth / 2, parentHeight / 2))
         .force("x", d3v4.forceX(parentWidth/2))
         .force("y", d3v4.forceY(parentHeight/2));
@@ -321,9 +353,9 @@ function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
         nodeObj = d;
         d3v4.selectAll("line").attr("class", "link");
         d3v4.selectAll("line").filter(function(d) {
-             return (d.source === nodeObj) || (d.target === nodeObj);
-           })
-          .attr("class", "hl")
+            return (d.source === nodeObj) || (d.target === nodeObj);
+        })
+            .attr("class", "highlight")
 
         node.filter(function(d) {
             return d.selected;

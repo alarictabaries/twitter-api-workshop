@@ -1,33 +1,69 @@
-{% include "header.html" with subtitle="Dataset" datatable="true" %}
+{% include "header.html" with subtitle="Dataset" d3js="true" %}
 
 <div class="content">
 
-  <div class="title">
+    <div id="overlay"><div class="loader"><span></span></div></div>
 
-    <div class="toggle-nav">
-      <i class="material-icons">chevron_right</i>
+    <div class="title">
+
+        <div class="toggle-nav">
+            <i class="material-icons">chevron_right</i>
+        </div>
+
+        <i class="material-icons">list</i> Dataset : {{ metadata.2 }}
+
     </div>
 
-    <i class="material-icons">list</i> Dataset : {{ metadata.2 }}
+    <div class="sub-content">
 
-  </div>
+        <div class="actions">
+            <a href="interactions?id={{metadata.0}}"><i class="material-icons">bubble_chart</i>Visualize interactions</a>
+        </div>
 
-  <div class="sub-content">
+        <div class="kpis">
+            <div class="sub-content">
+                <div class="item active">
+                    <div class="previous decrease"><i class="material-icons">arrow_drop_down</i> -4%</div>
+                    <div class="count">4 458</div>
+                    <div class="label">tweets</div>
+                </div><!--
+                --><div class="item">
+                    <div class="previous decrease"><i class="material-icons">arrow_drop_down</i> -8%</div>
+                    <div class="count">3 958</div>
+                    <div class="label">users</div>
+                </div><!--
+                --><div class="item">
+                    <div class="previous increase"><i class="material-icons">arrow_drop_up</i> +2%</div>
+                    <div class="count">3 542</div>
+                    <div class="label">interactions</div>
+                </div><!--
+                --><div class="item">
+                    <div class="previous decrease"><i class="material-icons">arrow_drop_down</i> -2%</div>
+                    <div class="count">0.4%</div>
+                    <div class="label">density</div>
+                </div><!--
+                --><div class="item">
+                    <div class="previous increase"><i class="material-icons">arrow_drop_up</i> +6%</div>
+                    <div class="count">+72</div>
+                    <div class="label">sentiment</div>
+                </div>
+            </div>
+        </div>
 
-      <div id="overlay"><div class="loader"><span></span></div></div>
+        <div class="line-chart"></div>
 
-      <div class="actions">
-        <a href="interactions?id={{metadata.0}}"><i class="material-icons">bubble_chart</i>Visualize interactions</a>
-        <a href="#"><i class="material-icons">graphic_eq</i>View processed data</a>
-      </div>
-
-      {{ distribution }}
-
-  </div>
+    </div>
 
 </div>
 
 </div>
+
+<script>
+    $(document).ready(function() {
+        distribution = {{ distribution | safe }};
+        console.log(distribution);
+    });
+</script>
 
 </body>
 </html>

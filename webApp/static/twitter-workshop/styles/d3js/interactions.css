@@ -17,16 +17,15 @@
 }
 
 .node .selected {
-    stroke: #2c3e50;
-    stroke-width: 2px;
+
 }
 
 .link {
     stroke: #bdc3c7;
 }
 
-.link .hl {
-    stroke: #95a5a6;
+.link .highlight {
+    stroke: #64B5F6;
 }
 
 circle.active {
@@ -37,9 +36,14 @@ circle.inactive {
     fill:#7f8c8d;
 }
 
-circle.influencer {
+circle.influencer_active {
+    stroke: #3498db;
     stroke-width: 2px;
-    stroke: #2980b9;
+}
+
+circle.influencer_inactive {
+    stroke: #7f8c8d;
+    stroke-width: 2px;
 }
 
 circle.alone {
@@ -47,7 +51,7 @@ circle.alone {
 }
 
 .col-label {
-    font-size: 12px;
+    font-size: 13px;
     text-align: center;
 }
 
@@ -89,7 +93,9 @@ circle.alone {
     color: #34495e;
     text-decoration: none;
     font-size: 12px;
-    background: rgba(236,240,241 ,1);
+    background: #ffffff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.13);
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
     margin-right: 12px;
     margin-bottom: 12px;
 }
@@ -159,28 +165,10 @@ circle.alone {
 .card .user .item .label {
     font-size: 11px;
     color: #7f8c8d;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .card .user .item .count {
     color: #3498db;
     font-weight: 600;
-}
-
-.settings {
-    position: absolute;
-    right: 32px;
-    top: 25px;
-    text-align: right;
-}
-
-.settings .display label {
-    font-size: 12px;
-}
-
-.settings .display input[type="checkbox"] {
-    border: 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.13);
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
-    background: #ffffff;
 }

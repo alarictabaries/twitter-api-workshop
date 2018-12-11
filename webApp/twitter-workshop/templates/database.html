@@ -2,6 +2,8 @@
 
 <div class="content">
 
+    <div id="overlay"><div class="loader"><span></span></div></div>
+
     <div class="title">
 
         <div class="toggle-nav">
@@ -14,13 +16,11 @@
 
     <div class="sub-content">
 
-        <div id="overlay"><div class="loader"><span></span></div></div>
-
         <table class="list db">
         <thead>
             <tr class="top">
-                <th>Subject</th>
-                <th>Count</th>
+                <th>Keyword</th>
+                <th>Tweets count</th>
                 <th>Language</th>
                 <th>Created at</th>
             </tr>
@@ -47,8 +47,16 @@
   window.$('.list').DataTable({
           responsive: true,
           "order": [],
-          "pageLength": 50
+          "pageLength": 25,
+          "lengthChange": false,
+          "info": false
       });
+  $(document).ready(function() {
+      if( $( "tbody tr" ).length < 25) {
+          $('.dataTables_paginate').hide();
+      }
+  });
+
 </script>
 
 </body>

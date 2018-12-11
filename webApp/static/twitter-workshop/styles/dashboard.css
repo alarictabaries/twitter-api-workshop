@@ -110,7 +110,7 @@ html, body {
     line-height: 45px;
 }
 
-.sub-content {
+.content > .sub-content {
     position: relative;
     margin: 25px;
     margin-top: 70px;
@@ -131,8 +131,7 @@ html, body {
 }
 
 .sub-content.full {
-    margin: 0;
-    margin-top: 45px;
+    margin: 45px 0 0;
     position: relative;
     overflow: hidden;
 }
@@ -158,12 +157,7 @@ html, body {
 .loader {
 	height: 32px;
 	width: 32px;
-	-webkit-animation: loader-5-1 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
-	        animation: loader-5-1 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
-}
-@-webkit-keyframes loader-5-1 {
-	0%   { -webkit-transform: rotate(0deg); }
-	100% { -webkit-transform: rotate(360deg); }
+    animation: loader-5-1 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
 }
 @keyframes loader-5-1 {
 	0%   { transform: rotate(0deg); }
@@ -180,13 +174,7 @@ html, body {
 	height: 8px;
 	background: #3498db;
 	border-radius: 50%;
-	-webkit-animation: loader-5-2 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
-	        animation: loader-5-2 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
-}
-@-webkit-keyframes loader-5-2 {
-	0%   { -webkit-transform: translate3d(0, 0, 0) scale(1); }
-	50%  { -webkit-transform: translate3d(24px, 0, 0) scale(.5); }
-	100% { -webkit-transform: translate3d(0, 0, 0) scale(1); }
+    animation: loader-5-2 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
 }
 @keyframes loader-5-2 {
 	0%   { transform: translate3d(0, 0, 0) scale(1); }
@@ -204,13 +192,7 @@ html, body {
 	height: 8px;
 	background: #3498db;
 	border-radius: 50%;
-	-webkit-animation: loader-5-3 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
-	        animation: loader-5-3 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
-}
-@-webkit-keyframes loader-5-3 {
-	0%   { -webkit-transform: translate3d(0, 0, 0) scale(1); }
-	50%  { -webkit-transform: translate3d(-24px, 0, 0) scale(.5); }
-	100% { -webkit-transform: translate3d(0, 0, 0) scale(1); }
+    animation: loader-5-3 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
 }
 @keyframes loader-5-3 {
 	0%   { transform: translate3d(0, 0, 0) scale(1); }
@@ -237,13 +219,7 @@ html, body {
 	height: 8px;
 	background: #3498db;
 	border-radius: 50%;
-	-webkit-animation: loader-5-4 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
-	        animation: loader-5-4 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
-}
-@-webkit-keyframes loader-5-4 {
-	0%   { -webkit-transform: translate3d(0, 0, 0) scale(1); }
-	50%  { -webkit-transform: translate3d(0, 24px, 0) scale(.5); }
-	100% { -webkit-transform: translate3d(0, 0, 0) scale(1); }
+    animation: loader-5-4 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
 }
 @keyframes loader-5-4 {
 	0%   { transform: translate3d(0, 0, 0) scale(1); }
@@ -261,13 +237,7 @@ html, body {
 	height: 8px;
 	background: #3498db;
 	border-radius: 50%;
-	-webkit-animation: loader-5-5 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
-	        animation: loader-5-5 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
-}
-@-webkit-keyframes loader-5-5 {
-	0%   { -webkit-transform: translate3d(0, 0, 0) scale(1); }
-	50%  { -webkit-transform: translate3d(0, -24px, 0) scale(.5); }
-	100% { -webkit-transform: translate3d(0, 0, 0) scale(1); }
+    animation: loader-5-5 2s cubic-bezier(0.770, 0.000, 0.175, 1.000) infinite;
 }
 @keyframes loader-5-5 {
 	0%   { transform: translate3d(0, 0, 0) scale(1); }
