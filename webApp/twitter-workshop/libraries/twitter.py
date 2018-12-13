@@ -106,17 +106,17 @@ def get_interactions(_ids, **options):
 
         # Iterate over tweets
         for tweet in doc["tweets"]:
-            datetime_obj = datetime.datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
-            datetime_obj = datetime_obj.replace(tzinfo=pytz.timezone('UTC'))
-            datetime_obj = datetime_obj.strftime("%Y-%m-%d %H:%M")
+            created_at = datetime.datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
+            created_at = created_at.replace(tzinfo=pytz.timezone('UTC'))
+            created_at = created_at.strftime("%Y-%m-%d %H:%M")
             tmp_node = {"id": tweet["user"]["id"], "id_str": tweet["user"]["id_str"],
                         "screen_name": tweet["user"]["screen_name"], "type": 1, "mentions": 0}
             # If date is set
             if start_date:
                 # If the tweet is in the specified time frame
-                if (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") >= datetime.datetime.strptime(start_date,
-                                                                                                             "%Y-%m-%d %H:%M")) and (
-                        datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") <= datetime.datetime.strptime(
+                if (datetime.datetime.strptime(created_at, "%Y-%m-%d %H:%M") >= datetime.datetime.strptime(start_date,
+                                                                                                           "%Y-%m-%d %H:%M")) and (
+                        datetime.datetime.strptime(created_at, "%Y-%m-%d %H:%M") <= datetime.datetime.strptime(
                     end_date, "%Y-%m-%d %H:%M")):
                     nodes.append(tmp_node)
             else:
@@ -125,15 +125,16 @@ def get_interactions(_ids, **options):
             # Iterate over mentions
             for user in tweet['entities']['user_mentions']:
                 if user and (user['id'] != tweet["user"]["id"]):  # The user can't mention himself
-                    tmp_node = {"id": user['id'], "id_str": user['id_str'], "screen_name": user["screen_name"], "type": 2,
+                    tmp_node = {"id": user['id'], "id_str": user['id_str'], "screen_name": user["screen_name"],
+                                "type": 2,
                                 "mentions": 0}
                     tmp_link = {"source": tweet["user"]["id"], "target": user['id'], "value": 1}
                     # If date is set
                     if start_date:
                         # If the tweet is in the specified time frame
-                        if (datetime.datetime.strptime(datetime_obj, "%Y-%m-%d %H:%M") >= datetime.datetime.strptime(
+                        if (datetime.datetime.strptime(created_at, "%Y-%m-%d %H:%M") >= datetime.datetime.strptime(
                                 start_date, "%Y-%m-%d %H:%M")) and (
-                                datetime.datetime.strptime(datetime_obj,
+                                datetime.datetime.strptime(created_at,
                                                            "%Y-%m-%d %H:%M") <= datetime.datetime.strptime(
                             end_date, "%Y-%m-%d %H:%M")):
                             nodes.append(tmp_node)
@@ -155,7 +156,8 @@ def get_interactions(_ids, **options):
                 active += 1
         # Append if node read for the first time
         if duplicated == 0:
-            tmp_node = {"id": node["id"], "id_str": node["id_str"], "screen_name": node["screen_name"], "type": node["type"],
+            tmp_node = {"id": node["id"], "id_str": node["id_str"], "screen_name": node["screen_name"],
+                        "type": node["type"],
                         "mentions": node["mentions"]}
             unique_nodes.append(tmp_node)
         # Set the type if the node is at least one time active
@@ -244,7 +246,6 @@ def get_interactions(_ids, **options):
 
     # nodes = engaged_nodes
 
-
     interacts["nodes"] = nodes
     interacts["links"] = links
 
@@ -253,7 +254,6 @@ def get_interactions(_ids, **options):
 
 # Get user's details
 def get_user_details(_id):
-
     # Connect to Twitter's API
     auth = tweepy.OAuthHandler('y3fvWam4738fGFCSuVJpIhtwp', 'czDAPY4XnYe4fp4n6FMwrHSFGtF0nY15PgnmozeBAsnObHiKJr')
     auth.set_access_token('229596006-BzKTTM85v2Ca0xf7d11CPM7AKhIOnx03EsUNjgsk',
@@ -289,9 +289,8 @@ def ceil_dt(dt, delta):
     return dt + (datetime.datetime.min - dt) % delta
 
 
-# Get tweets distribution by time
-def get_tweets_distribution(_ids):
-
+# Get tweets
+def get_tweets(_ids):
     tweets_data = []
 
     # Read the tweets document
@@ -304,27 +303,82 @@ def get_tweets_distribution(_ids):
 
         # Iterate over tweets
         for tweet in doc["tweets"]:
-            datetime_obj = datetime.datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
-            datetime_obj = datetime_obj.replace(tzinfo=pytz.timezone('UTC'))
-            datetime_obj = datetime_obj.strftime("%Y-%m-%d %H:%M")
-            tweets_data.append([datetime_obj])
+            tweets_data.append(tweet)
 
-    oldest_tweet = min(tweets_data)
-    newest_tweet = max(tweets_data)
+    return tweets_data
 
-    # delta = datetime.datetime.strptime(newest_tweet[0],"%Y-%m-%d %H:%M") - datetime.datetime.strptime(oldest_tweet[0],"%Y-%m-%d %H:%M")
+
+# Get count of tweets
+def get_tweets_count(tweets):
+    return len(tweets)
+
+
+# Get count of users involved
+def get_users_count(tweets):
+    users = []
+
+    for tweet in tweets:
+        i = 0
+        for user in users:
+            if tweet["user"]["id"] == user:
+                i += 1
+        if i == 0:
+            users.append(tweet["user"]["id"])
+
+    return len(users)
+
+
+# Get count of interactions
+def get_interactions_count(tweets):
+    interactions = 0
+
+    for tweet in tweets:
+        if tweet['entities']['user_mentions']:
+            interactions += 1
+
+    return interactions
+
+
+# Get statistics per time unit
+def get_stats_per_time_unit(tweets, unit):
+
+    if unit == "m":
+        time_format = "%Y-%m-%d %H:%M"
+    elif unit == "h":
+        time_format = "%Y-%m-%d %H"
+    elif unit == "d":
+        time_format = "%Y-%m-%d"
 
     distribution = []
 
-    # if delta <= datetime.timedelta(hours=72):
-    for tweet in tweets_data:
+    for tweet in tweets:
         created = 0
-        tweet_created_at = datetime.datetime.strptime(tweet[0], "%Y-%m-%d %H:%M").replace(minute=0).strftime("%Y-%m-%d %H:%M")
-        for unit in distribution:
-            if tweet_created_at == unit["date"]:
-                unit["count"] += 1
-                created = 1
+
+        created_at = datetime.datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
+        created_at = created_at.replace(tzinfo=pytz.timezone('UTC'))
+        created_at = created_at.strftime(time_format)
+
+        for timeframe in distribution:
+            if created_at == timeframe["timeframe"]:
+                created += 1
+
         if created is 0:
-            distribution.append({"date" : tweet_created_at, "count" : 1})
+            distribution.append({"timeframe": created_at})
+
+    for timeframe in distribution:
+
+        tweets_buffer = []
+
+        for tweet in tweets:
+            created_at = datetime.datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
+            created_at = created_at.replace(tzinfo=pytz.timezone('UTC'))
+            created_at = created_at.strftime(time_format)
+
+            if created_at == timeframe["timeframe"]:
+                tweets_buffer.append(tweet)
+
+        timeframe["tweets_count"] = get_tweets_count(tweets_buffer)
+        timeframe["users_count"] = get_users_count(tweets_buffer)
+        timeframe["interactions_count"] = get_interactions_count(tweets_buffer)
 
     return distribution

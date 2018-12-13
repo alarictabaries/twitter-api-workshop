@@ -53,12 +53,13 @@ def query(request):
 def dataset(request):
 
     metadata = twitter.get_metadata(request.GET['id'])
-    tweets_distribution = twitter.get_tweets_distribution(metadata["_tweets"])
-    twitter.get_tweets_distribution(metadata["_tweets"])
+    tweets = twitter.get_tweets(metadata["_tweets"])
+
+    print(twitter.get_stats_per_time_unit(tweets, "h"))
 
     metadata = [metadata["_id"], metadata["_tweets"], metadata["keyword"]]
 
-    return render(request, 'dataset.html', {'metadata': metadata, 'distribution': tweets_distribution})
+    return render(request, 'dataset.html', {'metadata': metadata})
 
 
 # /interactions
