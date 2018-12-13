@@ -102,6 +102,7 @@ def get_interactions(tweets):
     nodes = nodes[:500]
 
     links_buffer = []
+    nodes_buffer = []
     for link in links:
         connected = 0
         for node in nodes:
@@ -113,6 +114,17 @@ def get_interactions(tweets):
             links_buffer.append(link)
 
     links = links_buffer
+
+    nodes_buffer = []
+    for node in nodes:
+        lonely = 0
+        for link in links:
+            if node["id"] == link["source"] or node["id"] == link["target"]:
+                lonely += 1
+        if lonely > 0:
+            nodes_buffer.append(node)
+
+    nodes = nodes_buffer
 
     interactions["nodes"] = nodes
     interactions["links"] = links
