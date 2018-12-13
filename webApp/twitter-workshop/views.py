@@ -67,12 +67,13 @@ def dataset(request):
 def interactions(request):
 
     metadata = twitter.get_metadata(request.GET['id'])
-    interactions = twitter.get_interactions(metadata["_tweets"])
+    tweets = twitter.get_tweets(metadata["_tweets"])
+    interactions = twitter.get_interactions(tweets)
     metadata = [metadata["_id"], metadata["_tweets"], metadata["keyword"]]
 
-    most_engaged_nodes = twitter.get_most_engaged(interactions, 3)
+    influencers = twitter.get_influencers(interactions, 3)
 
-    return render(request, 'interactions.html', {'metadata': metadata, 'interactions': [interactions, most_engaged_nodes]})
+    return render(request, 'interactions.html', {'metadata': metadata, 'interactions': [interactions, influencers]})
 
 
 # Ajax calls
@@ -87,20 +88,10 @@ def update_interactions(request):
 
     # Initialize options
     id = request.POST.get('id')
-    start_date = request.POST.get('start_date')
-    end_date = request.POST.get('end_date')
-    threshold = int(request.POST.get('threshold'))
 
-    # Read metadata
-    metadata = twitter.get_metadata(id)
+    interactions = {}
 
-    # Update interactions list and most engaged nodes
-    interacts = twitter.get_interactions(metadata["_tweets"], start_date=start_date, end_date=end_date, threshold=threshold)
-    most_engaged_nodes = twitter.get_most_engaged(interacts, 3)
-
-    interacts = [interacts, most_engaged_nodes]
-
-    return JsonResponse(interacts, safe=False)
+    return JsonResponse(interactions, safe=False)
 
 
 # /get_user_details (ajax)

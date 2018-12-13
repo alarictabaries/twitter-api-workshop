@@ -17,7 +17,7 @@ function show_info(d) {
             complete: function (response) {
                 $(".card.node .pic").attr("src", response.responseJSON.profile_image_url_https);
                 $(".card.node .name").html(response.responseJSON.name);
-                $(".card.node .screen_name").html("<a target=\"_BLANK\" href=\"https://twitter.com/intent/user?user_id=" + d.id_str + "\">@" + d.screen_name + "</a>");
+                $(".card.node .screen_name").html("<a target=\"_BLANK\" href=\"https://twitter.com/intent/user?user_id=" + d.id_str + "\">@" + response.responseJSON.screen_name + "</a>");
                 $(".card.node .followers").html("<span class=\"label\">Followers</span><br /><span class=\"count\">" + numberWithSpaces(response.responseJSON.followers_count) + "</span>");
                 $(".card.node .mentions").html("<span class=\"label\">Mentions</span><br /><span class=\"count\">" + d.mentions + "</span>");
                 $(".card.node").fadeIn(85);
@@ -27,7 +27,7 @@ function show_info(d) {
     }
 }
 
-function update_interactions(threshold, gravity_modulator = -30, link_distance = 30) {
+function update_interactions(count = 0) {
     $('#overlay').fadeIn(125);
     show_info(false);
     $.ajax({
@@ -36,7 +36,7 @@ function update_interactions(threshold, gravity_modulator = -30, link_distance =
         url: '/update_interactions',
         data: {
             id: getUrlVars()["id"].replace("#", ""),
-            threshold: threshold
+
         },
         success: function (response) {
             var data_set = response[0];
@@ -57,7 +57,7 @@ function update_interactions(threshold, gravity_modulator = -30, link_distance =
                     complete: function (response) {
                         jQuery(cards[i]).find(".pic").attr("src", response.responseJSON.profile_image_url_https);
                         jQuery(cards[i]).find(".name").html(response.responseJSON.name);
-                        jQuery(cards[i]).find(".screen_name").html("<a target=\"_BLANK\" href=\"https://twitter.com/intent/user?user_id=" + most_engaged_nodes[iter]["id_str"] + "\">@" + most_engaged_nodes[iter]["screen_name"] + "</a>");
+                        jQuery(cards[i]).find(".screen_name").html("<a target=\"_BLANK\" href=\"https://twitter.com/intent/user?user_id=" + most_engaged_nodes[iter]["id_str"] + "\">@" + response.responseJSON.screen_name + "</a>");
                         jQuery(cards[i]).find(".followers").html("<span class=\"label\">Followers</span><br /><span class=\"count\">" + numberWithSpaces(response.responseJSON.followers_count) + "</span>");
                         jQuery(cards[i]).find(".mentions").html("<span class=\"label\">Mentions</span><br /><span class=\"count\">" + most_engaged_nodes[iter]["freq"] + "</span>");
                     }
@@ -70,7 +70,7 @@ function update_interactions(threshold, gravity_modulator = -30, link_distance =
             }
 
             svg = d3.select('.graph').append("svg");
-            createV4SelectableForceDirectedGraph(svg, data_set, most_engaged_nodes, gravity_modulator, link_distance);
+            createV4SelectableForceDirectedGraph(svg, data_set, most_engaged_nodes);
         },
         complete: function(){
             $('#overlay').fadeOut(125);
@@ -204,13 +204,13 @@ function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes, gr
     /*$("circle.void").remove();*/
 
     // add titles for mouseover blurbs
-    node.append("title").attr("class", "label")
+    /*node.append("title").attr("class", "label")
         .text(function(d) {
             if ('screen_name' in d)
                 return "@" + d.screen_name;
             else
                 return d.id;
-        });
+        });*/
 
     var simulation = d3v4.forceSimulation()
         .force("link", d3v4.forceLink()
