@@ -53,11 +53,11 @@ def query(request):
 def dataset(request):
 
     metadata = twitter.get_metadata(request.GET['id'])
-    tweets = twitter.get_tweets(metadata["_tweets"])
+    tweets = twitter.get_tweets(metadata["_id"])
 
     print(twitter.get_stats_per_time_unit(tweets, "h"))
 
-    metadata = [metadata["_id"], metadata["_tweets"], metadata["keyword"]]
+    metadata = [metadata["_id"], metadata["keyword"]]
 
     return render(request, 'dataset.html', {'metadata': metadata})
 
@@ -67,9 +67,10 @@ def dataset(request):
 def interactions(request):
 
     metadata = twitter.get_metadata(request.GET['id'])
-    tweets = twitter.get_tweets(metadata["_tweets"])
+    tweets = twitter.get_tweets(metadata["_id"])
     interactions = twitter.get_interactions(tweets)
-    metadata = [metadata["_id"], metadata["_tweets"], metadata["keyword"]]
+
+    metadata = [metadata["_id"], metadata["keyword"]]
 
     influencers = twitter.get_influencers(interactions, 3)
 

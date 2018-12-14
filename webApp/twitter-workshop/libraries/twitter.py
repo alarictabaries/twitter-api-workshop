@@ -20,31 +20,24 @@ def scrape_twitter(keyword, count, lang):
 
     # Write tweets
     db = mongodb.db_connect()
-    col = db["tweets"]
-    _docs = []
-
-    # Create new document every 1k tweets
-    i = 0
-    for tweet in tweepy.Cursor(api.search, q=keyword, lang=lang, tweet_mode='extended', result_type="recent",
-                               include_entities=True).items(count):
-        if i % 1000 == 0:
-            _tweets = col.insert_one({"tweets": []})
-            _docs.append(_tweets.inserted_id)
-        col.update_one({'_id': ObjectId(_tweets.inserted_id)}, {'$push': {'tweets': tweet._json}})
-        i += 1
 
     col = db["index"]
 
     # Write metadata
-    col.insert_one({
+    _query = col.insert_one({
         "keyword": keyword,
         "options": {
             "count": count,
             "lang": lang,
         },
-        "_tweets": _docs,
         "created_at": date_now.strftime("%Y-%m-%d %H:%M")
     })
+
+    col = db["tweets"]
+    for tweet in tweepy.Cursor(api.search, q=keyword, lang=lang, tweet_mode='extended', result_type="recent",
+                               include_entities=True).items(count):
+        tweet._json["_query"] = _query.inserted_id
+        col.insert_one(tweet._json)
 
     return 1
 
@@ -102,7 +95,6 @@ def get_interactions(tweets):
     nodes = nodes[:500]
 
     links_buffer = []
-    nodes_buffer = []
     for link in links:
         connected = 0
         for node in nodes:
@@ -171,20 +163,17 @@ def ceil_dt(dt, delta):
 
 
 # Get tweets
-def get_tweets(_ids):
+def get_tweets(_id):
     tweets = []
 
     # Read the tweets document
     db = mongodb.db_connect()
     col = db["tweets"]
 
-    for _id in _ids:
+    docs = col.find({"_query": ObjectId(_id)})
 
-        doc = col.find_one({"_id": ObjectId(_id)})
-
-        # Iterate over tweets
-        for tweet in doc["tweets"]:
-            tweets.append(tweet)
+    for doc in docs:
+        tweets.append(doc)
 
     return tweets
 
