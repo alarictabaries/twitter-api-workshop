@@ -152,6 +152,10 @@ function basicToggleNavbar() {
         $(".content").animate({
             paddingLeft: "45px"
         }, 175);
+        console.log("fdp");
+        $(".title").animate({
+            paddingRight: "45px"
+        }, 175);
         $( ".content .toggle-nav .material-icons" ).html('chevron_right');
     } else {
         $(".sidebar").animate({
@@ -159,6 +163,9 @@ function basicToggleNavbar() {
         }, 175);
         $(".content").animate({
             paddingLeft: "200px"
+        }, 175);
+        $(".title").animate({
+            paddingRight: "200px"
         }, 175);
         $(".sidebar .nav span").delay(55).fadeIn(150);
         $(".sidebar .nav a span").delay(55).fadeIn(150);

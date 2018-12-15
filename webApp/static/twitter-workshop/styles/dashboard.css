@@ -87,9 +87,11 @@ html, body {
     line-height: 45px;
     background: #ecf0f1;
     width: 100%;
+    padding-right: 45px;
     color: #34495e;
     font-size: 13px;
     position: fixed;
+    justify-content: space-between;
 }
 
 .content .toggle-nav {
@@ -115,6 +117,21 @@ html, body {
     margin: 25px;
     margin-top: 70px;
     color: #34495e;
+}
+
+.page-title {
+    display: flex;
+}
+
+.user-panel {
+    display: flex;
+}
+
+.user-panel a {
+    display: inline-block;
+    color: #34495e;
+    width: 35px;
+    text-align: center;
 }
 
 /* for better use if model learned */

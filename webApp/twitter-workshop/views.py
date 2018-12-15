@@ -6,12 +6,12 @@ from .libraries import mongodb
 from django.http import JsonResponse
 
 
-# /
-def index(request):
-    return render(request, 'index.html')
+# /app/home
+def home(request):
+    return render(request, 'app/home.html', {'user': request.user})
 
 
-# /database
+# /app/database
 # Display a the list of created queries
 def database(request):
 
@@ -26,10 +26,10 @@ def database(request):
 
     index = reversed(index)
 
-    return render(request, 'database.html', {'index': index})
+    return render(request, 'app/database.html', {'index': index})
 
 
-# /query
+# /app/query
 # Create a query
 def query(request):
     if request.method == 'POST':
@@ -45,10 +45,10 @@ def query(request):
     else:
         form = TwitterQuery.TwitterQuery()
 
-    return render(request, 'query.html', {'form': form})
+    return render(request, 'app/query.html', {'form': form})
 
 
-# /dataset
+# /app/dataset
 # Display the list of query's tweets
 def dataset(request):
 
@@ -59,10 +59,10 @@ def dataset(request):
 
     metadata = [metadata["_id"], metadata["keyword"]]
 
-    return render(request, 'dataset.html', {'metadata': metadata})
+    return render(request, 'app/dataset.html', {'metadata': metadata})
 
 
-# /interactions
+# /app/interactions
 # Display interactions graph
 def interactions(request):
 
@@ -74,12 +74,12 @@ def interactions(request):
 
     influencers = twitter.get_influencers(interactions, 3)
 
-    return render(request, 'interactions.html', {'metadata': metadata, 'interactions': [interactions, influencers]})
+    return render(request, 'app/interactions.html', {'metadata': metadata, 'interactions': [interactions, influencers]})
 
 
 # Ajax calls
 
-# /update_interactions (ajax)
+# /app/update_interactions (ajax)
 # Update interactions graph
 def update_interactions(request):
 
@@ -95,8 +95,8 @@ def update_interactions(request):
     return JsonResponse(interactions, safe=False)
 
 
-# /get_user_details (ajax)
-# Rerturn details of an user
+# /app/get_user_details (ajax)
+# Return details of an user
 def get_user_details(request):
 
     # Check if request is called from ajax

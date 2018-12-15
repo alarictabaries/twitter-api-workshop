@@ -13,17 +13,20 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.urls import path
-
+from django.urls import path, include
+from django.contrib import admin
 from . import views
 
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('query', views.query, name='query'),
-    path('database', views.database, name='database'),
-    path('dataset', views.dataset, name='dataset'),
-    path('interactions', views.interactions, name='interactions'),
+    path('admin/', admin.site.urls),
+    path('app/', include('django.contrib.auth.urls')),
+
+    path('app/home', views.home, name='app/home'),
+    path('app/query', views.query, name='query'),
+    path('app/database', views.database, name='database'),
+    path('app/dataset', views.dataset, name='dataset'),
+    path('app/interactions', views.interactions, name='interactions'),
     # Ajax calls
-    path('update_interactions', views.update_interactions, name='update_interactions'),
-    path('get_user_details', views.get_user_details, name='get_user_details'),
+    path('app/update_interactions', views.update_interactions, name='update_interactions'),
+    path('app/get_user_details', views.get_user_details, name='get_user_details'),
 ]

@@ -1,0 +1,18 @@
+{% include "app/includes/header.html" with title="Create a query" %}
+
+    <div class="sub-content">
+
+        <form class="query" action="" method="post">
+            {% csrf_token %}
+            {{ form|linebreaksbr }}
+            <input type="submit" value="Query">
+        </form>
+
+    </div>
+
+</div>
+
+</div>
+
+</body>
+</html>

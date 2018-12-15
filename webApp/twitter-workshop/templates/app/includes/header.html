@@ -5,7 +5,7 @@
     {% load static %}
 
     <meta charset="utf-8">
-    <title>Workshop : {{subtitle}}</title>
+    <title>Workshop : {{title}}</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -31,7 +31,7 @@
             <script src="{% static "twitter-workshop/libraries/d3.v4.min.js" %}"></script>
             <script src="{% static "twitter-workshop/scripts/d3js/interactions_brush.js" %}" type="text/javascript"></script>
             <script src="{% static "twitter-workshop/scripts/d3js/interactions_graph.js" %}" type="text/javascript"></script>
-    {% endif %}
+        {% endif %}
     {% endblock %}
 
     <link rel="stylesheet" type="text/css" href="{% static "twitter-workshop/styles/normalize.css" %}">
@@ -51,7 +51,7 @@
 
         <ul class="nav">
             <li>
-                <a href="/"><i class="material-icons">home</i><span>Home</span></a>
+                <a href="home"><i class="material-icons">home</i><span>Home</span></a>
             </li>
             <li>
                 <a href="query"><i class="material-icons">search</i><span>Create a query</span></a>
@@ -62,3 +62,31 @@
         </ul>
 
     </div>
+
+    <div class="content">
+
+        <div id="overlay"><div class="loader"><span></span></div></div>
+
+        <div class="title">
+
+            <div class="page-title">
+                <div class="toggle-nav">
+                    <i class="material-icons">chevron_right</i>
+                </div>
+
+                <i class="material-icons">home</i> {{  title }}
+                {% block metadata %}
+                    {% if metadata %}
+                        : {{ metadata.1 }}
+                    {% endif %}
+                {% endblock %}
+            </div>
+
+            <div class="user-panel">
+                <a href="#"><i class="material-icons">person</i></a>
+                <a href="#"><i class="material-icons">power_settings_new</i></a>
+            </div>
+
+        </div>
+
+

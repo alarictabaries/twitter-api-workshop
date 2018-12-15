@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'django.contrib.admin',
     'django.contrib.staticfiles',
 ]
 
@@ -76,8 +77,17 @@ WSGI_APPLICATION = 'twitter-workshop.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        #'ENGINE': 'django.db.backends.sqlite3',
+        #'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'djongo',
+        'NAME': 'twitter-workshop',
+        'HOST': '51.158.72.31',
+        #'HOST': '192.168.0.31',
+        'PORT': 27017,
+        'USER': "twitter-workshop",
+        'PASSWORD': "yWH9BTt0ZCky2Gmw",
+        'AUTH_SOURCE': 'twitter-workshop',
+        'AUTH_MECHANISM': 'SCRAM-SHA-1',
     }
 }
 
@@ -120,3 +130,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = ( os.path.join('static'), )
+
+LOGIN_REDIRECT_URL = '/app/home'
+LOGOUT_REDIRECT_URL = '/'

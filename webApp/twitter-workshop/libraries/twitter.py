@@ -21,7 +21,7 @@ def scrape_twitter(keyword, count, lang):
     # Write tweets
     db = mongodb.db_connect()
 
-    col = db["index"]
+    col = db["app_index"]
 
     # Write metadata
     _query = col.insert_one({
@@ -45,7 +45,7 @@ def scrape_twitter(keyword, count, lang):
 # Read metadata from DB
 def get_metadata(_id):
     db = mongodb.db_connect()
-    col = db["index"]
+    col = db["app_index"]
 
     # Read the metadata document
     doc = col.find_one({"_id": ObjectId(_id)})
@@ -168,7 +168,7 @@ def get_tweets(_id):
 
     # Read the tweets document
     db = mongodb.db_connect()
-    col = db["tweets"]
+    col = db["app_tweets"]
 
     docs = col.find({"_query": ObjectId(_id)})
 

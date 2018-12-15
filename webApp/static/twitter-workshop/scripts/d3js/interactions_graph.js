@@ -7,7 +7,7 @@ function show_info(d) {
         $.ajax({
             headers: { "X-CSRFToken": getCookie("csrftoken") },
             type: "POST",
-            url: '/get_user_details',
+            url: '/app/get_user_details',
             data: {
                 _id: d.id_str,
             },
@@ -47,7 +47,7 @@ function update_interactions(count = 0) {
                 $.ajax({
                     headers: { "X-CSRFToken": getCookie("csrftoken") },
                     type: "POST",
-                    url: '/get_user_details',
+                    url: '/app/get_user_details',
                     data: {
                         _id: most_engaged_nodes[i]["id_str"],
                     },
