@@ -16,7 +16,7 @@ def home(request):
 def database(request):
 
     db = mongodb.db_connect()
-    col = db["index"]
+    col = db["app_queries"]
     docs = col.find()
 
     index = []

@@ -33,7 +33,7 @@ def scrape_twitter(keyword, count, lang):
         "created_at": date_now.strftime("%Y-%m-%d %H:%M")
     })
 
-    col = db["tweets"]
+    col = db["app_tweets"]
     for tweet in tweepy.Cursor(api.search, q=keyword, lang=lang, tweet_mode='extended', result_type="recent",
                                include_entities=True).items(count):
         tweet._json["_query"] = _query.inserted_id
