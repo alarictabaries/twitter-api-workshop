@@ -27,7 +27,7 @@ html, body {
     min-height: 100%;
     max-height: 100%;
     background: #34495e;
-    font-size: 13px;
+    font-size: 12px;
     position: fixed;
     z-index: 200;
 }

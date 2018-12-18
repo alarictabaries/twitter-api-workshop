@@ -1,0 +1,92 @@
+body {
+    background: #f7f7f7;
+    font-family: "IBM Plex Sans";
+}
+
+.container {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 275px;
+    transform: translate(-50%, -50%);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.13);
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+}
+
+.container .title {
+    background: #34495e;
+    color: #ffffff;
+    height: 45px;
+    line-height: 45px;
+    padding: 0px 24px;
+    font-size: 12px;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+}
+
+.container .title .material-icons {
+    padding-right: 4px;
+    font-size: 13px;
+    vertical-align: -2px;
+}
+
+.container .content {
+    background: #ffffff;
+    padding: 20px;
+    color: #34495e;
+    border-bottom-left-radius: 2px;
+    border-bottom-right-radius: 2px;
+}
+
+p {
+    margin: 0;
+    padding: 0;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 12px;
+}
+
+input {
+    border: 0;
+    background: #ecf0f1;
+    margin-bottom: 8px;
+    padding: 8px 12px;
+    width: calc( 100% - 24px );
+    color: #34495e;
+    font-size: 12px;
+    border-radius: 2px;
+}
+
+button[type="submit"] {
+    margin-top: 12px;
+    width: 100%;
+    text-align: center;
+    background: #ffffff;
+    border: 0;
+    font-size: 12px;
+    padding: 8px 0px;
+    font-weight: 500;
+    color: #34495e;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.13);
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+    border-radius: 2px;
+    margin-bottom:2px;
+}
+
+ul {
+    font-size: 12px;
+    width: calc(100% - 24px);
+    list-style: none;
+    padding: 12px;
+    margin: 0;
+    margin-bottom: 12px;
+    text-align: justify;
+    padding: 12px;
+    color: #546E7A;
+    border-radius: 2px;
+    background: #FFE082;
+
+}

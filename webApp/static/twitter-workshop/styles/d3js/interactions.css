@@ -51,7 +51,7 @@ circle.alone {
 }
 
 .col-label {
-    font-size: 13px;
+    font-size: 12px;
     text-align: center;
 }
 
@@ -98,7 +98,13 @@ circle.alone {
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
     margin-right: 12px;
     margin-bottom: 12px;
+    transition: background 0.055s ease-in-out;
 }
+
+.col-actions a:hover {
+    background: #f7f7f7;
+}
+
 
 .col-actions i {
     font-size: 12px;

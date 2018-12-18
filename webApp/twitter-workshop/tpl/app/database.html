@@ -1,4 +1,4 @@
-{% include "app/includes/header.html" with title="Query database" datatable="true" %}
+{% include "app/inc/header.html" with title="Query database" datatable="true" %}
 
     <div class="sub-content">
 
@@ -14,7 +14,7 @@
         <tbody>
             {% for item in index %}
             <tr>
-                <td class="subject"><a href="dataset?id={{ item.0 }}">{{ item.1 }}</a></td>
+                <td class="subject"><a href="/app/dataset?id={{ item.0 }}">{{ item.1 }}</a></td>
                 <td class="count">{{ item.3 }}</td>
                 <td class="language">{{ item.4 }}</td>
                 <td class="date">{{ item.2 }}</td>

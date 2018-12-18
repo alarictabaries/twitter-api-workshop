@@ -164,19 +164,9 @@ table.dataTable.no-footer {
 /* form */
 
 .query label {
-    display: inline-block;
-    color: #34495e;
-    text-decoration: none;
+    display: block;
+    margin-bottom: 8px;
     font-size: 12px;
-    background: #f7f7f7;
-    border-top-left-radius: 2px;
-    border-bottom-left-radius: 2px;
-    padding: 0px 12px;
-    height: 31px;
-    line-height: 31px;
-    margin-bottom: 12px;
-    padding-right: 0;
-    border: 0;
 }
 
 .query input[type="submit"] {
@@ -194,38 +184,27 @@ table.dataTable.no-footer {
     margin-right: 12px;
     margin-bottom: 12px;
     border: 0;
+    margin-top: 12px;
 }
 
-.query input {
-    color: #34495e;
-    text-decoration: none;
-    font-size: 12px;
-    background: #f7f7f7;
-    border-top-right-radius: 2px;
-    border-bottom-right-radius: 2px;
-    padding: 8px 12px;
-    margin-right: 12px;
-    margin-bottom: 12px;
+.query input, select {
     border: 0;
-}
-
-.query input[type="number"] {
-    width: 75px;
+    background: #ecf0f1;
+    margin-bottom: 8px;
+    padding: 8px 12px;
+    color: #34495e;
+    font-size: 12px;
+    border-radius: 2px;
 }
 
 .query select {
-    color: #34495e;
-    text-decoration: none;
-    font-size: 12px !important;
-    background: #f7f7f7;
-    border-top-right-radius: 2px;
-    border-bottom-right-radius: 2px;
-    padding: 8px 12px;
-    margin-right: 12px;
-    margin-bottom: 12px;
-    border: 0;
-    appearance: none;
+    padding: 7px 12px;
 }
+
+.query input[type="number"] {
+    width: 125px;
+}
+
 
 /* Dataset dashboard */
 

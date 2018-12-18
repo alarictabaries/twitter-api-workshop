@@ -8,8 +8,8 @@ from bson.objectid import ObjectId
 import time
 
 
-# Save tweets meeting the criteria to a CSV file
-def scrape_twitter(keyword, count, lang):
+# Save tweets meeting the criteria to MongoDB
+def scrape_twitter(keyword, count, lang, _user):
     date_now = datetime.datetime.now()
 
     # Connect to Twitter's API
@@ -25,6 +25,7 @@ def scrape_twitter(keyword, count, lang):
 
     # Write metadata
     _query = col.insert_one({
+        "_user": _user,
         "keyword": keyword,
         "options": {
             "count": count,
@@ -207,6 +208,22 @@ def get_interactions_count(tweets):
             interactions += 1
 
     return interactions
+
+
+# Get tweets in a timeframe
+# Boundaries date format : %Y-%m-%d %H:%M
+def get_tweets_by_timeframe(tweets, start_date, end_date):
+
+    tweets_buffer = []
+    for tweet in tweets:
+        created_at = datetime.datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
+        created_at = created_at.replace(tzinfo=pytz.timezone('UTC'))
+        created_at = created_at.strftime("%Y-%m-%d %H:%M")
+
+        if start_date < created_at < end_date:
+            tweets_buffer.append(tweet)
+
+    return tweets_buffer
 
 
 # Get statistics per time unit

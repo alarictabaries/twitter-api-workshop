@@ -9,26 +9,26 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="icon" type="image/png" href="{% static "twitter-workshop/images/favicon.png" %}">
+    <link rel="icon" type="image/png" href="{% static "twitter-workshop/img/favicon.png" %}">
 
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:300,400,500,600" rel="stylesheet">
 
-    <script src="{% static "twitter-workshop/libraries/jquery-3.3.1.min.js" %}" type="text/javascript"></script>
+    <script src="{% static "twitter-workshop/libs/jquery-3.3.1.min.js" %}" type="text/javascript"></script>
 
     <script src="{% static "twitter-workshop/scripts/dashboard.js" %}" type="text/javascript"></script>
 
     {% block datatable %}
         {% if datatable %}
-            <link href="{% static "twitter-workshop/libraries/datatables/jquery.dataTables.min.css" %}" rel="stylesheet">
-            <script src="{% static "twitter-workshop/libraries/datatables/jquery.dataTables.min.js" %}" type="text/javascript"></script>
+            <link href="{% static "twitter-workshop/libs/datatables/jquery.dataTables.min.css" %}" rel="stylesheet">
+            <script src="{% static "twitter-workshop/libs/datatables/jquery.dataTables.min.js" %}" type="text/javascript"></script>
         {% endif %}
     {% endblock %}
 
     {% block d3js %}
         {% if d3js %}
             <link rel="stylesheet" type="text/css" href="{% static "twitter-workshop/styles/d3js/interactions.css" %}">
-            <script src="{% static "twitter-workshop/libraries/d3.v4.min.js" %}"></script>
+            <script src="{% static "twitter-workshop/libs/d3.v4.min.js" %}"></script>
             <script src="{% static "twitter-workshop/scripts/d3js/interactions_brush.js" %}" type="text/javascript"></script>
             <script src="{% static "twitter-workshop/scripts/d3js/interactions_graph.js" %}" type="text/javascript"></script>
         {% endif %}
@@ -36,7 +36,7 @@
 
     <link rel="stylesheet" type="text/css" href="{% static "twitter-workshop/styles/normalize.css" %}">
     <link rel="stylesheet" type="text/css" href="{% static "twitter-workshop/styles/dashboard.css" %}">
-    <link rel="stylesheet" type="text/css" href="{% static "twitter-workshop/styles/elements.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "twitter-workshop/styles/dashboard_elements.css" %}">
 
 </head>
 <body>
@@ -51,13 +51,13 @@
 
         <ul class="nav">
             <li>
-                <a href="home"><i class="material-icons">home</i><span>Home</span></a>
+                <a href="/app/home"><i class="material-icons">home</i><span>Home</span></a>
             </li>
             <li>
-                <a href="query"><i class="material-icons">search</i><span>Create a query</span></a>
+                <a href="/app/query"><i class="material-icons">search</i><span>Create a query</span></a>
             </li>
             <li>
-                <a href="database"><i class="material-icons">list</i><span>Query data base</span></a>
+                <a href="/app/database"><i class="material-icons">list</i><span>Query data base</span></a>
             </li>
         </ul>
 
@@ -84,7 +84,7 @@
 
             <div class="user-panel">
                 <a href="#"><i class="material-icons">person</i></a>
-                <a href="#"><i class="material-icons">power_settings_new</i></a>
+                <a href="{% url 'logout' %}"><i class="material-icons">power_settings_new</i></a>
             </div>
 
         </div>

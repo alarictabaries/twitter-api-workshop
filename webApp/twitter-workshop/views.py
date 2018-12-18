@@ -1,18 +1,21 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from .parts import TwitterQuery
-from .libraries import twitter
-from .libraries import mongodb
+from .libs import twitter
+from .libs import mongodb
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
 
 
-# /app/home
+# /app/home/
+@login_required(login_url='/app/login/')
 def home(request):
-    return render(request, 'app/home.html', {'user': request.user})
+    return render(request, 'app/home.html')
 
 
-# /app/database
+# /app/database/
 # Display a the list of created queries
+@login_required(login_url='/app/login/')
 def database(request):
 
     db = mongodb.db_connect()
@@ -22,16 +25,19 @@ def database(request):
     index = []
 
     for doc in docs:
-        index.append([doc["_id"], doc["keyword"], doc["created_at"], doc["options"]["count"], doc["options"]["lang"]])
+        if int(doc["_user"]) == request.user.id :
+            index.append([doc["_id"], doc["keyword"], doc["created_at"], doc["options"]["count"], doc["options"]["lang"]])
 
     index = reversed(index)
 
     return render(request, 'app/database.html', {'index': index})
 
 
-# /app/query
+# /app/query/
 # Create a query
+@login_required(login_url='/app/login/')
 def query(request):
+
     if request.method == 'POST':
         form = TwitterQuery.TwitterQuery(request.POST)
         if form.is_valid():
@@ -39,7 +45,7 @@ def query(request):
             count = form.cleaned_data['count']
             language = form.cleaned_data['language']
 
-            twitter.scrape_twitter(keyword, count, language)
+            twitter.scrape_twitter(keyword, count, language, request.user.id)
 
             return HttpResponseRedirect('database')
     else:
@@ -48,22 +54,26 @@ def query(request):
     return render(request, 'app/query.html', {'form': form})
 
 
-# /app/dataset
+# /app/dataset/
 # Display the list of query's tweets
+@login_required(login_url='/app/login/')
 def dataset(request):
 
     metadata = twitter.get_metadata(request.GET['id'])
     tweets = twitter.get_tweets(metadata["_id"])
 
-    print(twitter.get_stats_per_time_unit(tweets, "h"))
+    tweets = twitter.get_tweets_by_timeframe(tweets, "2018-12-13 00:00", "2018-12-14 00:00")
+
+    print(twitter.get_stats_per_time_unit(tweets, "d"))
 
     metadata = [metadata["_id"], metadata["keyword"]]
 
     return render(request, 'app/dataset.html', {'metadata': metadata})
 
 
-# /app/interactions
+# /app/interactions/
 # Display interactions graph
+@login_required(login_url='/app/login/')
 def interactions(request):
 
     metadata = twitter.get_metadata(request.GET['id'])
@@ -79,8 +89,9 @@ def interactions(request):
 
 # Ajax calls
 
-# /app/update_interactions (ajax)
+# /app/update_interactions/ (ajax)
 # Update interactions graph
+@login_required(login_url='/app/login/')
 def update_interactions(request):
 
     # Check if request is called from ajax
@@ -95,8 +106,9 @@ def update_interactions(request):
     return JsonResponse(interactions, safe=False)
 
 
-# /app/get_user_details (ajax)
+# /app/get_user_details/ (ajax)
 # Return details of an user
+@login_required(login_url='/app/login/')
 def get_user_details(request):
 
     # Check if request is called from ajax
