@@ -27,6 +27,7 @@ body {
 .container .title .material-icons {
     padding-right: 4px;
     font-size: 13px;
+    color: #3498db;
     vertical-align: -2px;
 }
 
