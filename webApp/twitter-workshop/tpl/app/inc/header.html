@@ -36,7 +36,6 @@
 
     <link rel="stylesheet" type="text/css" href="{% static "twitter-workshop/styles/normalize.css" %}">
     <link rel="stylesheet" type="text/css" href="{% static "twitter-workshop/styles/dashboard.css" %}">
-    <link rel="stylesheet" type="text/css" href="{% static "twitter-workshop/styles/dashboard_elements.css" %}">
 
 </head>
 <body>
@@ -74,7 +73,7 @@
                     <i class="material-icons">chevron_right</i>
                 </div>
 
-                <i class="material-icons">home</i> {{  title }}
+                <i class="material-icons">{{ icon }}</i> {{  title }}
                 {% block metadata %}
                     {% if metadata %}
                         : {{ metadata.1 }}

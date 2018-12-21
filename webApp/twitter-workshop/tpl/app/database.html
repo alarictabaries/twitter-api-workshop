@@ -1,4 +1,4 @@
-{% include "app/inc/header.html" with title="Query database" datatable="true" %}
+{% include "app/inc/header.html" with title="Query database" icon="list" datatable="true" %}
 
     <div class="sub-content">
 
@@ -35,7 +35,10 @@
           "order": [],
           "pageLength": 25,
           "lengthChange": false,
-          "info": false
+          "info": false,
+          "language": {
+            "emptyTable": "No query found"
+          }
       });
   $(document).ready(function() {
       if( $( "tbody tr" ).length < 25) {

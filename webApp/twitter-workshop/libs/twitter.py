@@ -9,7 +9,7 @@ import time
 
 
 # Save tweets meeting the criteria to MongoDB
-def scrape_twitter(keyword, count, lang, _user):
+def create_query(keyword, count, lang, _user):
     date_now = datetime.datetime.now()
 
     # Connect to Twitter's API
@@ -27,18 +27,82 @@ def scrape_twitter(keyword, count, lang, _user):
     _query = col.insert_one({
         "_user": _user,
         "keyword": keyword,
-        "options": {
-            "count": count,
-            "lang": lang,
-        },
-        "created_at": date_now.strftime("%Y-%m-%d %H:%M")
+        "lang": lang,
+        "active": 1,
+        "created_at": date_now.strftime("%Y-%m -%d %H:%M"),
     })
 
     col = db["app_tweets"]
+
+    last_update = None
+    real_count = 0
+
     for tweet in tweepy.Cursor(api.search, q=keyword, lang=lang, tweet_mode='extended', result_type="recent",
                                include_entities=True).items(count):
+        if last_update is None:
+            created_at = datetime.datetime.strptime(tweet._json["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
+            created_at = created_at.replace(tzinfo=pytz.timezone('UTC'))
+            created_at = created_at.strftime("%Y-%m-%d %H:%M:%S")
+            last_update = created_at
+        real_count += 1
         tweet._json["_query"] = _query.inserted_id
         col.insert_one(tweet._json)
+
+    col = db["app_queries"]
+
+    col.update_one({'_id': ObjectId(_query.inserted_id)},
+                   {"$set": {
+                        "count" : real_count,
+                        "last_update": last_update
+                   }})
+
+    return 1
+
+
+# Scrape tweets created after specific date
+def update_query(_query):
+
+    metadata = get_metadata(_query)
+
+    # Connect to Twitter's API
+    auth = tweepy.OAuthHandler('y3fvWam4738fGFCSuVJpIhtwp', 'czDAPY4XnYe4fp4n6FMwrHSFGtF0nY15PgnmozeBAsnObHiKJr')
+    auth.set_access_token('229596006-BzKTTM85v2Ca0xf7d11CPM7AKhIOnx03EsUNjgsk',
+                          'FnyvhnqiKtRCroJ1iX1qaLxtrn7uEDgXONGplAxZv230V')
+    api = tweepy.API(auth, wait_on_rate_limit=True)
+
+    db = mongodb.db_connect()
+    col = db["app_tweets"]
+
+    real_count = metadata["count"]
+    last_update = None
+
+    for tweet in tweepy.Cursor(api.search, q=metadata["keyword"], lang=metadata["lang"], tweet_mode='extended', result_type="recent", include_entities=True).items():
+
+        created_at = datetime.datetime.strptime(tweet._json["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
+        created_at = created_at.replace(tzinfo=pytz.timezone('UTC'))
+        created_at = created_at.strftime("%Y-%m-%d %H:%M:%S")
+
+        if created_at > metadata["last_update"]:
+
+            print("New tweet detected!")
+
+            if last_update is None:
+                last_update = created_at
+
+            real_count += 1
+            tweet._json["_query"] = metadata["_id"]
+            col.insert_one(tweet._json)
+
+    col = db["app_queries"]
+
+    if last_update is None:
+        last_update = metadata["last_update"]
+
+    col.update_one({'_id': ObjectId(metadata["_id"])},
+                   {"$set": {
+                       "count": real_count,
+                       "last_update": last_update
+                   }})
 
     return 1
 
