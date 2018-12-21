@@ -25,7 +25,7 @@ def database(request):
     index = []
 
     for doc in docs:
-        if int(doc["_user"]) == request.user.id :
+        if doc["_user"] == request.user.id :
             index.append([doc["_id"], doc["keyword"], doc["created_at"], doc["options"]["count"], doc["options"]["lang"]])
 
     index = reversed(index)

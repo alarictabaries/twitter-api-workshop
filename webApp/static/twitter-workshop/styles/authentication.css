@@ -1,5 +1,5 @@
 body {
-    background: #f7f7f7;
+    background: #ffffff;
     font-family: "IBM Plex Sans";
 }
 
@@ -7,36 +7,13 @@ body {
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 275px;
+    width: 245px;
     transform: translate(-50%, -50%);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.13);
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
-}
-
-.container .title {
-    background: #34495e;
-    color: #ffffff;
-    height: 45px;
-    line-height: 45px;
-    padding: 0px 24px;
-    font-size: 12px;
-    border-top-left-radius: 2px;
-    border-top-right-radius: 2px;
-}
-
-.container .title .material-icons {
-    padding-right: 4px;
-    font-size: 13px;
-    color: #3498db;
-    vertical-align: -2px;
 }
 
 .container .content {
     background: #ffffff;
-    padding: 20px;
     color: #34495e;
-    border-bottom-left-radius: 2px;
-    border-bottom-right-radius: 2px;
 }
 
 p {
