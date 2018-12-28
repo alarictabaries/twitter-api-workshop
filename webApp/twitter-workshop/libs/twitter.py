@@ -28,8 +28,9 @@ def create_query(keyword, count, lang, _user):
         "_user": _user,
         "keyword": keyword,
         "lang": lang,
-        "active": 1,
-        "created_at": date_now.strftime("%Y-%m -%d %H:%M"),
+        "count": 0,
+        "created": date_now.strftime("%Y-%m -%d %H:%M"),
+        "updated": "-"
     })
 
     col = db["app_tweets"]
@@ -53,7 +54,7 @@ def create_query(keyword, count, lang, _user):
     col.update_one({'_id': ObjectId(_query.inserted_id)},
                    {"$set": {
                         "count" : real_count,
-                        "last_update": last_update
+                        "updated": last_update
                    }})
 
     return 1
@@ -76,15 +77,18 @@ def update_query(_query):
     real_count = metadata["count"]
     last_update = None
 
+    if metadata["updated"] is None:
+        updated = metadata["created"]
+    else:
+        updated = metadata["updated"]
+
     for tweet in tweepy.Cursor(api.search, q=metadata["keyword"], lang=metadata["lang"], tweet_mode='extended', result_type="recent", include_entities=True).items():
 
         created_at = datetime.datetime.strptime(tweet._json["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
         created_at = created_at.replace(tzinfo=pytz.timezone('UTC'))
         created_at = created_at.strftime("%Y-%m-%d %H:%M:%S")
 
-        if created_at > metadata["last_update"]:
-
-            print("New tweet detected!")
+        if created_at > updated:
 
             if last_update is None:
                 last_update = created_at
@@ -93,15 +97,18 @@ def update_query(_query):
             tweet._json["_query"] = metadata["_id"]
             col.insert_one(tweet._json)
 
+        else:
+            break
+
     col = db["app_queries"]
 
     if last_update is None:
-        last_update = metadata["last_update"]
+        last_update = metadata["updated"]
 
     col.update_one({'_id': ObjectId(metadata["_id"])},
                    {"$set": {
                        "count": real_count,
-                       "last_update": last_update
+                       "updated": last_update
                    }})
 
     return 1

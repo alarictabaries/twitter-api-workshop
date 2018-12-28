@@ -31,5 +31,5 @@ urlpatterns = [
     path('app/get_user_details/', views.get_user_details, name='app/get_user_details'),
 
     #temp
-    path('app/update_queries/', views.update_queries, name='app/update_queries'),
+    path('app/update_query/', views.update_query, name='app/update_query'),
 ]

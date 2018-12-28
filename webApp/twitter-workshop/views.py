@@ -26,7 +26,7 @@ def database(request):
 
     for doc in docs:
         if doc["_user"] == request.user.id :
-            index.append([doc["_id"], doc["keyword"], doc["created_at"], doc["count"], doc["lang"]])
+            index.append([doc["_id"], doc["keyword"], doc["created"], doc["count"], doc["lang"], doc["updated"]])
 
     index = reversed(index)
 
@@ -89,15 +89,14 @@ def interactions(request):
 
 # /app/home/
 @login_required(login_url='/app/login/')
-def update_queries(request):
+def update_query(request):
 
-    db = mongodb.db_connect()
-    col = db["app_queries"]
+    metadata = twitter.get_metadata(request.GET['id'])
+    metadata = [metadata["_id"], metadata["keyword"]]
 
-    for query in col.find({"active": 1}):
-        twitter.update_query(query["_id"])
+    twitter.update_query(request.GET['id'])
 
-    return render(request, 'app/update_queries.html')
+    return render(request, 'app/update_query.html', {'metadata': metadata})
 
 # Ajax calls
 

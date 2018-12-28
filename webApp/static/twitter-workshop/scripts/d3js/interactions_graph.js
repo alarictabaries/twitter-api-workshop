@@ -34,7 +34,7 @@ function createV4SelectableForceDirectedGraph(svg, graph, most_engaged_nodes) {
 	$(".settings .data .links").html("Links analyzed: " + graph.links.length);
 	defs = svg.append("defs");
 	for (node in most_engaged_nodes) {
-		defs.append("pattern").attr("id", most_engaged_nodes[node]["id_str"]).attr("viewBox", "0 0 1 1").attr("patternUnits", "objectBoundingBox").attr("preserveAspectRatio", "xMidYMid slice").attr("height", 1).attr("width", 1).append("image").attr("height", 1).attr("width", 1).attr("preserveAspectRatio", "xMidYMid slice").attr("xlink:href", most_engaged_nodes[node]["profile_image_url"].replace("_normal", "_bigger"))
+		defs.append("pattern").attr("id", most_engaged_nodes[node]["id_str"]).attr("viewBox", "0 0 1 1").attr("patternUnits", "objectBoundingBox").attr("preserveAspectRatio", "xMidYMid slice").attr("height", 1).attr("width", 1).append("image").attr("height", 1).attr("width", 1).attr("preserveAspectRatio", "xMidYMid slice").attr("xlink:href", most_engaged_nodes[node]["profile_image_url"])
 	}
 	if (typeof d3v4 == 'undefined') d3v4 = d3;
 	var width = +svg.attr("width"),

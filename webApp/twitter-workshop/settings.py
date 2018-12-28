@@ -116,7 +116,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'CET'
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -130,6 +130,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = ( os.path.join('static'), )
+
+
+# Login parameters
 
 LOGIN_REDIRECT_URL = '/app/home'
 LOGOUT_REDIRECT_URL = '/'

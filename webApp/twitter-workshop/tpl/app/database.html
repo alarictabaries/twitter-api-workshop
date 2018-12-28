@@ -8,7 +8,8 @@
                 <th>Keyword</th>
                 <th>Tweets count</th>
                 <th>Language</th>
-                <th>Created at</th>
+                <th>Created</th>
+                <th>Updated</th>
             </tr>
             </thead>
         <tbody>
@@ -18,6 +19,7 @@
                 <td class="count">{{ item.3 }}</td>
                 <td class="language">{{ item.4 }}</td>
                 <td class="date">{{ item.2 }}</td>
+                <td class="date">{{ item.5 }} <a href="/app/update_query/?id={{ item.0 }}"><i class="material-icons">update</i></a></td>
             </tr>
             {% endfor %}
         </tbody>
