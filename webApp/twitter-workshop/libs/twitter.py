@@ -5,7 +5,7 @@ from . import mongodb
 import datetime
 import pytz
 from bson.objectid import ObjectId
-import time
+from pprint import pprint
 
 
 # Save tweets meeting the criteria to MongoDB
@@ -111,7 +111,7 @@ def update_query(_query):
                        "updated": last_update
                    }})
 
-    return 1
+    return real_count - metadata["count"]
 
 
 # Read metadata from DB
@@ -291,7 +291,7 @@ def get_tweets_by_timeframe(tweets, start_date, end_date):
         created_at = created_at.replace(tzinfo=pytz.timezone('UTC'))
         created_at = created_at.strftime("%Y-%m-%d %H:%M")
 
-        if start_date < created_at < end_date:
+        if start_date <= created_at < end_date:
             tweets_buffer.append(tweet)
 
     return tweets_buffer
@@ -323,6 +323,8 @@ def get_stats_per_time_unit(tweets, unit):
         if created is 0:
             distribution.append({"timeframe": created_at})
 
+    distribution.sort(key=lambda x: datetime.datetime.strptime(x['timeframe'], '%Y-%m-%d %H:%M'))
+
     for timeframe in distribution:
 
         tweets_buffer = []
@@ -338,5 +340,6 @@ def get_stats_per_time_unit(tweets, unit):
         timeframe["tweets_count"] = get_tweets_count(tweets_buffer)
         timeframe["users_count"] = get_users_count(tweets_buffer)
         timeframe["interactions_count"] = get_interactions_count(tweets_buffer)
+
 
     return distribution

@@ -44,5 +44,118 @@
 
 </div>
 
+<script>
+
+    var data = {{ stats|safe }};
+    data = data.sort();
+    console.log(data);
+
+
+
+    // set the dimensions and margins of the graph
+var margin = {top: 0, right: 0, bottom: 50, left: 0},
+    width = $(".line-chart").width() - margin.left - margin.right,
+    height = $(".line-chart").height() - margin.top - margin.bottom;
+
+// parse the date / time
+var parseTime = d3.timeParse("%Y-%m-%d %H:%M");
+
+// set the ranges
+var x = d3.scaleTime().range([0, width]);
+var y = d3.scaleLinear().range([height, 0]);
+
+var yAxis = d3.axisRight(y)
+    .tickSize(width)
+    .ticks(4);
+
+var xAxis = d3.axisBottom(x)
+    .tickFormat(d3.timeFormat("%H:%M"));
+
+// define the 1st line
+var valueline = d3.line()
+    .x(function(d) { return x(d.timeframe); })
+    .y(function(d) { return y(d.comparison_tweets_count); });
+
+// define the 2nd line
+var valueline2 = d3.line()
+    .x(function(d) { return x(d.timeframe); })
+    .y(function(d) { return y(d.current_tweets_count); });
+
+// append the svg obgect to the body of the page
+// appends a 'group' element to 'svg'
+// moves the 'group' element to the top left margin
+var svg = d3.select(".line-chart").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+// Get the data
+function draw(data) {
+
+  // format the data
+  data.forEach(function(d) {
+      d.timeframe = parseTime(d.timeframe);
+      d.comparison_tweets_count = +d.comparison_tweets_count;
+      d.current_tweets_count = +d.current_tweets_count;
+  });
+
+  // Scale the range of the data
+  x.domain(d3.extent(data, function(d) { return d.timeframe; }));
+  y.domain([0, d3.max(data, function(d) {
+	  return Math.max(d.comparison_tweets_count, d.current_tweets_count); })]);
+
+    // Add the X Axis
+    svg.append("g")
+      .call(customXAxis);
+
+  // Add the Y Axis
+  svg.append("g")
+      .call(customYAxis);
+
+  // Add the valueline path.
+  svg.append("path")
+      .data([data])
+      .attr("class", "line")
+      .style("stroke-dasharray", ("5, 5"))
+      .style("opacity", 0.5)
+      .style("stroke", "#3498db")
+      .style("stroke-width", "1")
+      .style("fill", "none")
+      .attr("d", valueline);
+
+  // Add the valueline2 path.
+  svg.append("path")
+      .data([data])
+      .attr("class", "line")
+      .style("stroke", "#3498db")
+      .style("stroke-width", "1")
+      .style("fill", "none")
+      .attr("d", valueline2);
+
+}
+
+function customYAxis(g) {
+  g.call(yAxis);
+  g.select(".domain").remove();
+  g.selectAll(".tick:first-of-type line").attr("stroke", "#bdc3c7");
+  g.selectAll(".tick:not(:first-of-type) line").attr("stroke", "#ecf0f1");
+  g.selectAll(".tick text").attr("x", 4).attr("dy", -4);
+}
+
+function customXAxis(g) {
+  g.call(xAxis);
+  g.select(".domain").remove();
+  g.attr("class", "x-axis");
+  g.attr('transform', 'translate(0,' + (height) + ')');
+}
+
+    $(document).ready(function() {
+        draw(data)
+    });
+
+</script>
+
 </body>
 </html>

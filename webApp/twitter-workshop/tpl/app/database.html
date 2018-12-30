@@ -16,10 +16,10 @@
             {% for item in index %}
             <tr>
                 <td class="subject"><a href="/app/dataset?id={{ item.0 }}">{{ item.1 }}</a></td>
-                <td class="count">{{ item.3 }}</td>
+                <td class="count" id="{{ item.0 }}">{{ item.3 }}</td>
                 <td class="language">{{ item.4 }}</td>
                 <td class="date">{{ item.2 }}</td>
-                <td class="date">{{ item.5 }} <a href="/app/update_query/?id={{ item.0 }}"><i class="material-icons">update</i></a></td>
+                <td class="date">{{ item.5 }} <a href="#" class="update" id="{{ item.0 }}"><i class="material-icons">update</i></a></td>
             </tr>
             {% endfor %}
         </tbody>
@@ -46,6 +46,36 @@
       if( $( "tbody tr" ).length < 25) {
           $('.dataTables_paginate').hide();
       }
+
+      $("a.update").click(function() {
+          _id = $(this).attr('id');
+          $(".update#" + _id + " .material-icons").css("animation", "rotation 2s infinite linear");
+          $.ajax({
+			headers: {
+				"X-CSRFToken": getCookie("csrftoken")
+			},
+			type: "POST",
+			url: '/app/update_query/',
+			data: {
+				_id: _id,
+			},
+			success: function(response) {},
+			complete: function(response) {
+			    if(response.responseJSON == 0) {
+			        $(".global-notification").html("<i class=\"material-icons\">priority_high</i><span> No new tweet detected</span>");
+                } else if (response.responseJSON == 1){
+			         $(".global-notification").html("<i class=\"material-icons\">done</i><span>" + response.responseJSON + " new tweet added to the dataset</span>");
+                } else {
+                        $(".global-notification").html("<i class=\"material-icons\">done</i><span>" + response.responseJSON + " new tweets added to the dataset</span>");
+                }
+			    $(".global-notification").slideDown(75);
+				$(".update#" + _id + " .material-icons").css("animation", "none");
+				$(".count#" + _id ).html(parseInt($(".count#" + _id ).html()) + parseInt(response.responseJSON));
+				$(".global-notification").delay(2500).slideUp(75);
+			}
+		});
+      });
+
   });
 
 </script>

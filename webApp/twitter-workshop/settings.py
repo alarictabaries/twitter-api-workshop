@@ -134,5 +134,7 @@ STATICFILES_DIRS = ( os.path.join('static'), )
 
 # Login parameters
 
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 LOGIN_REDIRECT_URL = '/app/home'
 LOGOUT_REDIRECT_URL = '/'

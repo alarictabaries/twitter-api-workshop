@@ -62,13 +62,16 @@ def dataset(request):
     metadata = twitter.get_metadata(request.GET['id'])
     tweets = twitter.get_tweets(metadata["_id"])
 
-    tweets = twitter.get_tweets_by_timeframe(tweets, "2018-12-13 00:00", "2018-12-14 00:00")
+    current_stats = twitter.get_stats_per_time_unit(twitter.get_tweets_by_timeframe(tweets, "2018-12-29 00:00", "2018-12-30 00:00"), "h")
 
-    print(twitter.get_stats_per_time_unit(tweets, "d"))
+    stats_f = []
+
+    for current_stat in current_stats:
+        stats_f.append({"timeframe": current_stat["timeframe"], "current_tweets_count": int(current_stat["tweets_count"]*1.9), "comparison_tweets_count": current_stat["tweets_count"]})
 
     metadata = [metadata["_id"], metadata["keyword"]]
 
-    return render(request, 'app/dataset.html', {'metadata': metadata})
+    return render(request, 'app/dataset.html', {'metadata': metadata, 'stats': stats_f })
 
 
 # /app/interactions/
@@ -91,12 +94,12 @@ def interactions(request):
 @login_required(login_url='/app/login/')
 def update_query(request):
 
-    metadata = twitter.get_metadata(request.GET['id'])
-    metadata = [metadata["_id"], metadata["keyword"]]
+    if request.is_ajax() is False:
+        return -1
 
-    twitter.update_query(request.GET['id'])
+    _id = request.POST.get('_id')
 
-    return render(request, 'app/update_query.html', {'metadata': metadata})
+    return JsonResponse(twitter.update_query(_id), safe=False)
 
 # Ajax calls
 
