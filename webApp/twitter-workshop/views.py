@@ -67,7 +67,7 @@ def dataset(request):
     stats_f = []
 
     for current_stat in current_stats:
-        stats_f.append({"timeframe": current_stat["timeframe"], "current_tweets_count": int(current_stat["tweets_count"]*1.9), "comparison_tweets_count": current_stat["tweets_count"]})
+        stats_f.append({"timeframe": current_stat["timeframe"], "current_tweets_count": int(current_stat["tweets_count"]*19), "comparison_tweets_count": current_stat["tweets_count"]*10})
 
     metadata = [metadata["_id"], metadata["keyword"]]
 

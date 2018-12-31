@@ -61,17 +61,17 @@
 			},
 			success: function(response) {},
 			complete: function(response) {
-			    if(response.responseJSON == 0) {
-			        $(".global-notification").html("<i class=\"material-icons\">priority_high</i><span> No new tweet detected</span>");
+                if(response.responseJSON == 0) {
+			        $(".global-notification").html("No new tweet detected</span>");
                 } else if (response.responseJSON == 1){
-			         $(".global-notification").html("<i class=\"material-icons\">done</i><span>" + response.responseJSON + " new tweet added to the dataset</span>");
+			         $(".global-notification").html(response.responseJSON + " new tweet added to the dataset</span>");
                 } else {
-                        $(".global-notification").html("<i class=\"material-icons\">done</i><span>" + response.responseJSON + " new tweets added to the dataset</span>");
+                        $(".global-notification").html(response.responseJSON + " new tweets added to the dataset</span>");
                 }
-			    $(".global-notification").slideDown(75);
+			    $(".global-notification").fadeIn(85);
 				$(".update#" + _id + " .material-icons").css("animation", "none");
 				$(".count#" + _id ).html(parseInt($(".count#" + _id ).html()) + parseInt(response.responseJSON));
-				$(".global-notification").delay(2500).slideUp(75);
+				$(".global-notification").delay(2500).fadeOut(85);
 			}
 		});
       });

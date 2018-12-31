@@ -111,7 +111,7 @@ html, body {
 	line-height: 45px;
 }
 
-.content>.sub-content {
+.content > .sub-content {
 	position: relative;
 	margin: 25px;
 	margin-top: 70px;
@@ -165,12 +165,6 @@ html, body {
 	padding: 12px;
 	border-radius: 2px;
 	display: none;
-}
-
-.global-notification .material-icons {
-	font-size: 12px;
-	vertical-align: -2px;
-	padding-right: 8px;
 }
 
 #overlay {
@@ -571,6 +565,7 @@ table.dataTable.no-footer {
 .kpis .sub-content .item.active {
 	border-color: #ecf0f1;
 	background: #ffffff;
+	cursor: inherit;
 }
 
 .kpis .sub-content .item .previous {
@@ -610,10 +605,78 @@ table.dataTable.no-footer {
 	padding: 12px;
 }
 
-.tick text {font-size: 12px; fill:#bdc3c7;}
+.line-chart .sub-title {
+	font-size: 12px;
+}
 
-.x-axis .tick line {display: none;}
-.x-axis .tick:first-child {display: none;}
+.chart-caption {
+	font-size: 12px;
+	text-align: right;
+	padding-right: 17px;
+}
+
+.chart-caption svg {
+	padding-right: 4px;
+}
+
+.chart-caption .spacer {
+	display: inline-block;
+	width: 12px;
+}
+
+.tooltip {
+	position: absolute;
+	left: 200px;
+	top: 100px;
+	text-align: left;
+	border-radius: 2px;
+	background: #ffffff;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.13);
+	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+	z-index: 250;
+	padding: 8px;
+	font-size: 12px;
+	color: #7f8c8d;
+	    font-weight: 500;
+}
+
+.tooltip:after {
+	content: '';
+	position: absolute;
+	left: 74px;
+	bottom: -6px;
+	width: 0;
+	height: 0;
+	background: none;
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-top: 5px solid #3498db;
+	clear: both;
+	z-index: 251;
+}
+
+.tooltip .material-icons {
+	font-size: 12px;
+	vertical-align: -2px;
+}
+
+.tooltip .value {
+	color: #3498db;
+	font-weight: 500;
+}
+
+.tooltip svg {
+	padding-right: 4px;
+}
+
+.line-chart rect {
+	cursor: pointer;
+}
+
+.line-chart .tick text {font-size: 12px; fill:#bdc3c7;}
+
+.line-chart .x-axis .tick line {display: none;}
+.line-chart .x-axis .tick:first-child {display: none;}
 
 @media only screen and (max-width: 580px) {
 	input:after {
@@ -636,13 +699,16 @@ table.dataTable.no-footer {
 	.content {
 		padding-left: 0px;
 	}
+	.content .title {
+		padding-right: 0;
+	}
 }
 
 @keyframes rotation {
-		from {
-				-webkit-transform: rotate(0deg);
-		}
-		to {
-				-webkit-transform: rotate(359deg);
-		}
+	from {
+		-webkit-transform: rotate(0deg);
+	}
+	to {
+		-webkit-transform: rotate(359deg);
+	}
 }

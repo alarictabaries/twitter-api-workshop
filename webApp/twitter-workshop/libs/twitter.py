@@ -29,7 +29,7 @@ def create_query(keyword, count, lang, _user):
         "keyword": keyword,
         "lang": lang,
         "count": 0,
-        "created": date_now.strftime("%Y-%m -%d %H:%M"),
+        "created": date_now.strftime("%Y-%m-%d %H:%M"),
         "updated": "-"
     })
 
@@ -323,7 +323,7 @@ def get_stats_per_time_unit(tweets, unit):
         if created is 0:
             distribution.append({"timeframe": created_at})
 
-    distribution.sort(key=lambda x: datetime.datetime.strptime(x['timeframe'], '%Y-%m-%d %H:%M'))
+    distribution.sort(key=lambda x: x['timeframe'])
 
     for timeframe in distribution:
 
