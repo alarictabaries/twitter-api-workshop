@@ -609,17 +609,17 @@ table.dataTable.no-footer {
 	font-size: 12px;
 }
 
-.chart-caption {
+.line-chart .caption {
 	font-size: 12px;
 	text-align: right;
-	padding-right: 17px;
+	padding-right: 5px;
 }
 
-.chart-caption svg {
+.line-chart .caption svg {
 	padding-right: 4px;
 }
 
-.chart-caption .spacer {
+.line-chart .caption .spacer {
 	display: inline-block;
 	width: 12px;
 }
@@ -637,7 +637,8 @@ table.dataTable.no-footer {
 	padding: 8px;
 	font-size: 12px;
 	color: #7f8c8d;
-	    font-weight: 500;
+	font-weight: 500;
+	opacity: 0;
 }
 
 .tooltip:after {

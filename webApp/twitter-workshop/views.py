@@ -64,14 +64,17 @@ def dataset(request):
 
     current_stats = twitter.get_stats_per_time_unit(twitter.get_tweets_by_timeframe(tweets, "2018-12-29 00:00", "2018-12-30 00:00"), "h")
 
-    stats_f = []
+    stats = []
 
     for current_stat in current_stats:
-        stats_f.append({"timeframe": current_stat["timeframe"], "current_tweets_count": int(current_stat["tweets_count"]*19), "comparison_tweets_count": current_stat["tweets_count"]*10})
+        stats.append({"current_timeframe": current_stat["timeframe"], "comparison_timeframe": current_stat["timeframe"],
+                      "current_tweets_count": int(current_stat["tweets_count"]*19), "comparison_tweets_count": current_stat["tweets_count"]*10,
+                      "current_users_count": int(current_stat["tweets_count"] * 8), "comparison_users_count": current_stat["tweets_count"] * 11,
+                      "current_interactions_count": int(current_stat["tweets_count"] * 21), "comparison_interactions_count": current_stat["tweets_count"] * 7})
 
     metadata = [metadata["_id"], metadata["keyword"]]
 
-    return render(request, 'app/dataset.html', {'metadata': metadata, 'stats': stats_f })
+    return render(request, 'app/dataset.html', {'metadata': metadata, 'stats': stats })
 
 
 # /app/interactions/
