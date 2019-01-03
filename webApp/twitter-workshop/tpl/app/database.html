@@ -15,11 +15,11 @@
         <tbody>
             {% for item in index %}
             <tr>
-                <td class="subject"><a href="/app/dataset?id={{ item.0 }}">{{ item.1 }}</a></td>
-                <td class="count" id="{{ item.0 }}">{{ item.3 }}</td>
-                <td class="language">{{ item.4 }}</td>
-                <td class="date">{{ item.2 }}</td>
-                <td class="date">{{ item.5 }} <a href="#" class="update" id="{{ item.0 }}"><i class="material-icons">update</i></a></td>
+                <td class="subject"><a href="/app/dataset?id={{ item.id }}">{{ item.keyword }}</a></td>
+                <td class="count" id="{{ item.id }}">{{ item.count }}</td>
+                <td class="language">{{ item.lang }}</td>
+                <td class="date">{{ item.created }}</td>
+                <td class="date">{{ item.updated }} <a href="#" class="update" id="{{ item.id }}"><i class="material-icons">update</i></a></td>
             </tr>
             {% endfor %}
         </tbody>

@@ -5,6 +5,7 @@ from .libs import twitter
 from .libs import mongodb
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from pprint import pprint
 
 
 # /app/home/
@@ -26,7 +27,7 @@ def database(request):
 
     for doc in docs:
         if doc["_user"] == request.user.id :
-            index.append([doc["_id"], doc["keyword"], doc["created"], doc["count"], doc["lang"], doc["updated"]])
+            index.append({"id": doc["_id"], "keyword": doc["keyword"], "created": doc["created"], "count":doc["count"], "lang":doc["lang"], "updated":doc["updated"]})
 
     index = reversed(index)
 
@@ -61,20 +62,35 @@ def dataset(request):
 
     metadata = twitter.get_metadata(request.GET['id'])
     tweets = twitter.get_tweets(metadata["_id"])
+    current_tweets = twitter.get_tweets_by_timeframe(tweets, "2018-12-29 00:00", "2018-12-30 00:00")
+    previous_tweets = twitter.get_tweets_by_timeframe(tweets, "2018-12-30 00:00", "2018-12-31 00:00")
 
-    current_stats = twitter.get_stats_per_time_unit(twitter.get_tweets_by_timeframe(tweets, "2018-12-29 00:00", "2018-12-30 00:00"), "h")
+    current_tweets_count = twitter.get_tweets_count(current_tweets)
+    current_users_count = twitter.get_users_count(current_tweets)
+    current_interactions_count = twitter.get_interactions_count(current_tweets)
 
-    stats = []
+    previous_tweets_count = twitter.get_tweets_count(previous_tweets)
+    previous_users_count = twitter.get_users_count(previous_tweets)
+    previous_interactions_count = twitter.get_interactions_count(previous_tweets)
 
-    for current_stat in current_stats:
-        stats.append({"current_timeframe": current_stat["timeframe"], "comparison_timeframe": current_stat["timeframe"],
-                      "current_tweets_count": int(current_stat["tweets_count"]*19), "comparison_tweets_count": current_stat["tweets_count"]*10,
-                      "current_users_count": int(current_stat["tweets_count"] * 8), "comparison_users_count": current_stat["tweets_count"] * 11,
-                      "current_interactions_count": int(current_stat["tweets_count"] * 21), "comparison_interactions_count": current_stat["tweets_count"] * 7})
+    stats = {"current_tweets_count" : current_tweets_count, "current_users_count" : current_users_count, "current_interactions_count" : current_interactions_count,
+                  "previous_tweets_count": previous_tweets_count, "previous_users_count": previous_users_count, "previous_interactions_count": previous_interactions_count,
+                  "tweets_count_variation": round(((current_tweets_count*100)/previous_tweets_count)-100, 2), "tweets_users_variation": round(((current_users_count*100)/previous_users_count)-100, 2), "tweets_interactions_variation": round(((current_interactions_count*100)/previous_interactions_count)-100, 2) }
 
-    metadata = [metadata["_id"], metadata["keyword"]]
 
-    return render(request, 'app/dataset.html', {'metadata': metadata, 'stats': stats })
+    current_stats = twitter.get_stats_per_time_unit(current_tweets, "h")
+    previous_stats = twitter.get_stats_per_time_unit(previous_tweets, "h")
+
+    detailed_stats = []
+    for current_stat, previous_stat in zip(current_stats, previous_stats):
+        detailed_stats.append({"current_timeframe": current_stat["timeframe"], "previous_timeframe": previous_stat["timeframe"],
+                      "current_tweets_count": current_stat["tweets_count"], "previous_tweets_count": previous_stat["tweets_count"],
+                      "current_users_count": current_stat["users_count"], "previous_users_count": previous_stat["users_count"],
+                      "current_interactions_count": current_stat["interactions_count"], "previous_interactions_count": previous_stat["interactions_count"]})
+
+    metadata = {"id" : metadata["_id"], "keyword" : metadata["keyword"]}
+
+    return render(request, 'app/dataset.html', {'metadata': metadata, 'stats': stats, 'detailed_stats': detailed_stats})
 
 
 # /app/interactions/
@@ -86,7 +102,7 @@ def interactions(request):
     tweets = twitter.get_tweets(metadata["_id"])
     interactions = twitter.get_interactions(tweets)
 
-    metadata = [metadata["_id"], metadata["keyword"]]
+    metadata = {"id" : metadata["_id"], "keyword": metadata["keyword"]}
 
     influencers = twitter.get_influencers(interactions, 3)
 

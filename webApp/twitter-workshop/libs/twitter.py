@@ -5,7 +5,6 @@ from . import mongodb
 import datetime
 import pytz
 from bson.objectid import ObjectId
-from pprint import pprint
 
 
 # Save tweets meeting the criteria to MongoDB
@@ -340,6 +339,5 @@ def get_stats_per_time_unit(tweets, unit):
         timeframe["tweets_count"] = get_tweets_count(tweets_buffer)
         timeframe["users_count"] = get_users_count(tweets_buffer)
         timeframe["interactions_count"] = get_interactions_count(tweets_buffer)
-
 
     return distribution
