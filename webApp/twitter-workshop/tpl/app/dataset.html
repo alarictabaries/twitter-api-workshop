@@ -63,6 +63,16 @@
 
     var data = {{ detailed_stats|safe }};
 
+    $(".kpis .item .previous").each( function () {
+        if($(this).text() < 0) {
+            $(this).addClass("decrease");
+            $(this).html("<i class=\"material-icons\">arrow_drop_down</i>" + $(this).text() + "%")
+        } else {
+            $(this).addClass("increase");
+            $(this).html("<i class=\"material-icons\">arrow_drop_up</i> +" + $(this).text() + "%")
+        }
+    });
+
     var parseTime = d3.timeParse("%Y-%m-%d %H:%M");
     data.forEach(function(d) {
         d.current_timeframe = parseTime(d.current_timeframe);

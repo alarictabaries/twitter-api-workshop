@@ -190,13 +190,3 @@
             g.selectAll(".tick text").attr("dy", 10);
         }
     }
-
-    $(".kpis .item .previous").each( function () {
-        if($(this).text() < 0) {
-            $(this).addClass("decrease");
-            $(this).html("<i class=\"material-icons\">arrow_drop_down</i>" + $(this).text() + "%")
-        } else {
-            $(this).addClass("increase");
-            $(this).html("<i class=\"material-icons\">arrow_drop_up</i> +" + $(this).text() + "%")
-        }
-    });
