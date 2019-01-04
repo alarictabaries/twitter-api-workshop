@@ -229,8 +229,41 @@ def get_influencers(interactions, count):
     return influencers
 
 
-def ceil_dt(dt, delta):
-    return dt + (datetime.datetime.min - dt) % delta
+#Get influencers
+def get_influencers2(tweets, count):
+    return 0
+
+# Get impacting tweets
+def get_impacting_tweets(tweets, count):
+
+    impacting_tweets = []
+
+    for tweet in tweets:
+
+        redundant = 0
+
+        try:
+            tweet["retweeted_status"]
+        except KeyError:
+            tweet["retweeted_status"] = None
+        if tweet["retweeted_status"] is not None:
+            id = tweet["retweeted_status"]["id"]
+            full_text = tweet["retweeted_status"]["full_text"]
+        else:
+            id = tweet["id"]
+            full_text = tweet["full_text"]
+
+        for impacting_tweet in impacting_tweets:
+            if impacting_tweet[0] == id:
+                redundant += 1
+                impacting_tweet[2] += 1
+
+        if redundant == 0:
+            impacting_tweets.append([id, full_text, 0])
+
+    impacting_tweets.sort(key=lambda x: x[2], reverse=True)
+
+    return impacting_tweets[:count]
 
 
 # Get tweets

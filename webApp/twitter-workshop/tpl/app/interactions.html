@@ -1,6 +1,10 @@
-{% include "app/inc/header.html" with title="Visualize interactions" icon="bubble_chart" d3js="true"%}
+{% include "app/inc/header.html" with title="Visualize communities" icon="bubble_chart" d3js="true"%}
 
-    <div class="sub-content full">
+<div class="actions">
+    <a href="/app/dataset/?id={{metadata.id}}"><i class="material-icons">subject</i>Dataset home</a>
+</div>
+
+    <div class="sub-content full dataset">
 
         <div class="graph"></div>
 

@@ -62,8 +62,8 @@ def dataset(request):
 
     metadata = twitter.get_metadata(request.GET['id'])
     tweets = twitter.get_tweets(metadata["_id"])
-    current_tweets = twitter.get_tweets_by_timeframe(tweets, "2018-12-29 00:00", "2018-12-30 00:00")
-    previous_tweets = twitter.get_tweets_by_timeframe(tweets, "2018-12-30 00:00", "2018-12-31 00:00")
+    current_tweets = twitter.get_tweets_by_timeframe(tweets, "2018-12-30 00:00", "2018-12-31 00:00")
+    previous_tweets = twitter.get_tweets_by_timeframe(tweets, "2018-12-29 00:00", "2018-12-30 00:00")
 
     current_tweets_count = twitter.get_tweets_count(current_tweets)
     current_users_count = twitter.get_users_count(current_tweets)

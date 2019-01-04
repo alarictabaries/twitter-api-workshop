@@ -118,6 +118,56 @@ html, body {
 	color: #34495e;
 }
 
+.content > .sub-content.dataset {
+	margin-top: 115px;
+}
+
+.actions {
+	position: fixed;
+	z-index: 50;
+	width: 100%;
+	margin-top: 45px;
+	height: 45px;
+	line-height: 45px;
+	background: #f7f7f7;
+}
+
+.actions a:first-child {
+	margin-left: 19px;
+}
+
+.actions a {
+	vertical-align: 3px;
+	display: inline-block;
+	color: #34495e;
+	text-decoration: none;
+	font-size: 12px;
+	padding: 0 6px;
+}
+
+.actions a.period {
+	position: relative;
+}
+
+.actions a.period .previous {
+	position: absolute;
+	top: -7px;
+	font-size: 11px;
+	left: 26px;
+	color: rgba(52,73,94 ,0.65);
+}
+
+.actions a.period .current {
+	vertical-align: -7px;
+	padding-left: 2px;
+}
+
+.actions a i {
+	font-size: 12px;
+	vertical-align: -2px;
+	padding-right: 6px;
+}
+
 .page-title {
 	display: flex;
 }
@@ -147,8 +197,8 @@ html, body {
 	padding-left: 45px;
 }
 
-.sub-content.full {
-	margin: 45px 0 0;
+.content > .sub-content.full {
+	margin: 90px 0 0;
 	position: relative;
 	overflow: hidden;
 }
@@ -325,44 +375,6 @@ html, body {
 }
 
 /* table */
-
-.actions {
-	z-index: 50;
-}
-
-.actions a {
-	display: inline-block;
-	color: #34495e;
-	text-decoration: none;
-	font-size: 12px;
-	border-bottom: 1px solid rgba(0, 0, 0, 0.13);
-	box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
-	border-radius: 2px;
-	padding: 8px 12px;
-	margin-right: 12px;
-	margin-bottom: 12px;
-}
-
-.actions a i {
-	font-size: 12px;
-	vertical-align: -2px;
-	padding-right: 8px;
-}
-
-.actions input.field {
-	padding: 8px 12px;
-	border: 0px;
-	color: #34495e;
-	background: rgba(236, 240, 241, 1);
-	font-size: 12px;
-	border-radius: 2px;
-	margin-right: 12px;
-}
-
-.actions input.field::placeholder {
-	font-family: "Material Icons";
-	color: #34495e;
-}
 
 .list {
 	width: 100%;

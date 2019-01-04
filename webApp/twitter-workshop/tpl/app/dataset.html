@@ -1,12 +1,11 @@
-{% include "app/inc/header.html" with title="Dataset" icon="subject" d3js="true" %}
+{% include "app/inc/header.html" with title="Dataset" icon="subject" d3js="true" datarangepicker="true" %}
 
-<div class="sub-content">
+<div class="actions">
+    <a href="#" class="period"><i class="material-icons">calendar_today</i><span class="current">2018-12-30 - 2018-12-31</span><span class="previous">2018-12-29 - 2018-12-30</span></a>
+    <a href="/app/interactions/?id={{metadata.id}}"><i class="material-icons">bubble_chart</i>Visualize communities</a>
+</div>
 
-    <div class="actions">
-        <a href="/app/interactions/?id={{metadata.id}}"><i class="material-icons">bubble_chart</i>Visualize interactions</a>
-    </div>
-
-
+<div class="sub-content dataset">
 
     <div class="kpis">
         <div class="sub-content">
@@ -37,6 +36,7 @@
         </div>
     </div>
 </div>
+
 
 <div class="line-chart">
     <div class="sub-title">Tweets</div>
@@ -82,6 +82,21 @@
     draw(data, "tweets");
 
     $(document).ready(function() {
+
+  $('.period').daterangepicker({
+        opens: 'bottom',
+        ranges: {
+           'Today': [moment(), moment()],
+           'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+           'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+           'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+           'This Month': [moment().startOf('month'), moment().endOf('month')],
+           'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        },
+        maxDate: new Date()
+      }, function(start, end, label) {
+        window.location.href = "/app/dataset/?id=" + "{{metadata.id}}" + "&start=" + start + "&end=" + end;
+      });
 
         $(".kpis .item").click(function() {
             $(".kpis .item").each( function () {
