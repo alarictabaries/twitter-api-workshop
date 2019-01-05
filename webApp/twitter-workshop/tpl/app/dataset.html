@@ -1,8 +1,8 @@
-{% include "app/inc/header.html" with title="Dataset" icon="subject" d3js="true" datarangepicker="true" %}
+{% include "app/inc/header.html" with title="Dataset" icon="subject" d3js="true" daterangepicker="true" %}
 
 <div class="actions">
-    <a href="#" class="period"><i class="material-icons">calendar_today</i><span class="current">2018-12-30 - 2018-12-31</span><span class="previous">2018-12-29 - 2018-12-30</span></a>
-    <a href="/app/interactions/?id={{metadata.id}}"><i class="material-icons">bubble_chart</i>Visualize communities</a>
+    <a href="#" class="period"><i class="material-icons">calendar_today</i><span class="current">{{ metadata.current_start_date }} - {{ metadata.current_end_date }}</span><span class="previous">{{ metadata.previous_start_date }} - {{ metadata.previous_end_date }}</span><i class="material-icons chevron">keyboard_arrow_down</i></a>
+    <a href="/app/interactions/?id={{metadata.id}}"><i class="material-icons">bubble_chart</i>Visualize interactions</a>
 </div>
 
 <div class="sub-content dataset">
@@ -34,24 +34,23 @@
             <div class="count">+72</div>
             <div class="label">sentiment</div>
         </div>
+        </div>
     </div>
-</div>
 
 
-<div class="line-chart">
-    <div class="sub-title">Tweets</div>
+    <div class="line-chart">
 
-    <svg id="graph"></svg>
+        <svg id="graph"></svg>
 
-    <div class="caption">
+        <div class="caption">
         <span class="current">
             <svg height="8" width="16"><line x1="0" y1="4" x2="16" y2="4" style="stroke:#3498db;stroke-width:2" /></svg> Timeframe selected
         </span><span class="spacer"></span>
-        <span class="previous">
+            <span class="previous">
             <svg height="8" width="16"><line x1="0" y1="4" x2="16" y2="4" style="stroke:#3498db;stroke-width:2;stroke-dasharray:3,1" /></svg>Comparison period
         </span>
+        </div>
     </div>
-</div>
 
 </div>
 
@@ -73,30 +72,21 @@
         }
     });
 
+    $(".kpis .item .count").each( function () {
+        $(this).html(numberWithSpaces($(this).text()));
+    });
+
     var parseTime = d3.timeParse("%Y-%m-%d %H:%M");
     data.forEach(function(d) {
         d.current_timeframe = parseTime(d.current_timeframe);
         d.previous_timeframe = parseTime(d.previous_timeframe);
     });
 
-    draw(data, "tweets");
+    draw(data, "tweets", "{{ metadata.delta_days }}");
 
     $(document).ready(function() {
 
-  $('.period').daterangepicker({
-        opens: 'bottom',
-        ranges: {
-           'Today': [moment(), moment()],
-           'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-           'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-           'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-           'This Month': [moment().startOf('month'), moment().endOf('month')],
-           'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-        },
-        maxDate: new Date()
-      }, function(start, end, label) {
-        window.location.href = "/app/dataset/?id=" + "{{metadata.id}}" + "&start=" + start + "&end=" + end;
-      });
+        displayDateRangePicker("{{ metadata.current_start_date|safe }}", "{{ metadata.current_end_date|safe }}", "dataset", "{{ metadata.id|safe }}");
 
         $(".kpis .item").click(function() {
             $(".kpis .item").each( function () {
@@ -104,8 +94,12 @@
             });
             $(this).addClass("active");
             $(".line-chart #graph").html("");
-            $(".line-chart .sub-title").text($(this).attr('id').charAt(0).toUpperCase() + $(this).attr('id').slice(1));
-            draw(data, $(this).attr('id'));
+            draw(data, $(this).attr('id'), "{{ metadata.delta_days }}");
+        });
+
+        $( window ).resize(function() {
+            $(".line-chart #graph").html("");
+            draw(data, $(".kpis .item.active").attr('id'), "{{ metadata.delta_days }}");
         });
 
     });

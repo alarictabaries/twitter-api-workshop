@@ -5,7 +5,7 @@ from .libs import twitter
 from .libs import mongodb
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-from pprint import pprint
+from datetime import datetime, timedelta
 
 
 # /app/home/
@@ -61,9 +61,25 @@ def query(request):
 def dataset(request):
 
     metadata = twitter.get_metadata(request.GET['id'])
+
+    # Date initilization
+    now = datetime.now()
+    yesterday = datetime.now() - timedelta(days=1)
+
+    try: metadata["current_start_date"] = datetime.fromtimestamp(int(request.GET['start'][:-3])).strftime("%Y-%m-%d")
+    except KeyError: metadata["current_start_date"] = yesterday.strftime("%Y-%m-%d")
+    try: metadata["current_end_date"] = datetime.fromtimestamp(int(request.GET['end'][:-3])).strftime("%Y-%m-%d")
+    except KeyError: metadata["current_end_date"] = now.strftime("%Y-%m-%d")
+
+    delta_days =(datetime.strptime(metadata["current_end_date"],"%Y-%m-%d") - datetime.strptime(metadata["current_start_date"],"%Y-%m-%d")).days
+
+    metadata["previous_start_date"] = (datetime.strptime(metadata["current_start_date"], "%Y-%m-%d") - timedelta(days=(delta_days))).strftime("%Y-%m-%d")
+    metadata["previous_end_date"] = metadata["current_start_date"]
+
+    # Part
     tweets = twitter.get_tweets(metadata["_id"])
-    current_tweets = twitter.get_tweets_by_timeframe(tweets, "2018-12-30 00:00", "2018-12-31 00:00")
-    previous_tweets = twitter.get_tweets_by_timeframe(tweets, "2018-12-29 00:00", "2018-12-30 00:00")
+    current_tweets = twitter.get_tweets_by_timeframe(tweets, metadata["current_start_date"], metadata["current_end_date"])
+    previous_tweets = twitter.get_tweets_by_timeframe(tweets, metadata["previous_start_date"], metadata["previous_end_date"])
 
     current_tweets_count = twitter.get_tweets_count(current_tweets)
     current_users_count = twitter.get_users_count(current_tweets)
@@ -73,13 +89,33 @@ def dataset(request):
     previous_users_count = twitter.get_users_count(previous_tweets)
     previous_interactions_count = twitter.get_interactions_count(previous_tweets)
 
+    if previous_tweets_count == 0:
+        tweets_count_variation = round(((current_tweets_count * 100)) - 100, 2)
+    else:
+        tweets_count_variation = round(((current_tweets_count * 100) / previous_tweets_count) - 100, 2)
+
+    if previous_users_count == 0:
+        tweets_users_variation = round(((current_users_count * 100)) - 100, 2)
+    else:
+        tweets_users_variation = round(((current_tweets_count * 100) / previous_users_count) - 100, 2)
+
+    if previous_interactions_count == 0:
+        tweets_interactions_variation = round(((current_interactions_count * 100)) - 100, 2)
+    else:
+        tweets_interactions_variation = round(((current_interactions_count * 100) / previous_interactions_count) - 100,
+                                              2)
+
     stats = {"current_tweets_count" : current_tweets_count, "current_users_count" : current_users_count, "current_interactions_count" : current_interactions_count,
                   "previous_tweets_count": previous_tweets_count, "previous_users_count": previous_users_count, "previous_interactions_count": previous_interactions_count,
-                  "tweets_count_variation": round(((current_tweets_count*100)/previous_tweets_count)-100, 2), "tweets_users_variation": round(((current_users_count*100)/previous_users_count)-100, 2), "tweets_interactions_variation": round(((current_interactions_count*100)/previous_interactions_count)-100, 2) }
+                  "tweets_count_variation": tweets_count_variation, "tweets_users_variation": tweets_users_variation, "tweets_interactions_variation": tweets_interactions_variation }
 
 
-    current_stats = twitter.get_stats_per_time_unit(current_tweets, "h")
-    previous_stats = twitter.get_stats_per_time_unit(previous_tweets, "h")
+    if delta_days == 1:
+        current_stats = twitter.get_stats_per_time_unit(current_tweets, "h", metadata["current_start_date"],metadata["current_end_date"])
+        previous_stats = twitter.get_stats_per_time_unit(previous_tweets, "h", metadata["previous_start_date"],metadata["previous_end_date"])
+    else:
+        current_stats = twitter.get_stats_per_time_unit(current_tweets, "d", metadata["current_start_date"], metadata["current_end_date"])
+        previous_stats = twitter.get_stats_per_time_unit(previous_tweets, "d", metadata["previous_start_date"], metadata["previous_end_date"])
 
     detailed_stats = []
     for current_stat, previous_stat in zip(current_stats, previous_stats):
@@ -88,7 +124,7 @@ def dataset(request):
                       "current_users_count": current_stat["users_count"], "previous_users_count": previous_stat["users_count"],
                       "current_interactions_count": current_stat["interactions_count"], "previous_interactions_count": previous_stat["interactions_count"]})
 
-    metadata = {"id" : metadata["_id"], "keyword" : metadata["keyword"]}
+    metadata = {"id" : metadata["_id"], "keyword" : metadata["keyword"], "current_start_date" : metadata["current_start_date"], "current_end_date" : metadata["current_end_date"], "previous_start_date": metadata["previous_start_date"], "previous_end_date" : metadata["previous_end_date"], "delta_days": delta_days}
 
     return render(request, 'app/dataset.html', {'metadata': metadata, 'stats': stats, 'detailed_stats': detailed_stats})
 
@@ -99,10 +135,35 @@ def dataset(request):
 def interactions(request):
 
     metadata = twitter.get_metadata(request.GET['id'])
-    tweets = twitter.get_tweets(metadata["_id"])
-    interactions = twitter.get_interactions(tweets)
 
-    metadata = {"id" : metadata["_id"], "keyword": metadata["keyword"]}
+    # Date initilization
+    now = datetime.now()
+    yesterday = datetime.now() - timedelta(days=1)
+
+    try:
+        metadata["current_start_date"] = datetime.fromtimestamp(int(request.GET['start'][:-3])).strftime("%Y-%m-%d")
+    except KeyError:
+        metadata["current_start_date"] = yesterday.strftime("%Y-%m-%d")
+    try:
+        metadata["current_end_date"] = datetime.fromtimestamp(int(request.GET['end'][:-3])).strftime("%Y-%m-%d")
+    except KeyError:
+        metadata["current_end_date"] = now.strftime("%Y-%m-%d")
+
+    delta_days = (datetime.strptime(metadata["current_end_date"], "%Y-%m-%d") - datetime.strptime(
+        metadata["current_start_date"], "%Y-%m-%d")).days
+
+    metadata["previous_start_date"] = (
+                datetime.strptime(metadata["current_start_date"], "%Y-%m-%d") - timedelta(days=(delta_days))).strftime(
+        "%Y-%m-%d")
+    metadata["previous_end_date"] = metadata["current_start_date"]
+
+    # Part
+    tweets = twitter.get_tweets(metadata["_id"])
+    current_tweets = twitter.get_tweets_by_timeframe(tweets, metadata["current_start_date"], metadata["current_end_date"])
+
+    interactions = twitter.get_interactions(current_tweets)
+
+    metadata = {"id" : metadata["_id"], "keyword" : metadata["keyword"], "current_start_date" : metadata["current_start_date"], "current_end_date" : metadata["current_end_date"], "previous_start_date": metadata["previous_start_date"], "previous_end_date" : metadata["previous_end_date"]}
 
     influencers = twitter.get_influencers(interactions, 3)
 

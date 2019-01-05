@@ -2,14 +2,14 @@
 
 import tweepy
 from . import mongodb
-import datetime
+from datetime import datetime, timedelta
 import pytz
 from bson.objectid import ObjectId
 
 
 # Save tweets meeting the criteria to MongoDB
 def create_query(keyword, count, lang, _user):
-    date_now = datetime.datetime.now()
+    date_now = datetime.now()
 
     # Connect to Twitter's API
     auth = tweepy.OAuthHandler('y3fvWam4738fGFCSuVJpIhtwp', 'czDAPY4XnYe4fp4n6FMwrHSFGtF0nY15PgnmozeBAsnObHiKJr')
@@ -40,7 +40,7 @@ def create_query(keyword, count, lang, _user):
     for tweet in tweepy.Cursor(api.search, q=keyword, lang=lang, tweet_mode='extended', result_type="recent",
                                include_entities=True).items(count):
         if last_update is None:
-            created_at = datetime.datetime.strptime(tweet._json["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
+            created_at = datetime.strptime(tweet._json["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
             created_at = created_at.replace(tzinfo=pytz.timezone('UTC'))
             created_at = created_at.strftime("%Y-%m-%d %H:%M:%S")
             last_update = created_at
@@ -83,7 +83,7 @@ def update_query(_query):
 
     for tweet in tweepy.Cursor(api.search, q=metadata["keyword"], lang=metadata["lang"], tweet_mode='extended', result_type="recent", include_entities=True).items():
 
-        created_at = datetime.datetime.strptime(tweet._json["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
+        created_at = datetime.strptime(tweet._json["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
         created_at = created_at.replace(tzinfo=pytz.timezone('UTC'))
         created_at = created_at.strftime("%Y-%m-%d %H:%M:%S")
 
@@ -319,7 +319,7 @@ def get_tweets_by_timeframe(tweets, start_date, end_date):
 
     tweets_buffer = []
     for tweet in tweets:
-        created_at = datetime.datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
+        created_at = datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
         created_at = created_at.replace(tzinfo=pytz.timezone('UTC'))
         created_at = created_at.strftime("%Y-%m-%d %H:%M")
 
@@ -329,31 +329,28 @@ def get_tweets_by_timeframe(tweets, start_date, end_date):
     return tweets_buffer
 
 
+def perdelta(start, end, delta):
+    curr = start
+    while curr < end:
+        yield curr
+        curr += delta
+
+
 # Get statistics per time unit
-def get_stats_per_time_unit(tweets, unit):
+def get_stats_per_time_unit(tweets, unit, start_date, end_date):
+
+    distribution = []
 
     if unit == "m":
         time_format = "%Y-%m-%d %H:%M"
     elif unit == "h":
         time_format = "%Y-%m-%d %H:00"
+        for timeframe in perdelta(datetime.strptime(start_date, "%Y-%m-%d"), datetime.strptime(end_date, "%Y-%m-%d"),timedelta(hours=1)):
+            distribution.append({"timeframe": timeframe.strftime(time_format)})
     elif unit == "d":
         time_format = "%Y-%m-%d 00:00"
-
-    distribution = []
-
-    for tweet in tweets:
-        created = 0
-
-        created_at = datetime.datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
-        created_at = created_at.replace(tzinfo=pytz.timezone('UTC'))
-        created_at = created_at.strftime(time_format)
-
-        for timeframe in distribution:
-            if created_at == timeframe["timeframe"]:
-                created += 1
-
-        if created is 0:
-            distribution.append({"timeframe": created_at})
+        for timeframe in perdelta(datetime.strptime(start_date, "%Y-%m-%d"), datetime.strptime(end_date, "%Y-%m-%d"),timedelta(days=1)):
+            distribution.append({"timeframe": timeframe.strftime(time_format)})
 
     distribution.sort(key=lambda x: x['timeframe'])
 
@@ -362,15 +359,20 @@ def get_stats_per_time_unit(tweets, unit):
         tweets_buffer = []
 
         for tweet in tweets:
-            created_at = datetime.datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
+            created_at = datetime.strptime(tweet["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
             created_at = created_at.replace(tzinfo=pytz.timezone('UTC'))
             created_at = created_at.strftime(time_format)
 
             if created_at == timeframe["timeframe"]:
                 tweets_buffer.append(tweet)
 
-        timeframe["tweets_count"] = get_tweets_count(tweets_buffer)
-        timeframe["users_count"] = get_users_count(tweets_buffer)
-        timeframe["interactions_count"] = get_interactions_count(tweets_buffer)
+        if tweets_buffer:
+            timeframe["tweets_count"] = get_tweets_count(tweets_buffer)
+            timeframe["users_count"] = get_users_count(tweets_buffer)
+            timeframe["interactions_count"] = get_interactions_count(tweets_buffer)
+        else:
+            timeframe["tweets_count"] = 0
+            timeframe["users_count"] = 0
+            timeframe["interactions_count"] = 0
 
     return distribution

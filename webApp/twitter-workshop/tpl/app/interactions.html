@@ -1,6 +1,7 @@
-{% include "app/inc/header.html" with title="Visualize communities" icon="bubble_chart" d3js="true"%}
+{% include "app/inc/header.html" with title="Visualize interactions" icon="bubble_chart" d3js="true" daterangepicker="true"%}
 
 <div class="actions">
+    <a href="#" class="period"><i class="material-icons">calendar_today</i><span class="current">{{ metadata.current_start_date }} - {{ metadata.current_end_date }}</span><span class="previous">{{ metadata.previous_start_date }} - {{ metadata.previous_end_date }}</span><i class="material-icons chevron">keyboard_arrow_down</i></a>
     <a href="/app/dataset/?id={{metadata.id}}"><i class="material-icons">subject</i>Dataset home</a>
 </div>
 
@@ -71,6 +72,8 @@
     });
 
     $(document).ready(function() {
+
+        displayDateRangePicker("{{ metadata.current_start_date|safe }}", "{{ metadata.current_end_date|safe }}", "interactions", "{{ metadata.id|safe }}");
 
         var svg = d3.select('.graph').append("svg");
         createV4SelectableForceDirectedGraph(svg, dataset, most_engaged_nodes);

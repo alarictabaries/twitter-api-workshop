@@ -2,10 +2,10 @@
 
 
     // Get the data
-    function draw(data, type) {
+    function draw(data, type, delta_days) {
 
         // set the dimensions and margins of the graph
-        var margin = {top: 5, right: 5, bottom: 35, left: 40},
+        var margin = {top: 5, right: 40, bottom: 35, left: 40},
             width = $(".line-chart").width() - margin.left - margin.right,
             height = $(".line-chart").height() - margin.top - margin.bottom;
 
@@ -18,9 +18,14 @@
             .tickSize(width)
             .ticks(2);
 
-        var xAxis = d3.axisBottom(x)
-            .tickFormat(d3.timeFormat("%H:%M"));
-
+        if(parseInt(delta_days) == 1) {
+            var xAxis = d3.axisBottom(x)
+                .tickFormat(d3.timeFormat("%H:%M"));
+        } else {
+            var xAxis = d3.axisBottom(x)
+                .ticks(parseInt(delta_days))
+                .tickFormat(d3.timeFormat("%a %m-%d"));
+        }
         var bisect = d3.bisector(function(d) {
             return d.current_timeframe;
         }).left;
@@ -153,17 +158,30 @@
 
                 var d = data[i];
                 if (d) {
-                    var xp = x(d.current_timeframe) + 20;
-                    var yp = y(d["current_" + type + "_count"]) + 20;
+                    var xp = x(d.current_timeframe);
+                    var yp = y(d["current_" + type + "_count"]);
+
+                    if(xp > ($(".line-chart #graph").width() - 150)) {
+                        xxp = -130
+                        yyp = 80
+                    } else if(xp < 150) {
+                        xxp = 72
+                        yyp = 80
+                    } else {
+                        yyp = 42
+                        xxp = -25
+                    }
+
+                    console.log(xp);
 
                     current_date = new Date(Date.parse(d.current_timeframe));
-                    previous_date = new Date(Date.parse(d.current_timeframe));
+                    previous_date = new Date(Date.parse(d.previous_timeframe));
 
                     d3.select('.tooltip').html( '<span class="value"><svg height="8" width="16"><line x1="0" y1="4" x2="16" y2="4" style="stroke:#3498db;stroke-width:1" /></svg>' + d["current_" + type + "_count"] + " </span>" + current_date.getFullYear() + "-" + ((current_date.getDate()+1)<10?'0':'') + (current_date.getDate()) + "-" + (current_date.getDate()<10?'0':'') + current_date.getDate() + " " + (current_date.getHours()<10?'0':'') + current_date.getHours() + ":" + (current_date.getMinutes()<10?'0':'') + current_date.getMinutes() + "" +
                         '<br /><span class="value"><svg height="8" width="16"><line x1="0" y1="4" x2="16" y2="4" style="stroke:#3498db;stroke-width:1;stroke-dasharray:3,1" /></svg>' + d["previous_" + type + "_count"] + " </span>" + previous_date.getFullYear() + "-" + ((previous_date.getDate()+1)<10?'0':'') + (previous_date.getDate()) + "-" + (previous_date.getDate()<10?'0':'') + previous_date.getDate() + " " + (previous_date.getHours()<10?'0':'') + previous_date.getHours() + ":" + (previous_date.getMinutes()<10?'0':'') + previous_date.getMinutes() + "");
                     d3.select('.tooltip')
-                        .style('left', (xp) - 46 +'px')
-                        .style('top', (yp + 89) +'px');
+                        .style('left', (xp)+ (xxp)  +'px')
+                        .style('top', (yp) + (yyp) +'px');
 
                     d3.select('.svg-line-marker')
                         .style('opacity', 20).attr('transform', 'translate('+xp+', '+yp+')');

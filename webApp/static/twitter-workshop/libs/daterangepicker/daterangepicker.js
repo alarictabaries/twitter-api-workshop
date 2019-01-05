@@ -6,6 +6,29 @@
 * @website: http://www.daterangepicker.com/
 */
 // Following the UMD template https://github.com/umdjs/umd/blob/master/templates/returnExportsGlobal.js
+
+function displayDateRangePicker(start_date, end_date, page, id) {
+    var date = new Date();
+        date.setDate(date.getDate() + 1);
+
+        $('.actions .period').daterangepicker({
+            startDate: moment(start_date, "YYYY-MM-DD"),
+            endDate: moment(end_date, "YYYY-MM-DD"),
+            opens: 'bottom',
+            ranges: {
+                'Today': [moment(), moment().add(1, 'days')],
+                'Yesterday': [moment().subtract(1, 'days'), moment()],
+                'Last 7 Days': [moment().subtract(6, 'days'), moment().add(1, 'days')],
+                'Last 30 Days': [moment().subtract(29, 'days'), moment().add(1, 'days')],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            },
+            maxDate: date
+        }, function(start, end, label) {
+            window.location.href = "/app/" + page + "/?id=" + id + "&start=" + start + "&end=" + end;
+        });
+}
+
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Make globaly available as well

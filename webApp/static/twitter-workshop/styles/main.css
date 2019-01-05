@@ -46,7 +46,7 @@ html, body {
 .sidebar li {
 	display: flex;
 	height: 36px;
-	transition: all 0.1s ease-in-out;
+	transition: all 75ms ease-in-out;
 	border-left: 3px solid transparent;
 }
 
@@ -147,6 +147,10 @@ html, body {
 
 .actions a.period {
 	position: relative;
+}
+
+.actions .period .chevron {
+	padding-left: 4px;
 }
 
 .actions a.period .previous {
@@ -619,12 +623,13 @@ table.dataTable.no-footer {
 
 .line-chart .sub-title {
 	font-size: 12px;
+	margin-bottom: 12px;
 }
 
 .line-chart .caption {
 	font-size: 12px;
 	text-align: right;
-	padding-right: 5px;
+	padding-right: 38px;
 }
 
 .line-chart .caption svg {
@@ -651,21 +656,6 @@ table.dataTable.no-footer {
 	color: #7f8c8d;
 	font-weight: 500;
 	opacity: 0;
-}
-
-.tooltip:after {
-	content: '';
-	position: absolute;
-	left: 74px;
-	bottom: -6px;
-	width: 0;
-	height: 0;
-	background: none;
-	border-left: 5px solid transparent;
-	border-right: 5px solid transparent;
-	border-top: 5px solid #3498db;
-	clear: both;
-	z-index: 251;
 }
 
 .tooltip .material-icons {

@@ -1,6 +1,5 @@
 bson
 pytz
-pandas
 git+https://github.com/tweepy/tweepy.git
 django
 pymongo
