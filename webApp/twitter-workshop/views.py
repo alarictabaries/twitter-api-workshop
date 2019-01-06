@@ -1,10 +1,12 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+
 from .parts import TwitterQuery
 from .libs import twitter
 from .libs import mongodb
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
+
 from datetime import datetime, timedelta
 
 
@@ -12,6 +14,18 @@ from datetime import datetime, timedelta
 @login_required(login_url='/app/login/')
 def home(request):
     return render(request, 'app/home.html')
+
+
+# /app/login/
+@login_required(login_url='/app/login/')
+def update_query(request):
+
+    if request.is_ajax() is False:
+        return -1
+
+    _id = request.POST.get('_id')
+
+    return JsonResponse(twitter.update_query(_id), safe=False)
 
 
 # /app/database/
@@ -55,32 +69,38 @@ def query(request):
     return render(request, 'app/query.html', {'form': form})
 
 
-# /app/dataset/
+# /app/dashboard/
 # Display the list of query's tweets
 @login_required(login_url='/app/login/')
-def dataset(request):
+def dashboard(request):
 
     metadata = twitter.get_metadata(request.GET['id'])
 
     # Date initilization
+    timeframe = {}
     now = datetime.now()
     yesterday = datetime.now() - timedelta(days=1)
 
-    try: metadata["current_start_date"] = datetime.fromtimestamp(int(request.GET['start'][:-3])).strftime("%Y-%m-%d")
-    except KeyError: metadata["current_start_date"] = yesterday.strftime("%Y-%m-%d")
-    try: metadata["current_end_date"] = datetime.fromtimestamp(int(request.GET['end'][:-3])).strftime("%Y-%m-%d")
-    except KeyError: metadata["current_end_date"] = now.strftime("%Y-%m-%d")
+    try:
+        timeframe["current_start_date"] = datetime.fromtimestamp(int(request.GET['start'][:-3])).strftime("%Y-%m-%d")
+    except KeyError:
+        timeframe["current_start_date"] = yesterday.strftime("%Y-%m-%d")
+    try:
+        timeframe["current_end_date"] = datetime.fromtimestamp(int(request.GET['end'][:-3])+ 24*60*60).strftime("%Y-%m-%d")
+    except KeyError:
+        timeframe["current_end_date"] = now.strftime("%Y-%m-%d")
 
-    delta_days =(datetime.strptime(metadata["current_end_date"],"%Y-%m-%d") - datetime.strptime(metadata["current_start_date"],"%Y-%m-%d")).days
+    delta =(datetime.strptime(timeframe["current_end_date"],"%Y-%m-%d") - datetime.strptime(timeframe["current_start_date"],"%Y-%m-%d")).days
 
-    metadata["previous_start_date"] = (datetime.strptime(metadata["current_start_date"], "%Y-%m-%d") - timedelta(days=(delta_days))).strftime("%Y-%m-%d")
-    metadata["previous_end_date"] = metadata["current_start_date"]
+    timeframe["previous_start_date"] = (datetime.strptime(timeframe["current_start_date"], "%Y-%m-%d") - timedelta(days=delta)).strftime("%Y-%m-%d")
+    timeframe["previous_end_date"] = timeframe["current_start_date"]
 
-    # Part
+    # Getting tweets
     tweets = twitter.get_tweets(metadata["_id"])
-    current_tweets = twitter.get_tweets_by_timeframe(tweets, metadata["current_start_date"], metadata["current_end_date"])
-    previous_tweets = twitter.get_tweets_by_timeframe(tweets, metadata["previous_start_date"], metadata["previous_end_date"])
+    current_tweets = twitter.get_tweets_by_timeframe(tweets, timeframe["current_start_date"], timeframe["current_end_date"])
+    previous_tweets = twitter.get_tweets_by_timeframe(tweets, timeframe["previous_start_date"], timeframe["previous_end_date"])
 
+    # Getting basic statistics
     current_tweets_count = twitter.get_tweets_count(current_tweets)
     current_users_count = twitter.get_users_count(current_tweets)
     current_interactions_count = twitter.get_interactions_count(current_tweets)
@@ -90,43 +110,45 @@ def dataset(request):
     previous_interactions_count = twitter.get_interactions_count(previous_tweets)
 
     if previous_tweets_count == 0:
-        tweets_count_variation = round(((current_tweets_count * 100)) - 100, 2)
-    else:
-        tweets_count_variation = round(((current_tweets_count * 100) / previous_tweets_count) - 100, 2)
-
+        previous_tweets_count = 1
     if previous_users_count == 0:
-        tweets_users_variation = round(((current_users_count * 100)) - 100, 2)
-    else:
-        tweets_users_variation = round(((current_tweets_count * 100) / previous_users_count) - 100, 2)
-
+        previous_users_count = 1
     if previous_interactions_count == 0:
-        tweets_interactions_variation = round(((current_interactions_count * 100)) - 100, 2)
-    else:
-        tweets_interactions_variation = round(((current_interactions_count * 100) / previous_interactions_count) - 100,
-                                              2)
+        previous_interactions_count = 1
+
+    tweets_count_variation = round(((current_tweets_count * 100) / previous_tweets_count) - 100, 2)
+    tweets_users_variation = round(((current_tweets_count * 100) / previous_users_count) - 100, 2)
+    tweets_interactions_variation = round(((current_interactions_count * 100) / previous_interactions_count) - 100, 2)
 
     stats = {"current_tweets_count" : current_tweets_count, "current_users_count" : current_users_count, "current_interactions_count" : current_interactions_count,
                   "previous_tweets_count": previous_tweets_count, "previous_users_count": previous_users_count, "previous_interactions_count": previous_interactions_count,
                   "tweets_count_variation": tweets_count_variation, "tweets_users_variation": tweets_users_variation, "tweets_interactions_variation": tweets_interactions_variation }
 
-
-    if delta_days == 1:
-        current_stats = twitter.get_stats_per_time_unit(current_tweets, "h", metadata["current_start_date"],metadata["current_end_date"])
-        previous_stats = twitter.get_stats_per_time_unit(previous_tweets, "h", metadata["previous_start_date"],metadata["previous_end_date"])
+    # Getting detailed statistics (per time unit)
+    if delta == 1:
+        time_unit = "h"
     else:
-        current_stats = twitter.get_stats_per_time_unit(current_tweets, "d", metadata["current_start_date"], metadata["current_end_date"])
-        previous_stats = twitter.get_stats_per_time_unit(previous_tweets, "d", metadata["previous_start_date"], metadata["previous_end_date"])
+        time_unit = "d"
+
+    current_stats = twitter.get_stats_per_time_unit(current_tweets, time_unit, timeframe["current_start_date"],timeframe["current_end_date"])
+    previous_stats = twitter.get_stats_per_time_unit(previous_tweets, time_unit, timeframe["previous_start_date"],timeframe["previous_end_date"])
 
     detailed_stats = []
+
     for current_stat, previous_stat in zip(current_stats, previous_stats):
         detailed_stats.append({"current_timeframe": current_stat["timeframe"], "previous_timeframe": previous_stat["timeframe"],
                       "current_tweets_count": current_stat["tweets_count"], "previous_tweets_count": previous_stat["tweets_count"],
                       "current_users_count": current_stat["users_count"], "previous_users_count": previous_stat["users_count"],
                       "current_interactions_count": current_stat["interactions_count"], "previous_interactions_count": previous_stat["interactions_count"]})
 
-    metadata = {"id" : metadata["_id"], "keyword" : metadata["keyword"], "current_start_date" : metadata["current_start_date"], "current_end_date" : metadata["current_end_date"], "previous_start_date": metadata["previous_start_date"], "previous_end_date" : metadata["previous_end_date"], "delta_days": delta_days}
+    # Correction for client's side
+    timeframe["current_end_date"] = (datetime.strptime(timeframe["current_end_date"], "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
+    timeframe["previous_end_date"] = (datetime.strptime(timeframe["previous_end_date"], "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
 
-    return render(request, 'app/dataset.html', {'metadata': metadata, 'stats': stats, 'detailed_stats': detailed_stats})
+    metadata = {"id" : metadata["_id"], "keyword" : metadata["keyword"]}
+    timeframe = {"current_start_date" : timeframe["current_start_date"], "current_end_date" : timeframe["current_end_date"], "previous_start_date": timeframe["previous_start_date"], "previous_end_date" : timeframe["previous_end_date"], "delta": delta}
+
+    return render(request, 'app/dashboard.html', {'metadata': metadata, 'timeframe': timeframe, 'stats': stats, 'detailed_stats': detailed_stats})
 
 
 # /app/interactions/
@@ -137,68 +159,49 @@ def interactions(request):
     metadata = twitter.get_metadata(request.GET['id'])
 
     # Date initilization
+    timeframe = {}
     now = datetime.now()
     yesterday = datetime.now() - timedelta(days=1)
 
     try:
-        metadata["current_start_date"] = datetime.fromtimestamp(int(request.GET['start'][:-3])).strftime("%Y-%m-%d")
+        timeframe["current_start_date"] = datetime.fromtimestamp(int(request.GET['start'][:-3])).strftime("%Y-%m-%d")
     except KeyError:
-        metadata["current_start_date"] = yesterday.strftime("%Y-%m-%d")
+        timeframe["current_start_date"] = yesterday.strftime("%Y-%m-%d")
     try:
-        metadata["current_end_date"] = datetime.fromtimestamp(int(request.GET['end'][:-3])).strftime("%Y-%m-%d")
+        timeframe["current_end_date"] = datetime.fromtimestamp(int(request.GET['end'][:-3]) + 24 * 60 * 60).strftime(
+            "%Y-%m-%d")
     except KeyError:
-        metadata["current_end_date"] = now.strftime("%Y-%m-%d")
+        timeframe["current_end_date"] = now.strftime("%Y-%m-%d")
 
-    delta_days = (datetime.strptime(metadata["current_end_date"], "%Y-%m-%d") - datetime.strptime(
-        metadata["current_start_date"], "%Y-%m-%d")).days
+    delta = (datetime.strptime(timeframe["current_end_date"], "%Y-%m-%d") - datetime.strptime(
+        timeframe["current_start_date"], "%Y-%m-%d")).days
 
-    metadata["previous_start_date"] = (
-                datetime.strptime(metadata["current_start_date"], "%Y-%m-%d") - timedelta(days=(delta_days))).strftime(
-        "%Y-%m-%d")
-    metadata["previous_end_date"] = metadata["current_start_date"]
+    timeframe["previous_start_date"] = (datetime.strptime(timeframe["current_start_date"], "%Y-%m-%d") - timedelta(days=delta)).strftime("%Y-%m-%d")
+    timeframe["previous_end_date"] = timeframe["current_start_date"]
 
-    # Part
+    # Getting tweets
     tweets = twitter.get_tweets(metadata["_id"])
-    current_tweets = twitter.get_tweets_by_timeframe(tweets, metadata["current_start_date"], metadata["current_end_date"])
+    current_tweets = twitter.get_tweets_by_timeframe(tweets, timeframe["current_start_date"], timeframe["current_end_date"])
 
+    # Building the interactions dict
     interactions = twitter.get_interactions(current_tweets)
 
-    metadata = {"id" : metadata["_id"], "keyword" : metadata["keyword"], "current_start_date" : metadata["current_start_date"], "current_end_date" : metadata["current_end_date"], "previous_start_date": metadata["previous_start_date"], "previous_end_date" : metadata["previous_end_date"]}
+    # Correction for client's side
+    timeframe["current_end_date"] = (
+                datetime.strptime(timeframe["current_end_date"], "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
+    timeframe["previous_end_date"] = (
+                datetime.strptime(timeframe["previous_end_date"], "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
 
-    influencers = twitter.get_influencers(interactions, 3)
+    metadata = {"id": metadata["_id"], "keyword": metadata["keyword"]}
+    timeframe = {"current_start_date": timeframe["current_start_date"],
+                 "current_end_date": timeframe["current_end_date"],
+                 "previous_start_date": timeframe["previous_start_date"],
+                 "previous_end_date": timeframe["previous_end_date"], "delta": delta}
 
-    return render(request, 'app/interactions.html', {'metadata': metadata, 'interactions': [interactions, influencers]})
 
-
-# /app/home/
-@login_required(login_url='/app/login/')
-def update_query(request):
-
-    if request.is_ajax() is False:
-        return -1
-
-    _id = request.POST.get('_id')
-
-    return JsonResponse(twitter.update_query(_id), safe=False)
+    return render(request, 'app/interactions.html', {'metadata': metadata, 'timeframe':timeframe, 'interactions': interactions})
 
 # Ajax calls
-
-# /app/update_interactions/ (ajax)
-# Update interactions graph
-@login_required(login_url='/app/login/')
-def update_interactions(request):
-
-    # Check if request is called from ajax
-    if request.is_ajax() is False:
-        return -1
-
-    # Initialize options
-    id = request.POST.get('id')
-
-    interactions = {}
-
-    return JsonResponse(interactions, safe=False)
-
 
 # /app/get_user_details/ (ajax)
 # Return details of an user

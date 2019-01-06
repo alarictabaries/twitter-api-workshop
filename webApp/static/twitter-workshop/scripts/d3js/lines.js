@@ -130,6 +130,12 @@
                 var mouse = d3.mouse(this);var xPos = mouse[0];
                 var x0 = x.invert(xPos - 20);
                 var i = bisect(data, x0);var d = data[i];
+
+                var xp = x(d.current_timeframe);
+
+                    d3.selectAll("circle").attr("r","3");
+                    d3.selectAll("circle[cx='" + xp + "']").attr("r","4");
+
             })
             .on("mouseout", function() {
 
@@ -149,6 +155,8 @@
                 var x0 = x.invert(xPos - 20);
                 var i = bisect(data, x0);var d = data[i];
 
+                d3.selectAll("circle").attr("r","3");
+
             })
             .on("mousemove", function() {
                 var mouse = d3.mouse(this);
@@ -161,18 +169,19 @@
                     var xp = x(d.current_timeframe);
                     var yp = y(d["current_" + type + "_count"]);
 
-                    if(xp > ($(".line-chart #graph").width() - 150)) {
-                        xxp = -130
-                        yyp = 80
-                    } else if(xp < 150) {
-                        xxp = 72
-                        yyp = 80
-                    } else {
-                        yyp = 42
-                        xxp = -25
-                    }
+                    d3.selectAll("circle").attr("r","3");
+                    d3.selectAll("circle[cx='" + xp + "']").attr("r","4");
 
-                    console.log(xp);
+                    if(xp > ($(".line-chart #graph").width() - 150)) {
+                        xxp = -130;
+                        yyp = 80;
+                    } else if(xp < 50) {
+                        xxp = 72;
+                        yyp = 80;
+                    } else {
+                        yyp = 42;
+                        xxp = -25;
+                    }
 
                     current_date = new Date(Date.parse(d.current_timeframe));
                     previous_date = new Date(Date.parse(d.previous_timeframe));
@@ -190,6 +199,7 @@
                         .attr('x1', xp)
                         .attr('x2', xp);
                 }
+
             });
 
         function customYAxis(g) {

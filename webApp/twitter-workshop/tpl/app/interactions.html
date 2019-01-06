@@ -1,8 +1,15 @@
 {% include "app/inc/header.html" with title="Visualize interactions" icon="bubble_chart" d3js="true" daterangepicker="true"%}
 
 <div class="actions">
-    <a href="#" class="period"><i class="material-icons">calendar_today</i><span class="current">{{ metadata.current_start_date }} - {{ metadata.current_end_date }}</span><span class="previous">{{ metadata.previous_start_date }} - {{ metadata.previous_end_date }}</span><i class="material-icons chevron">keyboard_arrow_down</i></a>
-    <a href="/app/dataset/?id={{metadata.id}}"><i class="material-icons">subject</i>Dataset home</a>
+    <a href="#" class="period"><i class="material-icons">calendar_today</i>
+        {% if timeframe.current_start_date == timeframe.current_end_date %}
+            <span class="current no-previous">{{ timeframe.current_start_date }}</span>
+            {% else %}
+            <span class="current no-previous">{{ timeframe.current_start_date }} - {{ timeframe.current_end_date }}</span>
+        {%  endif %}
+        <i class="material-icons chevron">keyboard_arrow_down</i>
+    </a>
+    <a href="/app/dataset/?id={{metadata.id}}"><i class="material-icons">subject</i>Dashboard</a>
 </div>
 
     <div class="sub-content full dataset">
@@ -13,23 +20,19 @@
 
             <div class="col-label">Top influencers</div>
 
-            {% for node in interactions.1 %}
-
                 <div class="card">
                     <div class="user">
-                        <img class="pic" src="{{ node.profile_image_url }}">
+                        <img class="pic" src="https://blog.za3k.com/wp-content/uploads/2015/03/default_profile_4.png">
                         <div class="user-details">
-                            <span class="name">{{ node.name }}</span><br />
-                            <span class="screen_name"><a target="_BLANK" href="https://twitter.com/intent/user?user_id={{ node.id_str }}">@{{ node.screen_name }}</a></span><br>
+                            <span class="name">Influencer#1</span><br />
+                            <span class="screen_name"><a target="_BLANK" href="https://twitter.com/intent/user?user_id=#">@influencer#1</a></span><br>
                             <div class="details">
-                                <div class="item"><span class="followers"><span class="label">Followers</span><br><span class="count">{{ node.followers_count }}</span></span></div>
-                                <div class="item"><span class="mentions"><span class="label">Mentions</span><br><span class="count">{{ node.mentions }}</span></span></div>
+                                <div class="item"><span class="followers"><span class="label">Followers</span><br><span class="count">1 337</span></span></div>
+                                <div class="item"><span class="mentions"><span class="label">Mentions</span><br><span class="count">42</span></span></div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-            {% endfor %}
 
             <div class="col-actions">
 
@@ -60,10 +63,7 @@
 <script>
 
     var data = {{ interactions|safe }};
-    dataset = data[0];
-    most_engaged_nodes = data[1];
-
-    console.log(dataset);
+    var influencers = [],
 
     counts = $(".cards").find(".count");
 
@@ -73,10 +73,16 @@
 
     $(document).ready(function() {
 
-        displayDateRangePicker("{{ metadata.current_start_date|safe }}", "{{ metadata.current_end_date|safe }}", "interactions", "{{ metadata.id|safe }}");
+        displayDateRangePicker("{{ timeframe.current_start_date|safe }}", "{{ timeframe.current_end_date|safe }}", "interactions", "{{ metadata.id|safe }}");
 
         var svg = d3.select('.graph').append("svg");
-        createV4SelectableForceDirectedGraph(svg, dataset, most_engaged_nodes);
+        createV4SelectableForceDirectedGraph(svg, data, influencers);
+
+        $( window ).resize(function() {
+            $(".graph").html("");
+            var svg = d3.select('.graph').append("svg");
+            createV4SelectableForceDirectedGraph(svg, data, influencers);
+        });
 
     });
 

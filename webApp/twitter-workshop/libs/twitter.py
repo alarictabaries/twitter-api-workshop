@@ -1,7 +1,8 @@
-# Operations with Twitter's API
+# Operations with Twitter's API and Twitter's data
 
 import tweepy
 from . import mongodb
+from . import misc
 from datetime import datetime, timedelta
 import pytz
 from bson.objectid import ObjectId
@@ -9,7 +10,8 @@ from bson.objectid import ObjectId
 
 # Save tweets meeting the criteria to MongoDB
 def create_query(keyword, count, lang, _user):
-    date_now = datetime.now()
+
+    date_now = datetime.utcnow()
 
     # Connect to Twitter's API
     auth = tweepy.OAuthHandler('y3fvWam4738fGFCSuVJpIhtwp', 'czDAPY4XnYe4fp4n6FMwrHSFGtF0nY15PgnmozeBAsnObHiKJr')
@@ -29,32 +31,35 @@ def create_query(keyword, count, lang, _user):
         "lang": lang,
         "count": 0,
         "created": date_now.strftime("%Y-%m-%d %H:%M"),
-        "updated": "-"
+        "updated": None
     })
 
     col = db["app_tweets"]
 
-    last_update = None
-    real_count = 0
+    if count > 0:
 
-    for tweet in tweepy.Cursor(api.search, q=keyword, lang=lang, tweet_mode='extended', result_type="recent",
-                               include_entities=True).items(count):
-        if last_update is None:
-            created_at = datetime.strptime(tweet._json["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
-            created_at = created_at.replace(tzinfo=pytz.timezone('UTC'))
-            created_at = created_at.strftime("%Y-%m-%d %H:%M:%S")
-            last_update = created_at
-        real_count += 1
-        tweet._json["_query"] = _query.inserted_id
-        col.insert_one(tweet._json)
+        last_update = None
+        real_count = 0
 
-    col = db["app_queries"]
+        for tweet in tweepy.Cursor(api.search, q=keyword, lang=lang, tweet_mode='extended', result_type="recent",
+                                   include_entities=True).items(count):
 
-    col.update_one({'_id': ObjectId(_query.inserted_id)},
-                   {"$set": {
-                        "count" : real_count,
-                        "updated": last_update
-                   }})
+            if last_update is None:
+                created_at = datetime.strptime(tweet._json["created_at"], '%a %b %d %H:%M:%S +0000 %Y')
+                created_at = created_at.replace(tzinfo=pytz.timezone('UTC'))
+                created_at = created_at.strftime("%Y-%m-%d %H:%M:%S")
+                last_update = created_at
+            real_count += 1
+            tweet._json["_query"] = _query.inserted_id
+            col.insert_one(tweet._json)
+
+        col = db["app_queries"]
+
+        col.update_one({'_id': ObjectId(_query.inserted_id)},
+                       {"$set": {
+                            "count" : real_count,
+                            "updated": last_update
+                       }})
 
     return 1
 
@@ -208,30 +213,10 @@ def get_user_details(_id):
     return user._json
 
 
-# Define X (count) most engaged nodes in an interactions list
+# Get influencers
 def get_influencers(interactions, count):
-    nodes = interactions["nodes"]
-
-    # Descending sort - No need to sort anymore since the dict is sorted in previous func
-    # nodes.sort(key=lambda e: e['mentions'], reverse=True)
-
-    # Take the X first
-    influencers = nodes[:count]
-
-    # Add user profile
-    for node in influencers:
-        user = get_user_details(node["id"])
-        node["profile_image_url"] = user["profile_image_url"].replace("_normal", "_bigger")
-        node["name"] = user["name"]
-        node["screen_name"] = user["screen_name"]
-        node["followers_count"] = user["followers_count"]
-
-    return influencers
-
-
-#Get influencers
-def get_influencers2(tweets, count):
     return 0
+
 
 # Get impacting tweets
 def get_impacting_tweets(tweets, count):
@@ -329,13 +314,6 @@ def get_tweets_by_timeframe(tweets, start_date, end_date):
     return tweets_buffer
 
 
-def perdelta(start, end, delta):
-    curr = start
-    while curr < end:
-        yield curr
-        curr += delta
-
-
 # Get statistics per time unit
 def get_stats_per_time_unit(tweets, unit, start_date, end_date):
 
@@ -345,11 +323,11 @@ def get_stats_per_time_unit(tweets, unit, start_date, end_date):
         time_format = "%Y-%m-%d %H:%M"
     elif unit == "h":
         time_format = "%Y-%m-%d %H:00"
-        for timeframe in perdelta(datetime.strptime(start_date, "%Y-%m-%d"), datetime.strptime(end_date, "%Y-%m-%d"),timedelta(hours=1)):
+        for timeframe in misc.perdelta(datetime.strptime(start_date, "%Y-%m-%d"), datetime.strptime(end_date, "%Y-%m-%d"),timedelta(hours=1)):
             distribution.append({"timeframe": timeframe.strftime(time_format)})
     elif unit == "d":
         time_format = "%Y-%m-%d 00:00"
-        for timeframe in perdelta(datetime.strptime(start_date, "%Y-%m-%d"), datetime.strptime(end_date, "%Y-%m-%d"),timedelta(days=1)):
+        for timeframe in misc.perdelta(datetime.strptime(start_date, "%Y-%m-%d"), datetime.strptime(end_date, "%Y-%m-%d"),timedelta(days=1)):
             distribution.append({"timeframe": timeframe.strftime(time_format)})
 
     distribution.sort(key=lambda x: x['timeframe'])

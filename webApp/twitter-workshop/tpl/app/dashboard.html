@@ -1,7 +1,16 @@
-{% include "app/inc/header.html" with title="Dataset" icon="subject" d3js="true" daterangepicker="true" %}
+{% include "app/inc/header.html" with title="Dashboard" icon="subject" d3js="true" daterangepicker="true" %}
 
 <div class="actions">
-    <a href="#" class="period"><i class="material-icons">calendar_today</i><span class="current">{{ metadata.current_start_date }} - {{ metadata.current_end_date }}</span><span class="previous">{{ metadata.previous_start_date }} - {{ metadata.previous_end_date }}</span><i class="material-icons chevron">keyboard_arrow_down</i></a>
+    <a href="#" class="period"><i class="material-icons">calendar_today</i>
+        {% if timeframe.current_start_date == timeframe.current_end_date %}
+            <span class="current">{{ timeframe.current_start_date }}</span>
+            <span class="previous">{{ timeframe.previous_start_date }}</span>
+            {% else %}
+            <span class="current">{{ timeframe.current_start_date }} - {{ timeframe.current_end_date }}</span>
+            <span class="previous">{{ timeframe.previous_start_date }} - {{ timeframe.previous_end_date }}</span>
+        {%  endif %}
+        <i class="material-icons chevron">keyboard_arrow_down</i>
+    </a>
     <a href="/app/interactions/?id={{metadata.id}}"><i class="material-icons">bubble_chart</i>Visualize interactions</a>
 </div>
 
@@ -29,10 +38,10 @@
             <div class="count">0.4%</div>
             <div class="label">density</div>
         </div><!--
-                --><div class="item" id="sentiment">
+                --><div class="item" id="satisfcation">
             <div class="previous">6</div>
             <div class="count">+72</div>
-            <div class="label">sentiment</div>
+            <div class="label">satisfaction</div>
         </div>
         </div>
     </div>
@@ -82,11 +91,11 @@
         d.previous_timeframe = parseTime(d.previous_timeframe);
     });
 
-    draw(data, "tweets", "{{ metadata.delta_days }}");
+    draw(data, "tweets", "{{ timeframe.delta }}");
 
     $(document).ready(function() {
 
-        displayDateRangePicker("{{ metadata.current_start_date|safe }}", "{{ metadata.current_end_date|safe }}", "dataset", "{{ metadata.id|safe }}");
+        displayDateRangePicker("{{ timeframe.current_start_date|safe }}", "{{ timeframe.current_end_date|safe }}", "dashboard", "{{ metadata.id|safe }}");
 
         $(".kpis .item").click(function() {
             $(".kpis .item").each( function () {
@@ -94,12 +103,12 @@
             });
             $(this).addClass("active");
             $(".line-chart #graph").html("");
-            draw(data, $(this).attr('id'), "{{ metadata.delta_days }}");
+            draw(data, $(this).attr('id'), "{{ timeframe.delta }}");
         });
 
         $( window ).resize(function() {
             $(".line-chart #graph").html("");
-            draw(data, $(".kpis .item.active").attr('id'), "{{ metadata.delta_days }}");
+            draw(data, $(".kpis .item.active").attr('id'), "{{ timeframe.delta }}");
         });
 
     });
