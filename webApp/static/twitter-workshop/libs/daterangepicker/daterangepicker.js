@@ -16,7 +16,7 @@ function displayDateRangePicker(start_date, end_date, page, id) {
         endDate: moment(end_date, "YYYY-MM-DD"),
         minDate: moment().subtract(1, 'years'),
         locale: {
-            "customRangeLabel": "Custom range",
+            "customRangeLabel": "Custom range"
         },
         opens: 'bottom',
         ranges: {

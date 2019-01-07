@@ -291,9 +291,16 @@
   margin: 0;
 }
 
-.daterangepicker.show-calendar .ranges {
-  margin-top: 0px;
+.daterangepicker.show-calendar .ranges li:first-child {
+  border-top-right-radius: 0px;
 }
+
+.daterangepicker.show-calendar .ranges li:last-child {
+  border-bottom-right-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
+
+.daterangepicker.show-calendar
 
 .daterangepicker .ranges ul {
   list-style: none;
