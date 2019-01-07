@@ -82,18 +82,21 @@ def dashboard(request):
     yesterday = datetime.now() - timedelta(days=1)
 
     try:
-        timeframe["current_start_date"] = datetime.fromtimestamp(int(request.GET['start'][:-3])).strftime("%Y-%m-%d")
+        timeframe["current_start_date"] = datetime.fromtimestamp(int(request.GET['start'][:-3]) + 24*60*60).strftime("%Y-%m-%d")
     except KeyError:
         timeframe["current_start_date"] = yesterday.strftime("%Y-%m-%d")
     try:
-        timeframe["current_end_date"] = datetime.fromtimestamp(int(request.GET['end'][:-3])+ 24*60*60).strftime("%Y-%m-%d")
+        timeframe["current_end_date"] = datetime.fromtimestamp(int(request.GET['end'][:-3])  + 24*60*60 ).strftime("%Y-%m-%d")
+        #
     except KeyError:
         timeframe["current_end_date"] = now.strftime("%Y-%m-%d")
 
-    delta =(datetime.strptime(timeframe["current_end_date"],"%Y-%m-%d") - datetime.strptime(timeframe["current_start_date"],"%Y-%m-%d")).days
+    timeframe["delta"] = (datetime.strptime(timeframe["current_end_date"],"%Y-%m-%d") - datetime.strptime(timeframe["current_start_date"],"%Y-%m-%d")).days
 
-    timeframe["previous_start_date"] = (datetime.strptime(timeframe["current_start_date"], "%Y-%m-%d") - timedelta(days=delta)).strftime("%Y-%m-%d")
+    timeframe["previous_start_date"] = (datetime.strptime(timeframe["current_start_date"], "%Y-%m-%d") - timedelta(days=timeframe["delta"])).strftime("%Y-%m-%d")
     timeframe["previous_end_date"] = timeframe["current_start_date"]
+
+    print(timeframe)
 
     # Getting tweets
     tweets = twitter.get_tweets(metadata["_id"])
@@ -125,7 +128,7 @@ def dashboard(request):
                   "tweets_count_variation": tweets_count_variation, "tweets_users_variation": tweets_users_variation, "tweets_interactions_variation": tweets_interactions_variation }
 
     # Getting detailed statistics (per time unit)
-    if delta == 1:
+    if timeframe["delta"] == 1:
         time_unit = "h"
     else:
         time_unit = "d"
@@ -146,7 +149,6 @@ def dashboard(request):
     timeframe["previous_end_date"] = (datetime.strptime(timeframe["previous_end_date"], "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
 
     metadata = {"id" : metadata["_id"], "keyword" : metadata["keyword"]}
-    timeframe = {"current_start_date" : timeframe["current_start_date"], "current_end_date" : timeframe["current_end_date"], "previous_start_date": timeframe["previous_start_date"], "previous_end_date" : timeframe["previous_end_date"], "delta": delta}
 
     return render(request, 'app/dashboard.html', {'metadata': metadata, 'timeframe': timeframe, 'stats': stats, 'detailed_stats': detailed_stats})
 
@@ -173,10 +175,10 @@ def interactions(request):
     except KeyError:
         timeframe["current_end_date"] = now.strftime("%Y-%m-%d")
 
-    delta = (datetime.strptime(timeframe["current_end_date"], "%Y-%m-%d") - datetime.strptime(
+    timeframe["delta"] = (datetime.strptime(timeframe["current_end_date"], "%Y-%m-%d") - datetime.strptime(
         timeframe["current_start_date"], "%Y-%m-%d")).days
 
-    timeframe["previous_start_date"] = (datetime.strptime(timeframe["current_start_date"], "%Y-%m-%d") - timedelta(days=delta)).strftime("%Y-%m-%d")
+    timeframe["previous_start_date"] = (datetime.strptime(timeframe["current_start_date"], "%Y-%m-%d") - timedelta(days=timeframe["delta"])).strftime("%Y-%m-%d")
     timeframe["previous_end_date"] = timeframe["current_start_date"]
 
     # Getting tweets
@@ -193,10 +195,6 @@ def interactions(request):
                 datetime.strptime(timeframe["previous_end_date"], "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
 
     metadata = {"id": metadata["_id"], "keyword": metadata["keyword"]}
-    timeframe = {"current_start_date": timeframe["current_start_date"],
-                 "current_end_date": timeframe["current_end_date"],
-                 "previous_start_date": timeframe["previous_start_date"],
-                 "previous_end_date": timeframe["previous_end_date"], "delta": delta}
 
 
     return render(request, 'app/interactions.html', {'metadata': metadata, 'timeframe':timeframe, 'interactions': interactions})
