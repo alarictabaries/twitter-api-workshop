@@ -4,3 +4,6 @@ git+https://github.com/tweepy/tweepy.git
 django
 pymongo
 djongo
+numpy
+networkx
+python-louvain

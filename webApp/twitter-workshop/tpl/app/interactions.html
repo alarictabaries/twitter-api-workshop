@@ -9,7 +9,7 @@
         {%  endif %}
         <i class="material-icons chevron">keyboard_arrow_down</i>
     </a>
-    <a href="/app/dataset/?id={{metadata.id}}"><i class="material-icons">subject</i>Dashboard</a>
+    <a href="/app/dashboard/?id={{metadata.id}}"><i class="material-icons">subject</i>Dashboard</a>
 </div>
 
     <div class="sub-content full dataset">
@@ -20,19 +20,23 @@
 
             <div class="col-label">Top influencers</div>
 
+            {% for node in influencers %}
+
                 <div class="card">
                     <div class="user">
-                        <img class="pic" src="https://blog.za3k.com/wp-content/uploads/2015/03/default_profile_4.png">
+                        <img class="pic" src="{{ node.profile_image_url }}">
                         <div class="user-details">
-                            <span class="name">Influencer#1</span><br />
-                            <span class="screen_name"><a target="_BLANK" href="https://twitter.com/intent/user?user_id=#">@influencer#1</a></span><br>
+                            <span class="name">{{ node.name }}</span><br />
+                            <span class="screen_name"><a target="_BLANK" href="https://twitter.com/intent/user?user_id={{ node.id_str }}">@{{ node.screen_name }}</a></span><br>
                             <div class="details">
-                                <div class="item"><span class="followers"><span class="label">Followers</span><br><span class="count">1 337</span></span></div>
-                                <div class="item"><span class="mentions"><span class="label">Mentions</span><br><span class="count">42</span></span></div>
+                                <div class="item"><span class="followers"><span class="label">Followers</span><br><span class="count">{{ node.followers_count }}</span></span></div>
+                                <div class="item"><span class="mentions"><span class="label">Mentions</span><br><span class="count">{{ node.mentions }}</span></span></div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+            {% endfor %}
 
             <div class="col-actions">
 
@@ -63,7 +67,7 @@
 <script>
 
     var data = {{ interactions|safe }};
-    var influencers = [],
+    var influencers = {{ influencers|safe }},
 
     counts = $(".cards").find(".count");
 

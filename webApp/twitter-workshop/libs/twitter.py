@@ -5,7 +5,11 @@ from . import mongodb
 from . import misc
 from datetime import datetime, timedelta
 import pytz
+import community
+import networkx as nx
 from bson.objectid import ObjectId
+import matplotlib.pyplot as plt
+
 
 
 # Save tweets meeting the criteria to MongoDB
@@ -215,7 +219,102 @@ def get_user_details(_id):
 
 # Get influencers
 def get_influencers(interactions, count):
-    return 0
+    nodes = interactions["nodes"]
+
+    # Descending sort - No need to sort anymore since the dict is sorted in previous func
+    # nodes.sort(key=lambda e: e['mentions'], reverse=True)
+
+    # Take the X first
+    influencers = nodes[:count]
+
+    # Add user profile
+    for node in influencers:
+        user = get_user_details(node["id"])
+        node["profile_image_url"] = user["profile_image_url"].replace("_normal", "_bigger")
+        node["name"] = user["name"]
+        node["screen_name"] = user["screen_name"]
+        node["followers_count"] = user["followers_count"]
+
+    return influencers
+
+
+# Build Networkx graph
+def build_network_graph(tweets):
+
+    nodes = []
+    edges = []
+
+    for tweet in tweets:
+        node_buffer = {"id": tweet["user"]["id"], "type": 1, "mentions": 0}
+        unique = 0
+        for node in nodes:
+            if node_buffer["id"] == node["id"]:
+                unique = 1
+                if node["type"] == 2:
+                    node["type"] = 1
+        if unique == 0:
+            nodes.append(node_buffer)
+        # Iterate over mentions
+        mentions = []
+        for user in tweet['entities']['user_mentions']:
+            if user and (user['id'] != tweet["user"]["id"]):  # The user can't mention himself
+                node_buffer = {"id": user['id'], "type": 2, "mentions": 0}
+                if user['id'] not in mentions:
+                    edges.append({"source": tweet["user"]["id"], "target": user['id']})
+                mentions.append(user['id'])
+                unique = 0
+                for node in nodes:
+                    if node_buffer["id"] == node["id"]:
+                        unique += 1
+                if unique == 0:
+                    nodes.append(node_buffer)
+
+    for edge in edges:
+        for node in nodes:
+            if node["id"] == edge["target"]:
+                node["mentions"] += 1
+
+    edges_buffer = []
+    for edge in edges:
+        connected = 0
+        for node in nodes:
+            if node["id"] == edge["target"]:
+                connected += 1
+            if node["id"] == edge["source"]:
+                connected += 1
+        if (connected != 0) and (connected % 2 == 0):
+            edges_buffer.append(edge)
+
+    edges = edges_buffer
+
+    # Should we remove lonely nodes for Networkx analysis?
+    #nodes_buffer = []
+    #for node in nodes:
+    #    lonely = 0
+    #    for edge in edges:
+    #        if node["id"] == edge["source"] or node["id"] == edge["target"]:
+    #            lonely += 1
+    #    if lonely > 0:
+    #        nodes_buffer.append(node)
+
+    #nodes = nodes_buffer
+
+    network = nx.Graph()
+
+    for node in nodes:
+        network.add_node(node["id"])
+
+    for edge in edges:
+        network.add_edge(edge["source"], edge["target"])
+
+    parts = community.best_partition(network)
+    values = [parts.get(node) for node in network.nodes()]
+
+    #for ((key, n), value) in zip(network.nodes(data=True), values):
+    #    n["community"] = value
+
+    #nx.draw(network, node_color = values, with_labels=False)
+    #plt.show()
 
 
 # Get impacting tweets

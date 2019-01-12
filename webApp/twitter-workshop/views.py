@@ -82,12 +82,12 @@ def dashboard(request):
     yesterday = datetime.now() - timedelta(days=1)
 
     try:
-        timeframe["current_start_date"] = datetime.fromtimestamp(int(request.GET['start'][:-3]) + 24*60*60).strftime("%Y-%m-%d")
+        # Weird behavior on Mac (Unix?), we need to add to the current start date (+ 24*60*60)
+        timeframe["current_start_date"] = datetime.fromtimestamp(int(request.GET['start'][:-3])).strftime("%Y-%m-%d")
     except KeyError:
         timeframe["current_start_date"] = yesterday.strftime("%Y-%m-%d")
     try:
-        timeframe["current_end_date"] = datetime.fromtimestamp(int(request.GET['end'][:-3])  + 24*60*60 ).strftime("%Y-%m-%d")
-        #
+        timeframe["current_end_date"] = datetime.fromtimestamp(int(request.GET['end'][:-3]) + 24*60*60 ).strftime("%Y-%m-%d")
     except KeyError:
         timeframe["current_end_date"] = now.strftime("%Y-%m-%d")
 
@@ -96,12 +96,13 @@ def dashboard(request):
     timeframe["previous_start_date"] = (datetime.strptime(timeframe["current_start_date"], "%Y-%m-%d") - timedelta(days=timeframe["delta"])).strftime("%Y-%m-%d")
     timeframe["previous_end_date"] = timeframe["current_start_date"]
 
-    print(timeframe)
-
     # Getting tweets
     tweets = twitter.get_tweets(metadata["_id"])
     current_tweets = twitter.get_tweets_by_timeframe(tweets, timeframe["current_start_date"], timeframe["current_end_date"])
     previous_tweets = twitter.get_tweets_by_timeframe(tweets, timeframe["previous_start_date"], timeframe["previous_end_date"])
+
+    # Networkx tests
+    twitter.build_network_graph(current_tweets)
 
     # Getting basic statistics
     current_tweets_count = twitter.get_tweets_count(current_tweets)
@@ -187,6 +188,7 @@ def interactions(request):
 
     # Building the interactions dict
     interactions = twitter.get_interactions(current_tweets)
+    influencers = twitter.get_influencers(interactions, 3)
 
     # Correction for client's side
     timeframe["current_end_date"] = (
@@ -197,7 +199,7 @@ def interactions(request):
     metadata = {"id": metadata["_id"], "keyword": metadata["keyword"]}
 
 
-    return render(request, 'app/interactions.html', {'metadata': metadata, 'timeframe':timeframe, 'interactions': interactions})
+    return render(request, 'app/interactions.html', {'metadata': metadata, 'timeframe':timeframe, 'interactions': interactions, 'influencers':influencers})
 
 # Ajax calls
 
