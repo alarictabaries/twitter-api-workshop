@@ -102,7 +102,7 @@ def dashboard(request):
     previous_tweets = twitter.get_tweets_by_timeframe(tweets, timeframe["previous_start_date"], timeframe["previous_end_date"])
 
     # Networkx tests
-    twitter.build_network_graph(current_tweets)
+    # twitter.build_network_graph(current_tweets)
 
     # Getting basic statistics
     current_tweets_count = twitter.get_tweets_count(current_tweets)

@@ -288,16 +288,16 @@ def build_network_graph(tweets):
     edges = edges_buffer
 
     # Should we remove lonely nodes for Networkx analysis?
-    #nodes_buffer = []
-    #for node in nodes:
-    #    lonely = 0
-    #    for edge in edges:
-    #        if node["id"] == edge["source"] or node["id"] == edge["target"]:
-    #            lonely += 1
-    #    if lonely > 0:
-    #        nodes_buffer.append(node)
+    nodes_buffer = []
+    for node in nodes:
+        lonely = 0
+        for edge in edges:
+            if node["id"] == edge["source"] or node["id"] == edge["target"]:
+                lonely += 1
+        if lonely > 0:
+            nodes_buffer.append(node)
 
-    #nodes = nodes_buffer
+    nodes = nodes_buffer
 
     network = nx.Graph()
 
@@ -310,10 +310,17 @@ def build_network_graph(tweets):
     parts = community.best_partition(network)
     values = [parts.get(node) for node in network.nodes()]
 
-    #for ((key, n), value) in zip(network.nodes(data=True), values):
-    #    n["community"] = value
+    for ((key, n), value) in zip(network.nodes(data=True), values):
+        n["community"] = value
 
-    #nx.draw(network, node_color = values, with_labels=False)
+    print(nx.density(network))
+    print(nx.is_directed(network))
+    print(nx.info(network))
+
+    #pos = nx.spring_layout(network)
+    #node_labels = nx.get_node_attributes(network, 'community')
+    #nx.draw(network,pos , node_color = values, with_labels=False, alpha=0.4)
+    #nx.draw_networkx_labels(network, pos, labels=node_labels, color="white")
     #plt.show()
 
 
