@@ -76,18 +76,18 @@ def dashboard(request):
 
     metadata = twitter.get_metadata(request.GET['id'])
 
-    # Date initilization
+    # Date initialization
     timeframe = {}
     now = datetime.now()
     yesterday = datetime.now() - timedelta(days=1)
 
     try:
         # Weird behavior on Mac (Unix?), we need to add to the current start date (+ 24*60*60)
-        timeframe["current_start_date"] = datetime.fromtimestamp(int(request.GET['start'][:-3])).strftime("%Y-%m-%d")
+        timeframe["current_start_date"] = datetime.utcfromtimestamp(int(request.GET['start_date'][:-3]) + 24*60*60 ).strftime("%Y-%m-%d")
     except KeyError:
         timeframe["current_start_date"] = yesterday.strftime("%Y-%m-%d")
     try:
-        timeframe["current_end_date"] = datetime.fromtimestamp(int(request.GET['end'][:-3]) + 24*60*60 ).strftime("%Y-%m-%d")
+        timeframe["current_end_date"] = datetime.utcfromtimestamp(int(request.GET['end_date'][:-3]) + 24*60*60 ).strftime("%Y-%m-%d")
     except KeyError:
         timeframe["current_end_date"] = now.strftime("%Y-%m-%d")
 
@@ -102,7 +102,7 @@ def dashboard(request):
     previous_tweets = twitter.get_tweets_by_timeframe(tweets, timeframe["previous_start_date"], timeframe["previous_end_date"])
 
     # Networkx tests
-    # twitter.build_network_graph(current_tweets)
+    twitter.build_network_graph(current_tweets)
 
     # Getting basic statistics
     current_tweets_count = twitter.get_tweets_count(current_tweets)
@@ -161,17 +161,17 @@ def interactions(request):
 
     metadata = twitter.get_metadata(request.GET['id'])
 
-    # Date initilization
+    # Date initialization
     timeframe = {}
     now = datetime.now()
     yesterday = datetime.now() - timedelta(days=1)
 
     try:
-        timeframe["current_start_date"] = datetime.fromtimestamp(int(request.GET['start'][:-3])).strftime("%Y-%m-%d")
+        timeframe["current_start_date"] = datetime.utcfromtimestamp(int(request.GET['start_date'][:-3])).strftime("%Y-%m-%d")
     except KeyError:
         timeframe["current_start_date"] = yesterday.strftime("%Y-%m-%d")
     try:
-        timeframe["current_end_date"] = datetime.fromtimestamp(int(request.GET['end'][:-3]) + 24 * 60 * 60).strftime(
+        timeframe["current_end_date"] = datetime.utcfromtimestamp(int(request.GET['end_date'][:-3]) + 24 * 60 * 60).strftime(
             "%Y-%m-%d")
     except KeyError:
         timeframe["current_end_date"] = now.strftime("%Y-%m-%d")

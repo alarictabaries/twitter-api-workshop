@@ -8,7 +8,9 @@ import pytz
 import community
 import networkx as nx
 from bson.objectid import ObjectId
-import matplotlib.pyplot as plt
+
+# import matplotlib.pyplot as plt
+
 
 
 
@@ -314,14 +316,13 @@ def build_network_graph(tweets):
         n["community"] = value
 
     print(nx.density(network))
-    print(nx.is_directed(network))
-    print(nx.info(network))
+    #print(nx.info(network))
 
-    #pos = nx.spring_layout(network)
-    #node_labels = nx.get_node_attributes(network, 'community')
-    #nx.draw(network,pos , node_color = values, with_labels=False, alpha=0.4)
-    #nx.draw_networkx_labels(network, pos, labels=node_labels, color="white")
-    #plt.show()
+    # pos = nx.spring_layout(network)
+    # node_labels = nx.get_node_attributes(network, 'community')
+    # nx.draw(network,pos , node_color = values, with_labels=False, alpha=0.4)
+    # nx.draw_networkx_labels(network, pos, labels=node_labels, color="white")
+    # plt.show()
 
 
 # Get impacting tweets

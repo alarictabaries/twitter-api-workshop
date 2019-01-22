@@ -29,7 +29,7 @@ function displayDateRangePicker(start_date, end_date, page, id) {
         },
         maxDate: date
     }, function(start, end, label) {
-        window.location.href = "/app/" + page + "/?id=" + id + "&start=" + start + "&end=" + end;
+        window.location.href = "/app/" + page + "/?id=" + id + "&start_date=" + start + "&end_date=" + end;
     });
 }
 
