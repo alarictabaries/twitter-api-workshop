@@ -8,6 +8,7 @@
 // Following the UMD template https://github.com/umdjs/umd/blob/master/templates/returnExportsGlobal.js
 
 function displayDateRangePicker(start_date, end_date, page, id) {
+
     var date = new Date();
     date.setDate(date.getDate() + 1);
 

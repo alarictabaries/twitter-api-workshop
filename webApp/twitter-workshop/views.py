@@ -102,16 +102,18 @@ def dashboard(request):
     previous_tweets = twitter.get_tweets_by_timeframe(tweets, timeframe["previous_start_date"], timeframe["previous_end_date"])
 
     # Networkx tests
-    twitter.build_network_graph(current_tweets)
+    # twitter.build_network_graph(current_tweets)
 
     # Getting basic statistics
     current_tweets_count = twitter.get_tweets_count(current_tweets)
     current_users_count = twitter.get_users_count(current_tweets)
     current_interactions_count = twitter.get_interactions_count(current_tweets)
+    current_density_count = twitter.get_density_rate(current_tweets)
 
     previous_tweets_count = twitter.get_tweets_count(previous_tweets)
     previous_users_count = twitter.get_users_count(previous_tweets)
     previous_interactions_count = twitter.get_interactions_count(previous_tweets)
+    previous_density_count = twitter.get_density_rate(previous_tweets)
 
     if previous_tweets_count == 0:
         previous_tweets_count = 1
@@ -119,14 +121,17 @@ def dashboard(request):
         previous_users_count = 1
     if previous_interactions_count == 0:
         previous_interactions_count = 1
+    if previous_density_count == 0:
+        previous_density_count = 1
 
     tweets_count_variation = round(((current_tweets_count * 100) / previous_tweets_count) - 100, 2)
     tweets_users_variation = round(((current_tweets_count * 100) / previous_users_count) - 100, 2)
     tweets_interactions_variation = round(((current_interactions_count * 100) / previous_interactions_count) - 100, 2)
+    tweets_density_variation = round(((current_density_count * 100) / previous_density_count) - 100, 2)
 
-    stats = {"current_tweets_count" : current_tweets_count, "current_users_count" : current_users_count, "current_interactions_count" : current_interactions_count,
-                  "previous_tweets_count": previous_tweets_count, "previous_users_count": previous_users_count, "previous_interactions_count": previous_interactions_count,
-                  "tweets_count_variation": tweets_count_variation, "tweets_users_variation": tweets_users_variation, "tweets_interactions_variation": tweets_interactions_variation }
+    stats = {"current_tweets_count" : current_tweets_count, "current_users_count" : current_users_count, "current_interactions_count" : current_interactions_count, "current_density_count" : current_density_count,
+                  "previous_tweets_count": previous_tweets_count, "previous_users_count": previous_users_count, "previous_interactions_count": previous_interactions_count, "previous_density_count": previous_density_count,
+                  "tweets_count_variation": tweets_count_variation, "tweets_users_variation": tweets_users_variation, "tweets_interactions_variation": tweets_interactions_variation, "tweets_density_variation": tweets_density_variation }
 
     # Getting detailed statistics (per time unit)
     if timeframe["delta"] == 1:
@@ -143,7 +148,8 @@ def dashboard(request):
         detailed_stats.append({"current_timeframe": current_stat["timeframe"], "previous_timeframe": previous_stat["timeframe"],
                       "current_tweets_count": current_stat["tweets_count"], "previous_tweets_count": previous_stat["tweets_count"],
                       "current_users_count": current_stat["users_count"], "previous_users_count": previous_stat["users_count"],
-                      "current_interactions_count": current_stat["interactions_count"], "previous_interactions_count": previous_stat["interactions_count"]})
+                      "current_interactions_count": current_stat["interactions_count"], "previous_interactions_count": previous_stat["interactions_count"],
+                      "current_density_count": current_stat["density_count"], "previous_density_count": previous_stat["density_count"]})
 
     # Correction for client's side
     timeframe["current_end_date"] = (datetime.strptime(timeframe["current_end_date"], "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")

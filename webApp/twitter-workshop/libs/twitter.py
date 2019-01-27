@@ -315,7 +315,15 @@ def build_network_graph(tweets):
     for ((key, n), value) in zip(network.nodes(data=True), values):
         n["community"] = value
 
+    nodes_count = len(nodes)
+    edges_count = len(edges)
+
+    density = edges_count / (nodes_count * (nodes_count - 1) / 2)
+
     print(nx.density(network))
+
+    print(density)
+
     #print(nx.info(network))
 
     # pos = nx.spring_layout(network)
@@ -405,6 +413,79 @@ def get_interactions_count(tweets):
     return interactions
 
 
+# Get density (in %)
+def get_density_rate(tweets):
+
+    nodes = []
+    edges = []
+
+    for tweet in tweets:
+        node_buffer = {"id": tweet["user"]["id"], "type": 1, "mentions": 0}
+        unique = 0
+        for node in nodes:
+            if node_buffer["id"] == node["id"]:
+                unique = 1
+                if node["type"] == 2:
+                    node["type"] = 1
+        if unique == 0:
+            nodes.append(node_buffer)
+        # Iterate over mentions
+        mentions = []
+        for user in tweet['entities']['user_mentions']:
+            if user and (user['id'] != tweet["user"]["id"]):  # The user can't mention himself
+                node_buffer = {"id": user['id'], "type": 2, "mentions": 0}
+                if user['id'] not in mentions:
+                    edges.append({"source": tweet["user"]["id"], "target": user['id']})
+                mentions.append(user['id'])
+                unique = 0
+                for node in nodes:
+                    if node_buffer["id"] == node["id"]:
+                        unique += 1
+                if unique == 0:
+                    nodes.append(node_buffer)
+
+    for edge in edges:
+        for node in nodes:
+            if node["id"] == edge["target"]:
+                node["mentions"] += 1
+
+    edges_buffer = []
+    for edge in edges:
+        connected = 0
+        for node in nodes:
+            if node["id"] == edge["target"]:
+                connected += 1
+            if node["id"] == edge["source"]:
+                connected += 1
+        if (connected != 0) and (connected % 2 == 0):
+            edges_buffer.append(edge)
+
+    edges = edges_buffer
+
+    # Should we remove lonely nodes for Networkx analysis?
+    nodes_buffer = []
+    for node in nodes:
+        lonely = 0
+        for edge in edges:
+            if node["id"] == edge["source"] or node["id"] == edge["target"]:
+                lonely += 1
+        if lonely > 0:
+            nodes_buffer.append(node)
+
+    nodes = nodes_buffer
+
+    network = nx.Graph()
+
+    for node in nodes:
+        network.add_node(node["id"])
+
+    for edge in edges:
+        network.add_edge(edge["source"], edge["target"])
+
+    density = round(nx.density(network) * 100, 2)
+
+    return density
+
 # Get tweets in a timeframe
 # Boundaries date format : %Y-%m-%d %H:%M
 def get_tweets_by_timeframe(tweets, start_date, end_date):
@@ -455,9 +536,11 @@ def get_stats_per_time_unit(tweets, unit, start_date, end_date):
             timeframe["tweets_count"] = get_tweets_count(tweets_buffer)
             timeframe["users_count"] = get_users_count(tweets_buffer)
             timeframe["interactions_count"] = get_interactions_count(tweets_buffer)
+            timeframe["density_count"] = get_density_rate(tweets_buffer)
         else:
             timeframe["tweets_count"] = 0
             timeframe["users_count"] = 0
             timeframe["interactions_count"] = 0
+            timeframe["density_count"] = 0
 
     return distribution
