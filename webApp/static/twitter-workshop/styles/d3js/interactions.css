@@ -28,13 +28,13 @@
     stroke: #64B5F6;
 }
 
-circle.active {
+/*circle.active {
     fill: #3498db;
 }
 
 circle.inactive {
     fill:#7f8c8d;
-}
+}*/
 
 circle.influencer_active {
     stroke: #3498db;

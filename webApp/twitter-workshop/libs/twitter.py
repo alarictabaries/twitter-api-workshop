@@ -200,6 +200,20 @@ def get_interactions(tweets):
 
     nodes = nodes_buffer
 
+    network = nx.Graph()
+
+    for node in nodes:
+        network.add_node(node["id"])
+
+    for link in links:
+        network.add_edge(link["source"], link["target"])
+
+    parts = community.best_partition(network)
+    values = [parts.get(node) for node in network.nodes()]
+
+    for (node, value) in zip(nodes, values):
+        node["community"] = value
+
     interactions["nodes"] = nodes
     interactions["links"] = links
 

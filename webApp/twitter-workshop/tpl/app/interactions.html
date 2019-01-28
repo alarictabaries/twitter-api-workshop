@@ -67,7 +67,10 @@
 <script>
 
     var data = {{ interactions|safe }};
-    var influencers = {{ influencers|safe }},
+    var influencers = {{ influencers|safe }};
+
+
+        console.log(data);
 
     counts = $(".cards").find(".count");
 
