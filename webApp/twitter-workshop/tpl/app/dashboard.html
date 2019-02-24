@@ -111,6 +111,15 @@
             draw(data, $(".kpis .item.active").attr('id'), "{{ timeframe.delta }}");
         });
 
+        $(".content .toggle-nav").click(function() {
+            $('#overlay').fadeIn(125);
+            setTimeout(function() {
+                $(".line-chart #graph").html("");
+                draw(data, $(".kpis .item.active").attr('id'), "{{ timeframe.delta }}");
+                $('#overlay').fadeOut(125);
+            }, 175);
+        });
+
     });
 
 </script>

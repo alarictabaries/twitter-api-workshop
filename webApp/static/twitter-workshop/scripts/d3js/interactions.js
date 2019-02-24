@@ -101,7 +101,7 @@ Colors.random = function(value) {
         var result;
         var count = 0;
         for (var prop in this.names)
-            if ((value/100)%42 < 1/++count)
+            if (value/100 < 1/++count)
                result = prop;
         return { name: result, rgb: this.names[result]};
     };

@@ -112,6 +112,18 @@
             .style('fill', 'none')
             .style('pointer-events', 'all');
 
+        d3.select(".tooltip").on("mouseenter", function() {
+            d3.select(".tooltip")
+                    .transition().duration(105)
+                    .style("opacity", 1)
+                    .style("z-index", 100);
+        }).on("mouseleave", function() {
+            d3.select(".tooltip")
+                    .transition().duration(105)
+                    .style("opacity", 0)
+                    .style("z-index", -100);
+        });
+
         chartArea
             .on("mouseover", function() {
                 d3.select(".svg-line-marker")
@@ -125,16 +137,17 @@
 
                 d3.select(".tooltip")
                     .transition().duration(105)
-                    .style("opacity", 1);
+                    .style("opacity", 1)
+                    .style("z-index", 100);
 
                 var mouse = d3.mouse(this);var xPos = mouse[0];
                 var x0 = x.invert(xPos - 20);
                 var i = bisect(data, x0);var d = data[i];
 
-                var xp = x(d.current_timeframe);
+                /*var xp = x(d.current_timeframe);
 
                     d3.selectAll("circle").attr("r","3");
-                    d3.selectAll("circle[cx='" + xp + "']").attr("r","4");
+                    d3.selectAll("circle[cx='" + xp + "']").attr("r","4");*/
 
             })
             .on("mouseout", function() {
@@ -149,13 +162,14 @@
 
                 d3.select(".tooltip")
                     .transition().duration(105)
-                    .style("opacity", 0);
+                    .style("opacity", 0)
+                    .style("z-index", -100);
 
                 var mouse = d3.mouse(this);var xPos = mouse[0];
                 var x0 = x.invert(xPos - 20);
                 var i = bisect(data, x0);var d = data[i];
 
-                d3.selectAll("circle").attr("r","3");
+                /*d3.selectAll("circle").attr("r","3");*/
 
             })
             .on("mousemove", function() {
@@ -169,8 +183,8 @@
                     var xp = x(d.current_timeframe);
                     var yp = y(d["current_" + type + "_count"]);
 
-                    d3.selectAll("circle").attr("r","3");
-                    d3.selectAll("circle[cx='" + xp + "']").attr("r","4");
+                    /*d3.selectAll("circle").attr("r","3");
+                    d3.selectAll("circle[cx='" + xp + "']").attr("r","4");*/
 
                     if(xp > ($(".line-chart #graph").width() - 150)) {
                         xxp = -130;

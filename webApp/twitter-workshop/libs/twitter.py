@@ -9,9 +9,15 @@ import community
 import networkx as nx
 from bson.objectid import ObjectId
 
-# import matplotlib.pyplot as plt
+# Text analysis
+import pandas as pd
+import re
+import nltk
+from nltk.corpus import stopwords
+from textblob import TextBlob, Blobber
+from textblob_fr import PatternTagger, PatternAnalyzer
 
-
+from french_lefff_lemmatizer.french_lefff_lemmatizer import FrenchLefffLemmatizer
 
 
 # Save tweets meeting the criteria to MongoDB
@@ -500,6 +506,46 @@ def get_density_rate(tweets):
 
     return density
 
+
+# Clean tweets
+def clean_tweets(tweets):
+
+    twitter_words = ["rt", "from", "via", "retweet", "cc"]
+    stop_words = set(stopwords.words("french"))
+    lemmatizer = FrenchLefffLemmatizer()
+
+    for word in twitter_words:
+        stop_words.add(word)
+
+    df = pd.DataFrame(tweets)
+    df["processed_text"] = df["full_text"].apply(lambda x: " ".join([split_hashtag(word) for word in x.split()]))
+    df["processed_text"] = df["processed_text"].apply(lambda x: " ".join(x.lower() for x in x.split()))
+    df["processed_text"] = df["processed_text"].str.replace('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', '')
+    df["processed_text"] = df["processed_text"].str.replace('@([A-Za-z0-9_]+)', '')
+    df["processed_text"] = df["processed_text"].str.replace("[^\w\s]", ' ')
+    df["processed_text"] = df["processed_text"].apply(lambda x: " ".join(x.split()))
+    df["processed_text"] = df["processed_text"].apply(lambda x: " ".join(x for x in x.split() if x not in stop_words))
+    freq = pd.Series(' '.join(df["processed_text"]).split()).value_counts()[:10]
+    freq = list(freq.index)
+    df["processed_text"] = df["processed_text"].apply(lambda x: " ".join(x for x in x.split() if x not in freq))
+    freq = pd.Series(' '.join(df["processed_text"] ).split()).value_counts()[-10:]
+    freq = list(freq.index)
+    df["processed_text"] = df["processed_text"].apply(lambda x: " ".join(x for x in x.split() if x not in freq))
+    df["processed_text"] = df["processed_text"].apply(lambda x: " ".join([lemmatizer.lemmatize(word) for word in x.split()]))
+
+    return df
+
+
+# Analyse tweets
+def analyse_tweets(df):
+
+    tb = Blobber(pos_tagger=PatternTagger(), analyzer=PatternAnalyzer())
+    df["sentiment_score"] = df["processed_text"].apply(lambda x: tb(x).sentiment[0])
+
+    header = ["full_text", "processed_text", "sentiment_score"]
+    df.to_csv("sentiment_sample.csv", columns = header)
+
+
 # Get tweets in a timeframe
 # Boundaries date format : %Y-%m-%d %H:%M
 def get_tweets_by_timeframe(tweets, start_date, end_date):
@@ -558,3 +604,16 @@ def get_stats_per_time_unit(tweets, unit, start_date, end_date):
             timeframe["density_count"] = 0
 
     return distribution
+
+
+def split_hashtag(word):
+    hashtag_pattern = re.compile('#([A-Za-z0-9_]+)')
+    if hashtag_pattern.match(word):
+        word = re.sub('([0-9]{2,})', r'\1 ', word)
+        word = re.sub('([0-9]{2,})', r' \1', word)
+        word = re.sub(r'(?<=[a-z])(?=[A-Z]{2})', r' ', word)
+        word = re.sub(r'(?<=[A-Z])(?=[A-Z][a-z]{2})', r' ', word)
+        word = re.sub(r'(([A-Z])(?=[a-z]))', r' \1', word)
+        return word
+    else:
+        return word

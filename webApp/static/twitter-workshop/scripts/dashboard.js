@@ -125,7 +125,6 @@ function basicToggleNavbar() {
 		$(".content").animate({
 			paddingLeft: "45px"
 		}, 175);
-		console.log("fdp");
 		$(".title").animate({
 			paddingRight: "45px"
 		}, 175);

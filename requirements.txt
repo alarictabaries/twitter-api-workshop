@@ -7,3 +7,7 @@ djongo
 numpy
 networkx
 python-louvain
+git+https://github.com/ClaudeCoulombe/FrenchLefffLemmatizer.git
+ntlk
+textblob
+textblob_fr

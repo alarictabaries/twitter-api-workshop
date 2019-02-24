@@ -661,6 +661,7 @@ table.dataTable.no-footer {
 	color: #7f8c8d;
 	font-weight: 500;
 	opacity: 0;
+	z-index: -100;
 }
 
 .tooltip .material-icons {

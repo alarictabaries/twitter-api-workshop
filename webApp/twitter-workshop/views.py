@@ -142,6 +142,8 @@ def dashboard(request):
     current_stats = twitter.get_stats_per_time_unit(current_tweets, time_unit, timeframe["current_start_date"],timeframe["current_end_date"])
     previous_stats = twitter.get_stats_per_time_unit(previous_tweets, time_unit, timeframe["previous_start_date"],timeframe["previous_end_date"])
 
+    #twitter.analyse_tweets(twitter.clean_tweets(current_tweets))
+
     detailed_stats = []
 
     for current_stat, previous_stat in zip(current_stats, previous_stats):
@@ -173,12 +175,14 @@ def interactions(request):
     yesterday = datetime.now() - timedelta(days=1)
 
     try:
-        timeframe["current_start_date"] = datetime.utcfromtimestamp(int(request.GET['start_date'][:-3])).strftime("%Y-%m-%d")
+        # Weird behavior on Mac (Unix?), we need to add to the current start date (+ 24*60*60)
+        timeframe["current_start_date"] = datetime.utcfromtimestamp(
+            int(request.GET['start_date'][:-3]) + 24 * 60 * 60).strftime("%Y-%m-%d")
     except KeyError:
         timeframe["current_start_date"] = yesterday.strftime("%Y-%m-%d")
     try:
-        timeframe["current_end_date"] = datetime.utcfromtimestamp(int(request.GET['end_date'][:-3]) + 24 * 60 * 60).strftime(
-            "%Y-%m-%d")
+        timeframe["current_end_date"] = datetime.utcfromtimestamp(
+            int(request.GET['end_date'][:-3]) + 24 * 60 * 60).strftime("%Y-%m-%d")
     except KeyError:
         timeframe["current_end_date"] = now.strftime("%Y-%m-%d")
 
